@@ -4,7 +4,8 @@ import 'package:chat_app/res/app_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
-Widget bottomButton({
+//Common
+Widget commonButton({
   required String text,
   required onTap,
   color,
@@ -14,14 +15,14 @@ Widget bottomButton({
   isMargin,
   padding,
   margin,
+  textStyle,
   bool? hasHeight,
   bool? uppercase,
   double? radius,
   double? fontSize,
 }) {
   return Container(
-    margin:
-        margin ?? (EdgeInsets.only(left: 15, top: 24, right: 15, bottom: 10)),
+    margin: margin ?? (EdgeInsets.only(left: 12, top: 0, right: 12, bottom: 0)),
     child: InkWell(
       highlightColor: Colors.transparent,
       splashColor: Colors.transparent,
@@ -31,17 +32,14 @@ Widget bottomButton({
         padding: padding,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(radius ?? 25),
-          border: isBoxBorder ?? Border.all(color: AppColors.blue60, width: 2),
+          border: isBoxBorder ?? Border.all(color: AppColors.blue60, width: 1),
           color: color ?? AppColors.blue60,
         ),
         child: Center(
-          child:
-              isIcon != null && isIcon
-                  ? Icon(Icons.delete, color: AppColors.white)
-                  : Text(
+          child: Text(
                     textAlign: TextAlign.center,
                     text,
-                    style: TextStyle(
+                    style: textStyle ?? TextStyle(
                       color:
                           textColor ??
                           (color == AppColors.white
@@ -68,7 +66,7 @@ Widget commonTextField({
   return Container(
     decoration: BoxDecoration(
       borderRadius: BorderRadius.all(Radius.circular(24)),
-      border: Border.all(color: AppColors.gray30, width: 2),
+      border: Border.all(color: AppColors.gray30, width: 1),
     ),
     child: TextField(
       controller: controller,
@@ -76,11 +74,11 @@ Widget commonTextField({
       keyboardType: keyboardType,
       decoration: InputDecoration(
         labelText: labelText,
-        labelStyle: AppStyles.textCommon.copyWith(color: AppColors.gray30),
+        labelStyle: AppStyles.title3Regular.copyWith(color: AppColors.gray40),
         floatingLabelBehavior: FloatingLabelBehavior.auto,
-        floatingLabelStyle: AppStyles.textCommon.copyWith(
-          fontSize: 20,
-          color: AppColors.gray30,
+        floatingLabelStyle: AppStyles.title3Regular.copyWith(
+          fontSize: 18,
+          color: AppColors.gray40,
         ),
         hintText: hintText,
         contentPadding: const EdgeInsets.symmetric(
@@ -95,37 +93,66 @@ Widget commonTextField({
   );
 }
 
-Widget titleAppTwoElement({
-  String? urlImage,
-  String? titleText,
-  VoidCallback? onPressed,
+Widget cricleColorImage({
+  Widget? childWidget,
+  double? size,
+  bool hasReels = true,
 }) {
-  return Padding(
-    padding: const EdgeInsets.symmetric(vertical: 16),
-    child: Row(
+  final double finalSize = size ?? 78;
+  double xSize = 6;
+  if (finalSize < 78) {
+    xSize = 4;
+  }
+  return SizedBox(
+    width: finalSize,
+    height: finalSize,
+    child: Stack(
+      alignment: Alignment.center,
       children: [
+        // Viền gradient
         Container(
-          alignment: Alignment.centerRight,
-          child: IconButton(
-            icon: SvgPicture.asset(urlImage ?? AppImages.icClose),
-            onPressed: onPressed,
+          width: finalSize,
+          height: finalSize,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            gradient:
+                (hasReels)
+                    ? LinearGradient(
+                      colors: [
+                        Color(0xFF7638FA), // Purple
+                        Color(0xFFD300C5), // Pink
+                        Color(0xFFFF0069), // Red
+                        Color(0xFFFF7A00), // Orange
+                        Color(0xFFFFD600), // Yellow
+                        Color(0xFF7638FA), // Purple repeat
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    )
+                    : LinearGradient(
+                      colors: [AppColors.gray30, AppColors.gray20],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
           ),
         ),
-        Expanded(
-          child: Container(
-            alignment: Alignment.center,
-            child: Text(
-              titleText ?? '',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
+        // Nền trắng bên trong
+        Container(
+          width: finalSize - xSize,
+          height: finalSize - xSize,
+          padding: EdgeInsets.all(2),
+          decoration: const BoxDecoration(
+            shape: BoxShape.circle,
+            color: Colors.white,
           ),
+          child: ClipOval(child: childWidget),
         ),
-        const SizedBox(width: 32),
       ],
     ),
   );
 }
 
+//Icon
 Widget iconLikeNotification({bool isHasNotification = false}) {
   return Stack(
     clipBehavior: Clip.none,
@@ -171,6 +198,18 @@ Widget iconShareNotification({int? num, bool isHasNotification = false}) {
             ),
           ),
         ),
+    ],
+  );
+}
+
+Widget iconMaintaining() {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.center,
+    mainAxisAlignment: MainAxisAlignment.center,
+    children: [
+      SvgPicture.asset(AppImages.icMaintaining),
+      const SizedBox(height: 8),
+      Text("Chức năng đang được phát triển"),
     ],
   );
 }

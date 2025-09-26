@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:chat_app/main/networks/api_end_point.dart';
+import 'package:chat_app/main/networks/model/post.dart';
 import 'package:chat_app/main/networks/model/reels.dart';
 import 'package:chat_app/main/networks/model/user.dart';
 import 'package:chat_app/main/ui/home/bloc/home_event.dart';
@@ -14,14 +15,14 @@ import '../../../networks/api_util.dart';
 
 class HomeBloc extends Bloc<HomeEvent, HomeState> {
   HomeBloc() : super(HomeLoading()) {
-    on<LoadListUser>(_loadListUser);
-    on<LoadListReel>(_loadListReel);
+    // on<LoadListUser>(_loadListUser);
+    on<LoadRequest>(_loadRequest);
     // on<DeletetUser>(_deleteUser);
     // on<UpdateUser>(_updateUser);
   }
   UserModel user = UserModel();
   Future<void> _loadListUser(
-    LoadListUser event,
+    LoadRequest event,
     Emitter<HomeState> emit,
   ) async {
     try {
@@ -39,21 +40,111 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     return;
   }
 
-  Future<void> _loadListReel(
-    LoadListReel event,
+  Future<void> _loadRequest(
+    LoadRequest event,
     Emitter<HomeState> emit,
   ) async {
     try {
+         final List<PostModel> posts = [
+        PostModel(
+          id: "1",
+          username: "ngoc_hoang",
+          userAvatar: "https://randomuser.me/api/portraits/men/1.jpg",
+          postImage: "https://picsum.photos/400/400?random=1",
+          caption: "Cuối tuần chill 😎",
+          likes: 120,
+          timeAgo: "2 giờ trước",
+        ),
+        PostModel(
+          id: "2",
+          username: "linh_nguyen",
+          userAvatar: "https://randomuser.me/api/portraits/women/2.jpg",
+          postImage: "https://picsum.photos/400/400?random=2",
+          caption: "Cà phê sáng ☕",
+          likes: 89,
+          timeAgo: "5 giờ trước",
+        ),
+        PostModel(
+          id: "3",
+          username: "david",
+          userAvatar: "https://randomuser.me/api/portraits/men/3.jpg",
+          postImage: "https://picsum.photos/400/400?random=3",
+          caption: "Coding all day 💻🔥",
+          likes: 300,
+          timeAgo: "1 ngày trước",
+        ),
+        PostModel(
+          id: "4",
+          username: "anna",
+          userAvatar: "https://randomuser.me/api/portraits/women/4.jpg",
+          postImage: "https://picsum.photos/400/400?random=4",
+          caption: "Du lịch biển 🌊",
+          likes: 240,
+          timeAgo: "2 ngày trước",
+        ),
+      ];
+
       final reels = [
         ReelModel(user: UserModel(name: "Hoang")),
         ReelModel(user: UserModel(name: "Tuan Anh")),
       ];
-      emit(HomeSuccess(reels: reels));
+      emit(HomeSuccess(reels: reels,posts: posts));
     } catch (e) {
       emit(HomeFailure());
     }
     return;
   }
+
+  // Future<void> _loadListPost(
+  //   LoadListPost event,
+  //   Emitter<HomeState> emit,
+  // ) async {
+  //   try {
+  //     final List<PostModel> posts = [
+  //       PostModel(
+  //         id: "1",
+  //         username: "ngoc_hoang",
+  //         userAvatar: "https://randomuser.me/api/portraits/men/1.jpg",
+  //         postImage: "https://picsum.photos/400/400?random=1",
+  //         caption: "Cuối tuần chill 😎",
+  //         likes: 120,
+  //         timeAgo: "2 giờ trước",
+  //       ),
+  //       PostModel(
+  //         id: "2",
+  //         username: "linh_nguyen",
+  //         userAvatar: "https://randomuser.me/api/portraits/women/2.jpg",
+  //         postImage: "https://picsum.photos/400/400?random=2",
+  //         caption: "Cà phê sáng ☕",
+  //         likes: 89,
+  //         timeAgo: "5 giờ trước",
+  //       ),
+  //       PostModel(
+  //         id: "3",
+  //         username: "david",
+  //         userAvatar: "https://randomuser.me/api/portraits/men/3.jpg",
+  //         postImage: "https://picsum.photos/400/400?random=3",
+  //         caption: "Coding all day 💻🔥",
+  //         likes: 300,
+  //         timeAgo: "1 ngày trước",
+  //       ),
+  //       PostModel(
+  //         id: "4",
+  //         username: "anna",
+  //         userAvatar: "https://randomuser.me/api/portraits/women/4.jpg",
+  //         postImage: "https://picsum.photos/400/400?random=4",
+  //         caption: "Du lịch biển 🌊",
+  //         likes: 240,
+  //         timeAgo: "2 ngày trước",
+  //       ),
+  //     ];
+
+  //     emit(HomeSuccess(posts: posts));
+  //   } catch (e) {
+  //     emit(HomeFailure());
+  //   }
+  //   return;
+  // }
 
   // Future<void> _deleteUser(DeletetUser event, Emitter<HomeState> emit) async {
   //   try {

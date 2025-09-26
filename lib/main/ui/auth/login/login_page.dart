@@ -5,10 +5,12 @@ import 'package:chat_app/main/router/router.dart';
 import 'package:chat_app/main/ui/auth/login/bloc/login_bloc.dart';
 import 'package:chat_app/main/ui/auth/login/bloc/login_event.dart';
 import 'package:chat_app/main/ui/auth/login/bloc/login_state.dart';
-import 'package:chat_app/main/utils/common_widdget.dart';
+import 'package:chat_app/main/utils/common_widget.dart';
 import 'package:chat_app/res/app_colors.dart';
 import 'package:chat_app/res/app_fonts.dart';
 import 'package:chat_app/res/app_images.dart';
+import 'package:chat_app/res/app_styles.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -64,7 +66,7 @@ class _LoginPageState extends State<LoginPage> {
               ),
             ),
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
+              padding: const EdgeInsets.symmetric(horizontal: 12),
               margin: EdgeInsets.only(top: height * 0.25),
               decoration: BoxDecoration(
                 color: Colors.white,
@@ -113,23 +115,18 @@ class _LoginPageState extends State<LoginPage> {
         ),
         CircleAvatar(
           radius: 60,
-          backgroundColor: Colors.grey[200], // màu nền
-          child: SvgPicture.asset(
-            AppImages.icCreate, // đường dẫn svg
-            width: 60,
-            height: 60,
-            fit: BoxFit.contain,
+          backgroundColor: AppColors.gray30, // màu nền
+          child: Image.asset(
+            AppImages.imgAvatarDefault, // đường dẫn svg
+            fit: BoxFit.cover,
           ),
         ),
         const SizedBox(height: 16),
-        const Text(
-          "hoang_vn03",
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-        ),
-        bottomButton(
+        const Text("hoang_vn03", style: AppStyles.title1Bold),
+        commonButton(
           text: "Tiếp tục",
           color: AppColors.blue60,
-          margin: EdgeInsets.symmetric(vertical: 24),
+          margin: EdgeInsets.symmetric(vertical: 16),
           onTap: () {
             context.go(AppPath.homePage);
           },
@@ -144,10 +141,7 @@ class _LoginPageState extends State<LoginPage> {
           },
           child: const Text(
             "Dùng trang cá nhân khác",
-            style: TextStyle(
-              fontFamily: AppFonts.regular,
-              color: Colors.black54,
-            ),
+            style: AppStyles.title3Regular,
           ),
         ),
       ],
@@ -157,7 +151,7 @@ class _LoginPageState extends State<LoginPage> {
   Widget _buildCreateNewAccount() {
     return Column(
       children: [
-        bottomButton(
+        commonButton(
           text: "Tạo tài khoản mới",
           color: AppColors.white,
           textColor: AppColors.blue60,
@@ -172,12 +166,14 @@ class _LoginPageState extends State<LoginPage> {
             );
           },
         ),
+        const SizedBox(height: 12),
+
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: const [
-            Icon(Icons.ac_unit, color: Colors.blue), // thay icon meta
-            SizedBox(width: 6),
-            Text("Meta", style: TextStyle(fontSize: 16, color: Colors.black54)),
+          children: [
+            Image.asset(AppImages.icMetaPng, width: 28, height: 18),
+            const SizedBox(width: 4),
+            Text("Meta", style: AppStyles.title3Bold),
           ],
         ),
       ],
@@ -224,7 +220,7 @@ class _LoginPageState extends State<LoginPage> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text("Tiếng Việt"),
+              Text("Tiếng Việt", style: AppStyles.title3Regular),
               const SizedBox(width: 4),
               Transform.flip(
                 flipY: true,
@@ -260,7 +256,7 @@ class _LoginPageState extends State<LoginPage> {
                     controller: _passwordController,
                     obscureText: true,
                   ),
-                  bottomButton(
+                  commonButton(
                     text: "Đăng nhập",
                     margin: EdgeInsets.symmetric(vertical: 16),
                     onTap: () {
@@ -281,12 +277,12 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                         builder:
                             (context) =>
-                                _buildBottomSheetCreateAccount(context),
+                                _buildBottomSheetForgotPassword(context),
                       );
                     },
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [Text("Quên mật khẩu?")],
+                    child: Align(
+                      alignment: Alignment.center,
+                      child: Text("Quên mật khẩu?"),
                     ),
                   ),
                 ],
@@ -320,10 +316,10 @@ class _LoginPageState extends State<LoginPage> {
               alignment: Alignment.center,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(15),
-                color: Colors.grey[200],
+                color: AppColors.gray30,
               ),
-              height: 7,
-              width: 70,
+              height: 4,
+              width: 32,
             ),
           ),
           Padding(
@@ -342,13 +338,7 @@ class _LoginPageState extends State<LoginPage> {
                 Expanded(
                   child: Container(
                     alignment: Alignment.center,
-                    child: Text(
-                      "Trang cá nhân",
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                    child: Text("Trang cá nhân", style: AppStyles.title1Bold),
                   ),
                 ),
                 const SizedBox(width: 32),
@@ -370,7 +360,7 @@ class _LoginPageState extends State<LoginPage> {
             child: Container(
               width: double.infinity,
               margin: EdgeInsets.only(bottom: 16),
-              padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
               decoration: BoxDecoration(
                 borderRadius: const BorderRadius.all(Radius.circular(16)),
                 border: Border.all(
@@ -378,7 +368,10 @@ class _LoginPageState extends State<LoginPage> {
                   width: 1,
                 ),
               ),
-              child: Text("Gỡ trang cá nhân khỏi thiết bị này"),
+              child: Text(
+                "Gỡ trang cá nhân khỏi thiết bị này",
+                style: AppStyles.title3Regular,
+              ),
             ),
           ),
         ],
@@ -388,8 +381,8 @@ class _LoginPageState extends State<LoginPage> {
 
   Widget _buildBottomSheetCreateAccount(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
       height: double.infinity,
+      padding: EdgeInsets.symmetric(horizontal: 12),
       decoration: const BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.only(
@@ -409,10 +402,10 @@ class _LoginPageState extends State<LoginPage> {
               alignment: Alignment.center,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(15),
-                color: Colors.grey[200],
+                color: AppColors.gray30,
               ),
-              height: 7,
-              width: 70,
+              height: 4,
+              width: 32,
             ),
           ),
           Padding(
@@ -421,38 +414,193 @@ class _LoginPageState extends State<LoginPage> {
               children: [
                 Container(
                   alignment: Alignment.centerRight,
-                  child: IconButton(
-                    icon: SvgPicture.asset(AppImages.icClose),
-                    onPressed: () {
+                  child: InkWell(
+                    child: Transform.flip(
+                      flipX: true,
+                      child: SvgPicture.asset(AppImages.icNextRight),
+                    ),
+                    onTap: () {
                       context.pop();
                     },
-                  ),
-                ),
-                Expanded(
-                  child: Container(
-                    alignment: Alignment.center,
-                    child: Text(
-                      "Trang cá nhân",
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
                   ),
                 ),
                 const SizedBox(width: 32),
               ],
             ),
           ),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Text(
+              "Gỡ trang cá nhân khỏi thiết bị này",
+              style: AppStyles.title3Regular,
+            ),
+          ),
+          const SizedBox(width: 32),
           Container(
             width: double.infinity,
-            margin: EdgeInsets.only(bottom: 16),
-            padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+            margin: EdgeInsets.symmetric(vertical: 24),
+            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
             decoration: BoxDecoration(
               borderRadius: const BorderRadius.all(Radius.circular(16)),
-              border: Border.all(color: Colors.grey.withOpacity(0.2), width: 1),
+              border: Border.all(color: AppColors.gray30, width: 1),
             ),
-            child: Text("Gỡ trang cá nhân khỏi thiết bị này"),
+            child: Row(
+              children: [
+                CircleAvatar(
+                  radius: 38,
+                  child: Image.asset(
+                    AppImages.imgAvatarDefault,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Text('hoangvn03', style: AppStyles.title3Bold),
+                const Spacer(), // đẩy Container ra cuối hàng
+                Container(
+                  decoration: BoxDecoration(
+                    borderRadius: const BorderRadius.all(Radius.circular(16)),
+                    border: Border.all(color: AppColors.gray30, width: 1),
+                  ),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 4,
+                  ),
+                  child: InkWell(
+                    child: Text('Gỡ/Xóa', style: AppStyles.title3Regular),
+                    onTap: () {},
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Text.rich(
+            TextSpan(
+              children: [
+                TextSpan(
+                  text: 'Tìm hiểu thêm ',
+                  style: AppStyles.title3Bold.copyWith(color: AppColors.blue60),
+                  recognizer:
+                      TapGestureRecognizer()
+                        ..onTap = () {
+                          print('Tap ');
+                        }, // hàm khi click
+                ),
+                TextSpan(
+                  text:
+                      'về lý do bạn nhìn thấy các trang cá nhân ở đây và ý nghĩa của việc gỡ các trang cá nhân.',
+                  style: AppStyles.title3Regular.copyWith(
+                    color: AppColors.gray40,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBottomSheetForgotPassword(BuildContext context) {
+    return Container(
+      height: double.infinity,
+      padding: EdgeInsets.symmetric(horizontal: 12),
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(16),
+          topRight: Radius.circular(16),
+        ),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Align(
+            alignment: Alignment.center,
+            child: InkWell(
+              onTap: () {
+                context.pop();
+              },
+              child: Container(
+                margin: EdgeInsets.only(top: 7),
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(15),
+                  color: AppColors.gray30,
+                ),
+                height: 4,
+                width: 32,
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            child: Row(
+              children: [
+                Container(
+                  alignment: Alignment.centerRight,
+                  child: InkWell(
+                    child: Transform.flip(
+                      flipX: true,
+                      child: SvgPicture.asset(AppImages.icNextRight),
+                    ),
+                    onTap: () {
+                      context.pop();
+                    },
+                  ),
+                ),
+                const SizedBox(width: 32),
+              ],
+            ),
+          ),
+          Text("Tìm tài khoản", style: AppStyles.title1Bold),
+          const SizedBox(height: 8),
+          Text(
+            "Nhập email hoặc tên người dùng của bạn.",
+            style: AppStyles.title3Regular,
+          ),
+          InkWell(
+            onTap: () {},
+            child: Text(
+              "Bạn không thể đặt lại mật khẩu?",
+              style: AppStyles.title3Regular.copyWith(color: AppColors.blue60),
+            ),
+          ),
+          const SizedBox(width: 32),
+          Padding(
+            padding: EdgeInsets.symmetric(vertical: 24),
+            child: commonTextField(
+              labelText: "Tên người dùng,email/số di động",
+              controller: _usernameController,
+            ),
+          ),
+          Text(
+            'Chúng tôi có thể  gửi cho bạn thông báo  qua SMS và WhatsApp nhằm mục đích bảo mật và đăng nhập.',
+          ),
+          commonButton(
+            text: "Tiếp tục",
+            margin: EdgeInsets.symmetric(vertical: 16),
+            onTap: () {
+              final username = _usernameController.text;
+              final password = _passwordController.text;
+              context.read<LoginBloc>().add(Login(username, password));
+            },
+          ),
+          commonButton(
+            text: "Tìm kiếm bằng số di động",
+            color: AppColors.white,
+            isBoxBorder: Border.all(color: AppColors.gray30, width: 1),
+            margin: EdgeInsets.symmetric(vertical: 0),
+            onTap: () {
+              showModalBottomSheet(
+                context: context,
+                isScrollControlled: true,
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+                ),
+                builder: (context) => _buildBottomSheetCreateAccount(context),
+              );
+            },
           ),
         ],
       ),
@@ -475,24 +623,49 @@ class _LoginPageState extends State<LoginPage> {
       child: SingleChildScrollView(
         child: Column(
           children: [
-            titleAppTwoElement(onPressed: () => context.pop()),
+            Container(
+              margin: const EdgeInsets.symmetric(vertical: 16),
+              alignment: Alignment.centerRight,
+              child: IconButton(
+                icon: SvgPicture.asset(AppImages.icClose),
+                onPressed: () {
+                  context.pop();
+                },
+              ),
+            ),
             Text("Chọn ngôn ngữ"),
             Container(
+              margin: EdgeInsets.symmetric(vertical: 16),
               decoration: BoxDecoration(
+                borderRadius: const BorderRadius.all(Radius.circular(16)),
                 border: Border.all(color: AppColors.gray30, width: 1),
               ),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
               child: ListView.separated(
                 shrinkWrap: true,
                 itemCount: items.length,
                 separatorBuilder: (_, __) => const Divider(height: 1),
                 itemBuilder: (context, index) {
-                  return ListTile(
-                    title: Text(items[index]),
-                    onTap: () {
-                      // Xử lý chọn ngôn ngữ
-                      print("Chọn: ${items[index]}");
-                      context.pop(items[index]); // trả về giá trị đã chọn
-                    },
+                  bool isChecked = false;
+                  return Row(
+                    children: [
+                      Text(items[index]),
+                      Checkbox(
+                        value: isChecked,
+                        side: BorderSide(
+                          // màu và độ dày viền
+                          color: AppColors.gray40,
+                          width: 2,
+                        ),
+                        checkColor: Colors.white, // màu dấu tích
+                        activeColor: Colors.blue,
+                        onChanged: (bool? value) {
+                          setState(() {
+                            isChecked = value!;
+                          });
+                        },
+                      ),
+                    ],
                   );
                 },
               ),

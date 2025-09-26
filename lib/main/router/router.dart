@@ -9,6 +9,7 @@ class AppPath {
   static const String loginPage = "/login";
   static const String registerPage = "/register";
   static const String fogotPassword = "/fogotPassword";
+  static const String profilePage = "/profilePage";
   ///context.gp(AppPath.homePage)
 }
 class PathName{
@@ -19,7 +20,8 @@ class PathName{
   static const String personalPage = "personal";
 
   static const String loginPage = "login";
-  static const String registerPage = "/register";
-  static const String fogotPassword = "/fogotPassword";
+  static const String registerPage = "register";
+  static const String fogotPassword = "fogotPassword";
+  static const String profilePage = "profilePage";
 ///context.goNamed(PathName.homePage)
 }

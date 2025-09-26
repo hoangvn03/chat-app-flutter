@@ -1,3 +1,4 @@
+import 'package:chat_app/main/networks/model/post.dart';
 import 'package:chat_app/main/networks/model/reels.dart';
 import 'package:chat_app/main/networks/model/user.dart';
 
@@ -6,6 +7,7 @@ class HomeLoading extends HomeState {}
 class HomeSuccess extends HomeState {
   UserModel? user;
   List<ReelModel>? reels;
-  HomeSuccess({this.user,this.reels});
+  List<PostModel>? posts;
+  HomeSuccess({this.user,this.reels,this.posts});
 }
 class HomeFailure extends HomeState {}

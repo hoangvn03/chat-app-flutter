@@ -1,3 +1,4 @@
+import 'package:chat_app/main/utils/common_widget.dart';
 import 'package:flutter/material.dart';
 
 class PostPage extends StatelessWidget {
@@ -5,6 +6,8 @@ class PostPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return Scaffold(
+      body: Center(child: iconMaintaining()),
+    );
   }
 }
