@@ -30,6 +30,17 @@ class AppImages {
   static const String icMeta = 'assets/icons/ic_meta.svg';
   static const String icLogoMeta = 'assets/icons/ic_logo_meta.svg';
   static const String icThreads = 'assets/icons/ic_threads.svg';
+  static const String icGridDark = 'assets/icons/ic_grid_dark.svg';
+  static const String icGrid = 'assets/icons/ic_grid.svg';
+  static const String icTag = 'assets/icons/ic_tag.svg';
+  static const String icGallery = 'assets/icons/ic_gallery.svg';
+  static const String icNotificationsOff = 'assets/icons/ic_notifications_off.svg';
+  static const String icNotificationsOn = 'assets/icons/ic_notifications_on.svg';
+  static const String icPictureGallery = 'assets/icons/ic_picture_gallery.svg';
+  static const String icChevronRight = 'assets/icons/ic_chevron_right.svg';
+  static const String icAddHighlight = 'assets/icons/ic_add_highlight.svg';
+  static const String icLive = 'assets/icons/ic_live.svg';
+  static const String icNote = 'assets/icons/ic_note.svg';
   //png
     static const String icMetaPng = 'assets/icons/ic_meta.png';
 

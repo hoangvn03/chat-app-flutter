@@ -1,4 +1,3 @@
-
 class AppPath {
   static const String homePage = "/home";
   static const String searchPage = "/search";
@@ -10,9 +9,12 @@ class AppPath {
   static const String registerPage = "/register";
   static const String fogotPassword = "/fogotPassword";
   static const String profilePage = "/profilePage";
+  static const String chatPage = "/chatPage";
+
   ///context.gp(AppPath.homePage)
 }
-class PathName{
+
+class PathName {
   static const String homePage = "home";
   static const String searchPage = "search";
   static const String reelsPage = "reels";
@@ -23,5 +25,7 @@ class PathName{
   static const String registerPage = "register";
   static const String fogotPassword = "fogotPassword";
   static const String profilePage = "profilePage";
-///context.goNamed(PathName.homePage)
+  static const String chatPage = "chatPage";
+
+  ///context.goNamed(PathName.homePage)
 }

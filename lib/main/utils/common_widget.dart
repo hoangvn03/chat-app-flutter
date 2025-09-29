@@ -1,3 +1,4 @@
+import 'package:chat_app/main/networks/model/user.dart';
 import 'package:chat_app/res/app_colors.dart';
 import 'package:chat_app/res/app_images.dart';
 import 'package:chat_app/res/app_styles.dart';
@@ -16,40 +17,43 @@ Widget commonButton({
   padding,
   margin,
   textStyle,
+  double? height,
   bool? hasHeight,
   bool? uppercase,
   double? radius,
   double? fontSize,
 }) {
-  return Container(
-    margin: margin ?? (EdgeInsets.only(left: 12, top: 0, right: 12, bottom: 0)),
-    child: InkWell(
-      highlightColor: Colors.transparent,
-      splashColor: Colors.transparent,
-      onTap: onTap,
-      child: Container(
-        height: hasHeight == null ? 50 : null,
-        padding: padding,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(radius ?? 25),
-          border: isBoxBorder ?? Border.all(color: AppColors.blue60, width: 1),
-          color: color ?? AppColors.blue60,
-        ),
-        child: Center(
-          child: Text(
-                    textAlign: TextAlign.center,
-                    text,
-                    style: textStyle ?? TextStyle(
-                      color:
-                          textColor ??
-                          (color == AppColors.white
-                              ? AppColors.black
-                              : AppColors.white),
+  return InkWell(
+    highlightColor: Colors.transparent,
+    splashColor: Colors.transparent,
+    onTap: onTap,
+    child: Container(
+      margin:
+          margin ?? (EdgeInsets.only(left: 12, top: 0, right: 12, bottom: 0)),
 
-                      fontSize: fontSize ?? 15,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
+      height: hasHeight == null ? 50 : height,
+      padding: padding,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(radius ?? 25),
+        border: isBoxBorder ?? Border.all(color: AppColors.blue60, width: 1),
+        color: color ?? AppColors.blue60,
+      ),
+      child: Center(
+        child: Text(
+          textAlign: TextAlign.center,
+          text,
+          style:
+              textStyle ??
+              TextStyle(
+                color:
+                    textColor ??
+                    (color == AppColors.white
+                        ? AppColors.black
+                        : AppColors.white),
+
+                fontSize: fontSize ?? 15,
+                fontWeight: FontWeight.w500,
+              ),
         ),
       ),
     ),
@@ -126,8 +130,8 @@ Widget cricleColorImage({
                         Color(0xFFFFD600), // Yellow
                         Color(0xFF7638FA), // Purple repeat
                       ],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
+                      begin: Alignment.topRight,
+                      end: Alignment.bottomLeft,
                     )
                     : LinearGradient(
                       colors: [AppColors.gray30, AppColors.gray20],
@@ -149,6 +153,100 @@ Widget cricleColorImage({
         ),
       ],
     ),
+  );
+}
+
+Widget userNote({String? img, String? note, String? subTitle}) {
+  return Column(
+    children: [
+      Stack(
+        clipBehavior: Clip.none,
+        children: [
+          /// Avatar
+          ClipOval(
+            child: Image.asset(
+              img ?? AppImages.imgAvatarDefault,
+              width: 68,
+              height: 68,
+              fit: BoxFit.cover,
+            ),
+          ),
+
+          /// Note hiển thị phía trên avatar
+          Positioned(
+            left: 0,
+            bottom: 60,
+            child: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(16),
+                    color: Colors.white,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        offset: const Offset(-2, 0),
+                        blurRadius: 6,
+                      ),
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        offset: const Offset(2, 0),
+                        blurRadius: 6,
+                      ),
+                    ],
+                  ),
+                  child: SizedBox(
+                    width: 64,
+                    child: Text(
+                      note ?? '',
+                      style: AppStyles.footnoteRegular,
+                      softWrap: true,
+                      maxLines: 2,
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ),
+                Positioned(
+                  bottom: -4,
+                  left: 12,
+                  child: Container(
+                    width: 8,
+                    height: 8,
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+                Positioned(
+                  bottom: -8,
+                  left: 24,
+                  child: Container(
+                    margin: EdgeInsets.only(right: 12),
+                    width: 4,
+                    height: 4,
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+      if (subTitle != null)
+        Padding(
+          padding: const EdgeInsets.only(top: 4),
+          child: Text(subTitle, style: AppStyles.footnoteRegular),
+        ),
+    ],
   );
 }
 

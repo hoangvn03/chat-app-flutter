@@ -1,6 +1,7 @@
 import 'package:chat_app/main/main_page.dart';
 import 'package:chat_app/main/router/router.dart';
 import 'package:chat_app/main/ui/auth/login/login_page.dart';
+import 'package:chat_app/main/ui/chat/chat_page.dart';
 import 'package:chat_app/main/ui/home/home_page.dart';
 import 'package:chat_app/main/ui/personal/personal_page.dart';
 import 'package:chat_app/main/ui/post/post_page.dart';
@@ -31,7 +32,7 @@ class AppGoRouter {
   );
 
   static final GoRouter _goRouter = GoRouter(
-    initialLocation: AppPath.profilePage,
+    initialLocation: AppPath.loginPage,
     navigatorKey: _rootNavigatorKey,
     debugLogDiagnostics: true,
     routes: <RouteBase>[
@@ -47,6 +48,13 @@ class AppGoRouter {
         path: AppPath.profilePage,
         builder: (context, state) {
           return ProfilePage();
+        },
+      ),
+      GoRoute(
+        name: PathName.chatPage,
+        path: AppPath.chatPage,
+        builder: (context, state) {
+          return ChatPage();
         },
       ),
       //Bottom Bar

@@ -2,6 +2,7 @@ import 'package:chat_app/main/features/post/post_widget.dart';
 import 'package:chat_app/main/networks/model/post.dart';
 import 'package:chat_app/main/networks/model/reels.dart';
 import 'package:chat_app/main/networks/model/user.dart';
+import 'package:chat_app/main/router/router.dart';
 import 'package:chat_app/main/ui/home/bloc/home_bloc.dart';
 import 'package:chat_app/main/ui/home/bloc/home_event.dart';
 import 'package:chat_app/main/ui/home/bloc/home_state.dart';
@@ -11,6 +12,7 @@ import 'package:chat_app/res/app_images.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:go_router/go_router.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -37,6 +39,7 @@ class _HomePageState extends State<HomePage> {
                 slivers: [
                   SliverAppBar(
                     backgroundColor: AppColors.white,
+                    surfaceTintColor: AppColors.white,
                     floating: true, // ẩn khi vuốt lên
                     snap: true, // hiện lại khi vuốt xuống
                     pinned: false, // không cố định
@@ -93,7 +96,9 @@ class _HomePageState extends State<HomePage> {
                         icon: iconLikeNotification(isHasNotification: true),
                       ),
                       IconButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          context.pushNamed(PathName.chatPage);
+                        },
                         icon: iconShareNotification(
                           num: 5,
                           isHasNotification: true,

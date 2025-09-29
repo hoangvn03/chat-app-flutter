@@ -4,19 +4,14 @@ import 'package:chat_app/main/networks/api_end_point.dart';
 import 'package:chat_app/main/networks/model/post.dart';
 import 'package:chat_app/main/networks/model/reels.dart';
 import 'package:chat_app/main/networks/model/user.dart';
-import 'package:chat_app/main/ui/Profile/bloc/Profile_event.dart';
-import 'package:chat_app/main/ui/Profile/bloc/Profile_state.dart';
-import 'package:chat_app/main/utils/shared_preference.dart';
-
-import 'package:http/http.dart' as http;
-import 'dart:convert';
+import 'package:chat_app/main/ui/profile/bloc/profile_event.dart';
+import 'package:chat_app/main/ui/profile/bloc/profile_state.dart';
 
 import '../../../networks/api_util.dart';
 
 class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
   ProfileBloc() : super(ProfileLoading()) {
     on<LoadRequest>(_loadRequest);
-
   }
   UserModel user = UserModel();
   Future<void> _loadListUser(
@@ -43,7 +38,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     Emitter<ProfileState> emit,
   ) async {
     try {
-         final List<PostModel> posts = [
+      final List<PostModel> posts = [
         PostModel(
           id: "1",
           username: "ngoc_hoang",
@@ -51,6 +46,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
           postImage: "https://picsum.photos/400/400?random=1",
           caption: "Cuối tuần chill 😎",
           likes: 120,
+          typePost: "reels",
           timeAgo: "2 giờ trước",
         ),
         PostModel(
@@ -80,13 +76,88 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
           likes: 240,
           timeAgo: "2 ngày trước",
         ),
+        PostModel(
+          id: "5",
+          username: "anna",
+          userAvatar: "https://randomuser.me/api/portraits/women/5.jpg",
+          postImage: "https://picsum.photos/400/400?random=5",
+          caption: "Du lịch biển 🌊",
+          likes: 240,
+          timeAgo: "2 ngày trước",
+        ),
+        PostModel(
+          id: "6",
+          username: "anna",
+          typePost: "reels",
+          userAvatar: "https://randomuser.me/api/portraits/women/6.jpg",
+          postImage: "https://picsum.photos/400/400?random=6",
+          caption: "Du lịch biển 🌊",
+          likes: 240,
+          timeAgo: "2 ngày trước",
+        ),
+        PostModel(
+          id: "7",
+          username: "anna",
+          typePost: "reels",
+          userAvatar: "https://randomuser.me/api/portraits/women/7.jpg",
+          postImage: "https://picsum.photos/400/400?random=7",
+          caption: "Du lịch biển 🌊",
+          likes: 240,
+          timeAgo: "2 ngày trước",
+        ),
+        PostModel(
+          id: "8",
+          username: "anna",
+          typePost: "video",
+          userAvatar: "https://randomuser.me/api/portraits/women/8.jpg",
+          postImage: "https://picsum.photos/400/400?random=8",
+          caption: "Du lịch biển 🌊",
+          likes: 240,
+          timeAgo: "2 ngày trước",
+        ),
+        PostModel(
+          id: "9",
+          username: "anna",
+          userAvatar: "https://randomuser.me/api/portraits/women/9.jpg",
+          postImage: "https://picsum.photos/400/400?random=9",
+          caption: "Du lịch biển 🌊",
+          likes: 240,
+          timeAgo: "2 ngày trước",
+        ),
+        PostModel(
+          id: "10",
+          username: "anna",
+          userAvatar: "https://randomuser.me/api/portraits/women/10.jpg",
+          postImage: "https://picsum.photos/400/400?random=10",
+          caption: "Du lịch biển 🌊",
+          likes: 240,
+          timeAgo: "2 ngày trước",
+        ),
+        PostModel(
+          id: "11",
+          username: "anna",
+          userAvatar: "https://randomuser.me/api/portraits/women/11.jpg",
+          postImage: "https://picsum.photos/400/400?random=11",
+          caption: "Du lịch biển 🌊",
+          likes: 240,
+          timeAgo: "2 ngày trước",
+        ),
+        PostModel(
+          id: "12",
+          username: "anna",
+          userAvatar: "https://randomuser.me/api/portraits/women/4.jpg",
+          postImage: "https://picsum.photos/400/400?random=4",
+          caption: "Du lịch biển 🌊",
+          likes: 240,
+          timeAgo: "2 ngày trước",
+        ),
       ];
 
       final reels = [
         ReelModel(user: UserModel(name: "Hoang")),
         ReelModel(user: UserModel(name: "Tuan Anh")),
       ];
-      emit(ProfileSuccess(reels: reels,posts: posts));
+      emit(ProfileSuccess(reels: reels, posts: posts));
     } catch (e) {
       emit(ProfileFailure());
     }

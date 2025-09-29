@@ -82,7 +82,7 @@ class AppStyles {
   static const TextStyle calloutBold = TextStyle(
     fontFamily: fontFamily,
     fontSize: 12,
-    fontWeight: FontWeight.w500, // Medium
+    fontWeight: FontWeight.bold, // Medium
     letterSpacing: 0.02,
   );
 

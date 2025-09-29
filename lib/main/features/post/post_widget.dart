@@ -3,6 +3,7 @@ import 'package:chat_app/main/networks/model/user.dart';
 import 'package:chat_app/main/router/router.dart';
 import 'package:chat_app/main/utils/common_widget.dart';
 import 'package:chat_app/res/app_images.dart';
+import 'package:chat_app/res/app_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
@@ -28,22 +29,19 @@ class PostWidget extends StatelessWidget {
 
         //User Like
         _buildListUserLikePost(
-          userContactName: "Hieu",
-          userContactImage: AppImages.imgAvatarDefault,
+          users: [
+            UserModel(name: 'hieu_pham', avatar: AppImages.imgAvatarDefault),
+            UserModel(name: 'tuan_anh', avatar: AppImages.imgAvatarDefault),
+            UserModel(
+              name: 'nguyen_nguyen',
+              avatar: AppImages.imgAvatarDefault,
+            ),
+            UserModel(name: 'ngoc_hoang', avatar: AppImages.imgAvatarDefault),
+            UserModel(name: 'minh_hieu', avatar: AppImages.imgAvatarDefault),
+          ],
         ),
-
         // Caption
         _builCaptionPost(),
-
-        // Time ago
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12),
-          child: Text(
-            post.timeAgo ?? '',
-            style: const TextStyle(color: Colors.grey, fontSize: 12),
-          ),
-        ),
-        const SizedBox(height: 16),
       ],
     );
   }
@@ -53,7 +51,7 @@ class PostWidget extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
       child: Row(
         children: [
-          InkWell(
+          GestureDetector(
             child: cricleColorImage(
               size: 34,
               childWidget: Image.asset(
@@ -66,15 +64,20 @@ class PostWidget extends StatelessWidget {
             },
           ),
           SizedBox(width: 8),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                post.username ?? 'Unknown',
-                style: const TextStyle(fontWeight: FontWeight.bold),
-              ),
-              Text(post.timePost ?? '1 ngày trước'),
-            ],
+          GestureDetector(
+            onTap: () {
+              context.pushNamed(PathName.profilePage);
+            },
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(post.username ?? 'Unknown', style: AppStyles.headlineBold),
+                Text(
+                  post.timePost ?? '1 ngày trước',
+                  style: AppStyles.footnoteRegular,
+                ),
+              ],
+            ),
           ),
           Expanded(child: SizedBox(height: 8)),
           InkWell(
@@ -105,55 +108,92 @@ class PostWidget extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
       child: Row(
         children: [
-          SvgPicture.asset(AppImages.icLike),
+          SvgPicture.asset(AppImages.icLike, width: 24, height: 24),
           SizedBox(width: 4),
-          Text(
-            '${post.likes}',
-            style: const TextStyle(fontWeight: FontWeight.bold),
-          ),
+          Text('${post.likes}', style: AppStyles.calloutBold),
           SizedBox(width: 12),
-          SvgPicture.asset(AppImages.icComment),
+          SvgPicture.asset(AppImages.icComment, width: 24, height: 24),
           SizedBox(width: 4),
-          Text(
-            '${post.likes}',
-            style: const TextStyle(fontWeight: FontWeight.bold),
-          ),
+          Text('${post.likes}', style: AppStyles.calloutBold),
+
           SizedBox(width: 12),
-          SvgPicture.asset(AppImages.icShare),
+          SvgPicture.asset(AppImages.icShare, width: 24, height: 24),
           SizedBox(width: 4),
-          Text(
-            '${post.likes}',
-            style: const TextStyle(fontWeight: FontWeight.bold),
-          ),
+          Text('${post.likes}', style: AppStyles.calloutBold),
+
           Spacer(),
-          SvgPicture.asset(AppImages.icSave),
+          SvgPicture.asset(AppImages.icSave, width: 24, height: 24),
         ],
       ),
     );
   }
 
-  Widget _buildListUserLikePost({
-    String? userContactName,
-    String? userContactImage,
-  }) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-      child: Row(
-        children: [
-          Container(
-            decoration: const BoxDecoration(
-              shape: BoxShape.circle,
-              color: Colors.white,
-            ),
-            margin: EdgeInsets.only(right: 4),
-            width: 16,
-            height: 16,
-            child: Image.asset(userContactImage ?? AppImages.imgAvatarDefault),
+  Widget _buildListUserLikePost({List<UserModel>? users}) {
+    return users != null
+        ? Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              SizedBox(
+                height: 16,
+                width: 16,
+                child: Stack(
+                  clipBehavior: Clip.none,
+                  children:
+                      List.generate(1, (index) {
+                        return Container(
+                          width: 16,
+                          height: 16,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(color: Colors.white, width: 1),
+                          ),
+                          child: ClipOval(
+                            child: Image.asset(
+                              users[index].avatar ?? AppImages.imgAvatarDefault,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        );
+                      }).reversed.toList(),
+                ),
+              ),
+              const SizedBox(width: 4),
+              if (users.length >= 2)
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () {
+                      //Todo
+                    },
+                    child: RichText(
+                      softWrap: true,
+                      text: TextSpan(
+                        text: 'Có',
+                        style: AppStyles.bodyRegular,
+                        children: [
+                          TextSpan(
+                            text: " ${users[0].name}",
+                            style: AppStyles.bodyBold,
+                          ),
+                          TextSpan(
+                            text: " và", // 👈 text giống Insta
+                            style: AppStyles.bodyRegular,
+                          ),
+                          TextSpan(
+                            text:
+                                " những người khác thích", // 👈 text giống Insta
+                            style: AppStyles.bodyBold,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+            ],
           ),
-          Text('Có $userContactName và những người khác thích'),
-        ],
-      ),
-    );
+        )
+        : Container();
   }
 
   Widget _builCaptionPost() {
@@ -162,17 +202,8 @@ class PostWidget extends StatelessWidget {
       child: RichText(
         text: TextSpan(
           children: [
-            TextSpan(
-              text: post.username,
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
-              ),
-            ),
-            TextSpan(
-              text: " ${post.caption}",
-              style: const TextStyle(color: Colors.black),
-            ),
+            TextSpan(text: post.username, style: AppStyles.headlineBold),
+            TextSpan(text: " ${post.caption}", style: AppStyles.bodyRegular),
           ],
         ),
       ),

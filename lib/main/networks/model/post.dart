@@ -4,6 +4,7 @@ class PostModel {
    String? userAvatar;
    String? postImage;
    String? caption;
+   String? typePost;
    int? likes;
    String? timeAgo;
    String? timePost;
@@ -12,6 +13,7 @@ class PostModel {
     this.id,
     this.username,
     this.userAvatar,
+    this.typePost,
     this.postImage,
     this.caption,
     this.likes,

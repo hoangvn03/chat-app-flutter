@@ -364,7 +364,7 @@ class _LoginPageState extends State<LoginPage> {
               decoration: BoxDecoration(
                 borderRadius: const BorderRadius.all(Radius.circular(16)),
                 border: Border.all(
-                  color: Colors.grey.withOpacity(0.2),
+                  color: AppColors.gray20,
                   width: 1,
                 ),
               ),
