@@ -1,11 +1,11 @@
 import 'package:chat_app/main/features/account_suggest/account_suggest_widget.dart';
-import 'package:chat_app/main/features/post/post_widget.dart';
-import 'package:chat_app/main/features/read_more_text/read_more_cubit.dart';
-import 'package:chat_app/main/features/read_more_text/read_more_text.dart';
+import 'package:chat_app/main/features/interaction_button/bloc/interaction_bloc.dart';
+import 'package:chat_app/main/features/interaction_button/interaction_button.dart';
 import 'package:chat_app/main/networks/model/common_item.dart';
 import 'package:chat_app/main/networks/model/post.dart';
 import 'package:chat_app/main/networks/model/reels.dart';
 import 'package:chat_app/main/networks/model/user.dart';
+import 'package:chat_app/main/router/router.dart';
 import 'package:chat_app/main/ui/profile/bloc/profile_bloc.dart';
 import 'package:chat_app/main/ui/profile/bloc/profile_event.dart';
 import 'package:chat_app/main/ui/profile/bloc/profile_state.dart';
@@ -18,9 +18,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 
+// ignore: must_be_immutable
 class ProfilePage extends StatefulWidget {
-  const ProfilePage({super.key});
-
+  ProfilePage({super.key, required this.user});
+  UserModel user;
   @override
   State<ProfilePage> createState() => _ProfilePageState();
 }
@@ -43,7 +44,7 @@ class _ProfilePageState extends State<ProfilePage>
         BlocProvider<ProfileBloc>(
           create: (_) => ProfileBloc()..add(LoadRequest()),
         ),
-        BlocProvider<ReadMoreCubit>(create: (_) => ReadMoreCubit()),
+        BlocProvider<InteractionBloc>(create: (_) => InteractionBloc()),
       ],
       child: Scaffold(
         backgroundColor: AppColors.white,
@@ -62,7 +63,10 @@ class _ProfilePageState extends State<ProfilePage>
                         floating: true,
                         snap: true,
                         pinned: true,
-                        title: Text("hoangvn03", style: AppStyles.title1Bold),
+                        title: Text(
+                          widget.user.name ?? 'Unkonwn',
+                          style: AppStyles.title1Bold,
+                        ),
                         leading: IconButton(
                           onPressed: () {
                             context.pop();
@@ -90,7 +94,7 @@ class _ProfilePageState extends State<ProfilePage>
                                     padding: EdgeInsets.only(left: 24),
                                     enabled: false, // tắt click
                                     child: Text(
-                                      "Thông báo từ hoangvn03",
+                                      "Thông báo từ ${widget.user.name ?? 'Unkonwn'}",
                                       style: AppStyles.bodyRegular,
                                     ),
                                   ),
@@ -118,7 +122,6 @@ class _ProfilePageState extends State<ProfilePage>
                                     onTap: () {},
                                     child: ListTile(
                                       dense: true,
-
                                       leading: SvgPicture.asset(
                                         AppImages.icAddHighlight,
                                       ),
@@ -189,6 +192,7 @@ class _ProfilePageState extends State<ProfilePage>
                             onPressed: () {
                               showModalBottomSheet(
                                 context: context,
+                                useSafeArea: true, 
                                 backgroundColor: AppColors.white,
                                 isScrollControlled: true,
                                 shape: const RoundedRectangleBorder(
@@ -218,7 +222,7 @@ class _ProfilePageState extends State<ProfilePage>
                       // TabBar dính ngay dưới info
                       SliverPersistentHeader(
                         pinned: true,
-                        delegate: _SliverAppBarDelegate(
+                        delegate: SliverAppBarDelegate(
                           TabBar(
                             controller: _tabController,
                             labelColor: Colors.black,
@@ -289,7 +293,8 @@ class _ProfilePageState extends State<ProfilePage>
               cricleColorImage(
                 size: 86,
                 childWidget: Image.asset(
-                  AppImages.imgAvatarDefault, // ảnh PNG/JPG
+                  widget.user.avatar ??
+                      AppImages.imgAvatarDefault, // ảnh PNG/JPG
                   fit: BoxFit.cover,
                 ),
               ),
@@ -298,7 +303,10 @@ class _ProfilePageState extends State<ProfilePage>
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text("Nguyễn Ngọc Hoàng", style: AppStyles.headlineBold),
+                    Text(
+                      widget.user.name ?? 'Unkonwn',
+                      style: AppStyles.headlineBold,
+                    ),
                     const SizedBox(height: 8),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -348,7 +356,7 @@ class _ProfilePageState extends State<ProfilePage>
                 "Blogger",
                 style: AppStyles.bodyRegular.copyWith(color: AppColors.gray40),
               ),
-              readMoreDescription(context, '''Everynight Alone
+              readMoreDescription('''Everynight Alone
 Đừng để giọt nước mắt vẫn rơi tàn hoa khắp nơi thiếu em babe
 Everynight Alone
 Lại gọi tên những nổi nhớ đong đầyBao đam mê cũng đã chóng phai
@@ -438,6 +446,7 @@ Như là bản thân chính em.'''),
             onTap: () {
               showModalBottomSheet(
                 context: context,
+                useSafeArea: true, 
                 shape: const RoundedRectangleBorder(
                   borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
                 ),
@@ -504,6 +513,7 @@ Như là bản thân chính em.'''),
             onTap: () {
               showModalBottomSheet(
                 context: context,
+                useSafeArea: true, 
                 shape: const RoundedRectangleBorder(
                   borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
                 ),
@@ -529,64 +539,70 @@ Như là bản thân chính em.'''),
     ];
     final fistUser = ['chaubui_'];
 
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        SizedBox(
-          height: 28,
-          width: avatars.length * 20,
-          child: Stack(
-            clipBehavior: Clip.none,
-            children:
-                List.generate(avatars.length, (index) {
-                  return Positioned(
-                    left: index * 20, // 👈 khoảng cách chồng nhau
-                    child: Container(
-                      width: 28,
-                      height: 28,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(color: Colors.white, width: 1),
+    return GestureDetector(
+      onTap: () {
+        context.pushNamed(PathName.profileListFollowerPage);
+      },
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          SizedBox(
+            height: 28,
+            width: avatars.length * 20,
+            child: Stack(
+              clipBehavior: Clip.none,
+              children:
+                  List.generate(avatars.length, (index) {
+                    return Positioned(
+                      left: index * 20, // 👈 khoảng cách chồng nhau
+                      child: Container(
+                        width: 28,
+                        height: 28,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(color: Colors.white, width: 1),
+                        ),
+                        child: ClipOval(
+                          child: Image.asset(avatars[index], fit: BoxFit.cover),
+                        ),
                       ),
-                      child: ClipOval(
-                        child: Image.asset(avatars[index], fit: BoxFit.cover),
-                      ),
-                    ),
-                  );
-                }).reversed.toList(),
-          ),
-        ),
-        const SizedBox(width: 12),
-        GestureDetector(
-          onTap: () {
-            //Todo
-          },
-          child: RichText(
-            text: TextSpan(
-              text: 'Có',
-              style: AppStyles.bodyRegular,
-              children: [
-                TextSpan(
-                  text: " ${fistUser[0]}", // 👈 text giống Insta
-                  style: AppStyles.bodyBold,
-                ),
-                TextSpan(
-                  text: " và", // 👈 text giống Insta
-                  style: AppStyles.bodyRegular,
-                ),
-                TextSpan(
-                  text: " ${fistUser.length} người khác", // 👈 text giống Insta
-                  style: AppStyles.bodyBold,
-                ),
-                TextSpan(
-                  text: " theo dõi", // 👈 text giống Insta
-                  style: AppStyles.bodyRegular,
-                ),
-              ],
+                    );
+                  }).reversed.toList(),
             ),
           ),
-        ),
-      ],
+          const SizedBox(width: 12),
+          GestureDetector(
+            onTap: () {
+              //Todo
+            },
+            child: RichText(
+              text: TextSpan(
+                text: 'Có',
+                style: AppStyles.bodyRegular,
+                children: [
+                  TextSpan(
+                    text: " ${fistUser[0]}", // 👈 text giống Insta
+                    style: AppStyles.bodyBold,
+                  ),
+                  TextSpan(
+                    text: " và", // 👈 text giống Insta
+                    style: AppStyles.bodyRegular,
+                  ),
+                  TextSpan(
+                    text:
+                        " ${fistUser.length} người khác", // 👈 text giống Insta
+                    style: AppStyles.bodyBold,
+                  ),
+                  TextSpan(
+                    text: " theo dõi", // 👈 text giống Insta
+                    style: AppStyles.bodyRegular,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -1004,10 +1020,10 @@ Như là bản thân chính em.'''),
   }
 }
 
-class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
+class SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
   final TabBar _tabBar;
 
-  _SliverAppBarDelegate(this._tabBar);
+  SliverAppBarDelegate(this._tabBar);
 
   @override
   double get minExtent => _tabBar.preferredSize.height;
@@ -1028,7 +1044,7 @@ class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
   }
 
   @override
-  bool shouldRebuild(_SliverAppBarDelegate oldDelegate) {
+  bool shouldRebuild(SliverAppBarDelegate oldDelegate) {
     return false;
   }
 }

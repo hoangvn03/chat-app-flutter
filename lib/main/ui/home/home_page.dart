@@ -1,4 +1,5 @@
-import 'package:chat_app/main/features/post/post_widget.dart';
+import 'package:chat_app/main/features/interaction_button/bloc/interaction_bloc.dart';
+import 'package:chat_app/main/features/post/post_item_widget.dart';
 import 'package:chat_app/main/networks/model/post.dart';
 import 'package:chat_app/main/networks/model/reels.dart';
 import 'package:chat_app/main/networks/model/user.dart';
@@ -9,6 +10,7 @@ import 'package:chat_app/main/ui/home/bloc/home_state.dart';
 import 'package:chat_app/main/utils/common_widget.dart';
 import 'package:chat_app/res/app_colors.dart';
 import 'package:chat_app/res/app_images.dart';
+import 'package:chat_app/res/app_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
@@ -26,8 +28,10 @@ class _HomePageState extends State<HomePage> {
   final passwordController = TextEditingController();
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => HomeBloc()..add(LoadRequest()),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<HomeBloc>(create: (_) => HomeBloc()..add(LoadRequest())),
+      ],
       child: Scaffold(
         backgroundColor: AppColors.white,
         body: BlocBuilder<HomeBloc, HomeState>(
@@ -212,52 +216,65 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildListReels(List<ReelModel> reels) {
+    // tạo 1 list mới, thêm Your Story vào đầu
+    final allReels = [null, ...reels]; // null đại diện cho "Your Story"
+
     return Container(
       height: 120,
-      // color: AppColors.gray30,
       padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Row(
-        children: [
-          Column(
-            children: [
-              Stack(
-                clipBehavior: Clip.none,
-                children: [
-                  Container(
-                    decoration: const BoxDecoration(shape: BoxShape.circle),
-                    child: Center(
-                      child: ClipOval(
-                        child: Image.asset(
-                          AppImages.imgAvatarDefault, // ảnh PNG/JPG
-                          fit: BoxFit.cover,
-                          width: 78,
-                          height: 78,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: allReels.length,
+        itemBuilder: (context, index) {
+          if (index == 0) {
+            // item đầu tiên là "Your Story"
+            return GestureDetector(
+              onTap: (){
+                context.pushNamed(PathName.createReelsPage);
+              },
+              child: Padding(
+                padding: const EdgeInsets.only(right: 12),
+                child: Column(
+                  children: [
+                    Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        Container(
+                          decoration: const BoxDecoration(shape: BoxShape.circle),
+                          child: Center(
+                            child: ClipOval(
+                              child: Image.asset(
+                                AppImages.imgAvatarDefault,
+                                fit: BoxFit.cover,
+                                width: 78,
+                                height: 78,
+                              ),
+                            ),
+                          ),
                         ),
+                        Positioned(
+                          left: 55,
+                          top: 55,
+                          child: SvgPicture.asset(AppImages.icRoundAdd),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      "Your Story",
+                      style: AppStyles.footnoteRegular.copyWith(
+                        color: AppColors.gray60,
                       ),
                     ),
-                  ),
-                  Positioned(
-                    left: 55,
-                    top: 55,
-                    child: SvgPicture.asset(AppImages.icRoundAdd),
-                  ),
-                ],
+                  ],
+                ),
               ),
-              const Text("Your Story"),
-            ],
-          ),
-          const SizedBox(width: 12), // khoảng cách với ListView
-          // ListView scroll ngang
-          Expanded(
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              itemCount: reels.length,
-              itemBuilder: (context, index) {
-                return _buildItemReel(reels[index]);
-              },
-            ),
-          ),
-        ],
+            );
+          } else {
+            // các item còn lại
+            return _buildItemReel(allReels[index]!);
+          }
+        },
       ),
     );
   }
@@ -273,7 +290,8 @@ class _HomePageState extends State<HomePage> {
               fit: BoxFit.cover,
             ),
           ),
-          Text(reel.user!.name ?? "Unknown"),
+          const SizedBox(height: 4),
+          Text(reel.user!.name ?? "Unknown", style: AppStyles.footnoteRegular),
         ],
       ),
     );

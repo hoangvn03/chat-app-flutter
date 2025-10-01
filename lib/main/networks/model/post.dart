@@ -1,7 +1,8 @@
+import 'package:chat_app/main/networks/model/user.dart';
+
 class PostModel {
    String? id;
-   String? username;
-   String? userAvatar;
+   UserModel user;
    String? postImage;
    String? caption;
    String? typePost;
@@ -11,8 +12,7 @@ class PostModel {
 
   PostModel({
     this.id,
-    this.username,
-    this.userAvatar,
+    required this.user,
     this.typePost,
     this.postImage,
     this.caption,

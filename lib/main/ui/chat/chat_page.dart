@@ -1,9 +1,10 @@
 import 'package:chat_app/main/features/account_suggest/account_suggest_widget.dart';
-import 'package:chat_app/main/features/post/post_widget.dart';
+import 'package:chat_app/main/features/post/post_item_widget.dart';
 import 'package:chat_app/main/networks/model/message.dart';
 import 'package:chat_app/main/networks/model/post.dart';
 import 'package:chat_app/main/networks/model/reels.dart';
 import 'package:chat_app/main/networks/model/user.dart';
+import 'package:chat_app/main/router/router.dart';
 import 'package:chat_app/main/ui/chat/bloc/chat_bloc.dart';
 import 'package:chat_app/main/ui/chat/bloc/chat_event.dart';
 import 'package:chat_app/main/ui/chat/bloc/chat_state.dart';
@@ -179,19 +180,28 @@ class _ChatPageState extends State<ChatPage> {
                       _buildListMessage([
                         MessageModel(
                           status: 'Đã gửi',
-                          nameUserContact: 'Lisa',
+                          userModel: UserModel(
+                            name: 'hieu_pham',
+                            avatar: AppImages.imgAvatarDefault,
+                          ),
                           userMessage: ['Hello'],
                           userContactMessage: ['Hi'],
                         ),
                         MessageModel(
                           status: 'Đã gửi',
-                          nameUserContact: 'tuan_anh',
+                          userModel: UserModel(
+                            name: 'tuan_anh',
+                            avatar: AppImages.imgAvatarDefault,
+                          ),
                           userMessage: ['Hello'],
                           userContactMessage: ['Hi'],
                         ),
                         MessageModel(
-                          status: 'thanh_nguyen',
-                          nameUserContact: 'Lisa',
+                          status: 'Có lỗi khi gửi',
+                          userModel: UserModel(
+                            name: 'thanh_nguyen',
+                            avatar: AppImages.imgAvatarDefault,
+                          ),
                           userMessage: ['Hello'],
                           userContactMessage: ['Hi'],
                         ),
@@ -285,8 +295,13 @@ class _ChatPageState extends State<ChatPage> {
       contentPadding: EdgeInsets.zero,
       dense: true,
       leading: Image.asset(AppImages.imgAvatarDefault),
+      onTap: () {
+        context.pushNamed(PathName.chatRoomPage, extra: message);
+      },
       title: Text(
-        message.nameUserContact ?? 'Unknown',
+        message.userModel != null
+            ? message.userModel!.name ?? 'Unknown'
+            : 'Unknown',
         style: AppStyles.title2Regular,
       ),
       subtitle: Text(

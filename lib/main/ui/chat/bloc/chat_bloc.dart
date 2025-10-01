@@ -7,6 +7,7 @@ import 'package:chat_app/main/networks/model/user.dart';
 import 'package:chat_app/main/ui/chat/bloc/chat_event.dart';
 import 'package:chat_app/main/ui/chat/bloc/chat_state.dart';
 import 'package:chat_app/main/utils/shared_preference.dart';
+import 'package:chat_app/res/app_images.dart';
 
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -21,10 +22,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     // on<UpdateUser>(_updateUser);
   }
   UserModel user = UserModel();
-  Future<void> _loadListUser(
-    LoadRequest event,
-    Emitter<ChatState> emit,
-  ) async {
+  Future<void> _loadListUser(LoadRequest event, Emitter<ChatState> emit) async {
     try {
       var url = ApiEndPoints.USERINFO;
       final response = await ApiUtil.post(url: url);
@@ -40,16 +38,15 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     return;
   }
 
-  Future<void> _loadRequest(
-    LoadRequest event,
-    Emitter<ChatState> emit,
-  ) async {
+  Future<void> _loadRequest(LoadRequest event, Emitter<ChatState> emit) async {
     try {
-         final List<PostModel> posts = [
+      final List<PostModel> posts = [
         PostModel(
           id: "1",
-          username: "ngoc_hoang",
-          userAvatar: "https://randomuser.me/api/portraits/men/1.jpg",
+          user: UserModel(
+            name: 'hieu_pham',
+            avatar: AppImages.imgAvatarDefault,
+          ),
           postImage: "https://picsum.photos/400/400?random=1",
           caption: "Cuối tuần chill 😎",
           likes: 120,
@@ -57,8 +54,10 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
         ),
         PostModel(
           id: "2",
-          username: "linh_nguyen",
-          userAvatar: "https://randomuser.me/api/portraits/women/2.jpg",
+                   user: UserModel(
+            name: 'hieu_pham',
+            avatar: AppImages.imgAvatarDefault,
+          ),
           postImage: "https://picsum.photos/400/400?random=2",
           caption: "Cà phê sáng ☕",
           likes: 89,
@@ -66,8 +65,10 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
         ),
         PostModel(
           id: "3",
-          username: "david",
-          userAvatar: "https://randomuser.me/api/portraits/men/3.jpg",
+                  user: UserModel(
+            name: 'hieu_pham',
+            avatar: AppImages.imgAvatarDefault,
+          ),
           postImage: "https://picsum.photos/400/400?random=3",
           caption: "Coding all day 💻🔥",
           likes: 300,
@@ -75,8 +76,10 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
         ),
         PostModel(
           id: "4",
-          username: "anna",
-          userAvatar: "https://randomuser.me/api/portraits/women/4.jpg",
+            user: UserModel(
+            name: 'hieu_pham',
+            avatar: AppImages.imgAvatarDefault,
+          ),
           postImage: "https://picsum.photos/400/400?random=4",
           caption: "Du lịch biển 🌊",
           likes: 240,
@@ -88,7 +91,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
         ReelModel(user: UserModel(name: "Hoang")),
         ReelModel(user: UserModel(name: "Tuan Anh")),
       ];
-      emit(ChatSuccess(reels: reels,posts: posts));
+      emit(ChatSuccess(reels: reels, posts: posts));
     } catch (e) {
       emit(ChatFailure());
     }

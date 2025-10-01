@@ -1,13 +1,19 @@
 import 'package:chat_app/main/main_page.dart';
+import 'package:chat_app/main/networks/model/message.dart';
+import 'package:chat_app/main/networks/model/user.dart';
 import 'package:chat_app/main/router/router.dart';
 import 'package:chat_app/main/ui/auth/login/login_page.dart';
 import 'package:chat_app/main/ui/chat/chat_page.dart';
+import 'package:chat_app/main/ui/chat/chat_room.dart';
 import 'package:chat_app/main/ui/home/home_page.dart';
 import 'package:chat_app/main/ui/personal/personal_page.dart';
 import 'package:chat_app/main/ui/post/post_page.dart';
+import 'package:chat_app/main/ui/profile/profile_list_follower.dart';
 import 'package:chat_app/main/ui/profile/profile_page.dart';
+import 'package:chat_app/main/ui/reels/create_reel/create_reel_page.dart';
 import 'package:chat_app/main/ui/reels/reels_page.dart';
 import 'package:chat_app/main/ui/search/search_page.dart';
+import 'package:chat_app/main/ui/search/search_result_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -47,7 +53,8 @@ class AppGoRouter {
         name: PathName.profilePage,
         path: AppPath.profilePage,
         builder: (context, state) {
-          return ProfilePage();
+          final data = state.extra as UserModel;
+          return ProfilePage(user: data);
         },
       ),
       GoRoute(
@@ -55,6 +62,28 @@ class AppGoRouter {
         path: AppPath.chatPage,
         builder: (context, state) {
           return ChatPage();
+        },
+      ),
+      GoRoute(
+        name: PathName.chatRoomPage,
+        path: AppPath.chatRoomPage,
+        builder: (context, state) {
+          final data = state.extra as MessageModel;
+          return ChatRoom(data: data);
+        },
+      ),
+      GoRoute(
+        name: PathName.profileListFollowerPage,
+        path: AppPath.profileListFollowerPage,
+        builder: (context, state) {
+          return ProfileListFollowerPage();
+        },
+      ),
+      GoRoute(
+        name: PathName.createReelsPage,
+        path: AppPath.createReelsPage,
+        builder: (context, state) {
+          return CreateReelsPage();
         },
       ),
       //Bottom Bar
@@ -81,6 +110,15 @@ class AppGoRouter {
               GoRoute(
                 name: PathName.searchPage,
                 path: AppPath.searchPage,
+                routes: [
+                  GoRoute(
+                    name: PathName.searchResultPage,
+                    path: AppPath.searchResultPage,
+                    builder: (context, state) {
+                      return SearchResultPage();
+                    },
+                  ),
+                ],
                 builder: (context, state) {
                   return SearchPage();
                 },

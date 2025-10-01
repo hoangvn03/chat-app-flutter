@@ -6,6 +6,7 @@ import 'package:chat_app/main/networks/model/reels.dart';
 import 'package:chat_app/main/networks/model/user.dart';
 import 'package:chat_app/main/ui/profile/bloc/profile_event.dart';
 import 'package:chat_app/main/ui/profile/bloc/profile_state.dart';
+import 'package:chat_app/res/app_images.dart';
 
 import '../../../networks/api_util.dart';
 
@@ -41,8 +42,10 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
       final List<PostModel> posts = [
         PostModel(
           id: "1",
-          username: "ngoc_hoang",
-          userAvatar: "https://randomuser.me/api/portraits/men/1.jpg",
+          user: UserModel(
+            name: 'hieu_pham',
+            avatar: AppImages.imgAvatarDefault,
+          ),
           postImage: "https://picsum.photos/400/400?random=1",
           caption: "Cuối tuần chill 😎",
           likes: 120,
@@ -51,8 +54,10 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
         ),
         PostModel(
           id: "2",
-          username: "linh_nguyen",
-          userAvatar: "https://randomuser.me/api/portraits/women/2.jpg",
+          user: UserModel(
+            name: 'linh_nguyen',
+            avatar: AppImages.imgAvatarDefault,
+          ),
           postImage: "https://picsum.photos/400/400?random=2",
           caption: "Cà phê sáng ☕",
           likes: 89,
@@ -60,8 +65,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
         ),
         PostModel(
           id: "3",
-          username: "david",
-          userAvatar: "https://randomuser.me/api/portraits/men/3.jpg",
+          user: UserModel(name: 'lisa', avatar: AppImages.imgAvatarDefault),
           postImage: "https://picsum.photos/400/400?random=3",
           caption: "Coding all day 💻🔥",
           likes: 300,
@@ -69,8 +73,10 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
         ),
         PostModel(
           id: "4",
-          username: "anna",
-          userAvatar: "https://randomuser.me/api/portraits/women/4.jpg",
+          user: UserModel(
+            name: 'thanh_nguyen',
+            avatar: AppImages.imgAvatarDefault,
+          ),
           postImage: "https://picsum.photos/400/400?random=4",
           caption: "Du lịch biển 🌊",
           likes: 240,
@@ -78,8 +84,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
         ),
         PostModel(
           id: "5",
-          username: "anna",
-          userAvatar: "https://randomuser.me/api/portraits/women/5.jpg",
+          user: UserModel(name: 'tuan_anh', avatar: AppImages.imgAvatarDefault),
           postImage: "https://picsum.photos/400/400?random=5",
           caption: "Du lịch biển 🌊",
           likes: 240,
@@ -87,9 +92,11 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
         ),
         PostModel(
           id: "6",
-          username: "anna",
           typePost: "reels",
-          userAvatar: "https://randomuser.me/api/portraits/women/6.jpg",
+          user: UserModel(
+            name: 'minh_hieu',
+            avatar: AppImages.imgAvatarDefault,
+          ),
           postImage: "https://picsum.photos/400/400?random=6",
           caption: "Du lịch biển 🌊",
           likes: 240,
@@ -97,9 +104,8 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
         ),
         PostModel(
           id: "7",
-          username: "anna",
           typePost: "reels",
-          userAvatar: "https://randomuser.me/api/portraits/women/7.jpg",
+          user: UserModel(name: 'rosé', avatar: AppImages.imgAvatarDefault),
           postImage: "https://picsum.photos/400/400?random=7",
           caption: "Du lịch biển 🌊",
           likes: 240,
@@ -107,9 +113,8 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
         ),
         PostModel(
           id: "8",
-          username: "anna",
           typePost: "video",
-          userAvatar: "https://randomuser.me/api/portraits/women/8.jpg",
+          user: UserModel(name: 'david', avatar: AppImages.imgAvatarDefault),
           postImage: "https://picsum.photos/400/400?random=8",
           caption: "Du lịch biển 🌊",
           likes: 240,
@@ -117,8 +122,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
         ),
         PostModel(
           id: "9",
-          username: "anna",
-          userAvatar: "https://randomuser.me/api/portraits/women/9.jpg",
+          user: UserModel(name: 'yasuo', avatar: AppImages.imgAvatarDefault),
           postImage: "https://picsum.photos/400/400?random=9",
           caption: "Du lịch biển 🌊",
           likes: 240,
@@ -126,8 +130,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
         ),
         PostModel(
           id: "10",
-          username: "anna",
-          userAvatar: "https://randomuser.me/api/portraits/women/10.jpg",
+          user: UserModel(name: 'hasagi', avatar: AppImages.imgAvatarDefault),
           postImage: "https://picsum.photos/400/400?random=10",
           caption: "Du lịch biển 🌊",
           likes: 240,
@@ -135,8 +138,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
         ),
         PostModel(
           id: "11",
-          username: "anna",
-          userAvatar: "https://randomuser.me/api/portraits/women/11.jpg",
+          user: UserModel(name: 'anna', avatar: AppImages.imgAvatarDefault),
           postImage: "https://picsum.photos/400/400?random=11",
           caption: "Du lịch biển 🌊",
           likes: 240,
@@ -144,8 +146,10 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
         ),
         PostModel(
           id: "12",
-          username: "anna",
-          userAvatar: "https://randomuser.me/api/portraits/women/4.jpg",
+          user: UserModel(
+            name: 'hieu_pham',
+            avatar: AppImages.imgAvatarDefault,
+          ),
           postImage: "https://picsum.photos/400/400?random=4",
           caption: "Du lịch biển 🌊",
           likes: 240,

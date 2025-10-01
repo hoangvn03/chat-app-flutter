@@ -7,6 +7,7 @@ import 'package:chat_app/main/networks/model/user.dart';
 import 'package:chat_app/main/ui/home/bloc/home_event.dart';
 import 'package:chat_app/main/ui/home/bloc/home_state.dart';
 import 'package:chat_app/main/utils/shared_preference.dart';
+import 'package:chat_app/res/app_images.dart';
 
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -21,10 +22,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     // on<UpdateUser>(_updateUser);
   }
   UserModel user = UserModel();
-  Future<void> _loadListUser(
-    LoadRequest event,
-    Emitter<HomeState> emit,
-  ) async {
+  Future<void> _loadListUser(LoadRequest event, Emitter<HomeState> emit) async {
     try {
       var url = ApiEndPoints.USERINFO;
       final response = await ApiUtil.post(url: url);
@@ -40,16 +38,12 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     return;
   }
 
-  Future<void> _loadRequest(
-    LoadRequest event,
-    Emitter<HomeState> emit,
-  ) async {
+  Future<void> _loadRequest(LoadRequest event, Emitter<HomeState> emit) async {
     try {
-         final List<PostModel> posts = [
+      final List<PostModel> posts = [
         PostModel(
           id: "1",
-          username: "ngoc_hoang",
-          userAvatar: "https://randomuser.me/api/portraits/men/1.jpg",
+          user: UserModel(name: 'david', avatar: AppImages.imgAvatarDefault),
           postImage: "https://picsum.photos/400/400?random=1",
           caption: "Cuối tuần chill 😎",
           likes: 120,
@@ -57,8 +51,10 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         ),
         PostModel(
           id: "2",
-          username: "linh_nguyen",
-          userAvatar: "https://randomuser.me/api/portraits/women/2.jpg",
+          user: UserModel(
+            name: 'hieu_thu_2',
+            avatar: AppImages.imgAvatarDefault,
+          ),
           postImage: "https://picsum.photos/400/400?random=2",
           caption: "Cà phê sáng ☕",
           likes: 89,
@@ -66,8 +62,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         ),
         PostModel(
           id: "3",
-          username: "david",
-          userAvatar: "https://randomuser.me/api/portraits/men/3.jpg",
+          user: UserModel(name: 'lisa', avatar: AppImages.imgAvatarDefault),
           postImage: "https://picsum.photos/400/400?random=3",
           caption: "Coding all day 💻🔥",
           likes: 300,
@@ -75,8 +70,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         ),
         PostModel(
           id: "4",
-          username: "anna",
-          userAvatar: "https://randomuser.me/api/portraits/women/4.jpg",
+          user: UserModel(name: 'rose', avatar: AppImages.imgAvatarDefault),
           postImage: "https://picsum.photos/400/400?random=4",
           caption: "Du lịch biển 🌊",
           likes: 240,
@@ -88,7 +82,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         ReelModel(user: UserModel(name: "Hoang")),
         ReelModel(user: UserModel(name: "Tuan Anh")),
       ];
-      emit(HomeSuccess(reels: reels,posts: posts));
+      emit(HomeSuccess(reels: reels, posts: posts));
     } catch (e) {
       emit(HomeFailure());
     }

@@ -10,6 +10,7 @@ Widget commonButton({
   required String text,
   required onTap,
   color,
+  colorBorder,
   textColor,
   isBoxBorder,
   isIcon,
@@ -35,7 +36,9 @@ Widget commonButton({
       padding: padding,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(radius ?? 25),
-        border: isBoxBorder ?? Border.all(color: AppColors.blue60, width: 1),
+        border:
+            isBoxBorder ??
+            Border.all(color: colorBorder ?? AppColors.blue60, width: 1),
         color: color ?? AppColors.blue60,
       ),
       child: Center(
@@ -63,13 +66,16 @@ Widget commonButton({
 Widget commonTextField({
   String? labelText,
   String? hintText,
+  double? radius,
   TextEditingController? controller,
   bool? obscureText,
+  Color? color,
   TextInputType? keyboardType,
 }) {
   return Container(
     decoration: BoxDecoration(
-      borderRadius: BorderRadius.all(Radius.circular(24)),
+      color: color,
+      borderRadius: BorderRadius.all(Radius.circular(radius ?? 24)),
       border: Border.all(color: AppColors.gray30, width: 1),
     ),
     child: TextField(
@@ -97,10 +103,123 @@ Widget commonTextField({
   );
 }
 
+Widget commonTextFieldV2({
+  String? labelText,
+  String? hintText,
+  String? iconLeading,
+  TextStyle? labelStyle,
+  TextStyle? hintStyle,
+  TextStyle? inputStyle,
+  double? radius,
+  double? height,
+  EdgeInsets? margin,
+  EdgeInsets? padding,
+  TextEditingController? controller,
+  bool? obscureText,
+  bool? enabled,
+  Color? color,
+  TextInputType? keyboardType,
+  VoidCallback? onTap,
+  ValueChanged<String>? onChanged,
+}) {
+  final effectiveController = controller ?? TextEditingController();
+
+  return Container(
+    alignment: Alignment.center,
+    margin: margin ?? const EdgeInsets.only(right: 16),
+    padding: padding ?? const EdgeInsets.symmetric(horizontal: 12),
+    decoration: BoxDecoration(
+      color: color ?? AppColors.gray20,
+      borderRadius: BorderRadius.all(Radius.circular(radius ?? 8)),
+    ),
+    height: height ?? 38,
+    child: ValueListenableBuilder<TextEditingValue>(
+      valueListenable: effectiveController,
+      builder: (context, value, child) {
+        return TextField(
+          textAlignVertical: TextAlignVertical.center,
+          obscureText: obscureText ?? false,
+          controller: effectiveController,
+          style: inputStyle ?? AppStyles.title3Regular,
+          onTap: onTap,
+          onChanged: onChanged,
+          cursorColor: AppColors.gray40,
+          cursorWidth: 1.5,
+          cursorHeight: 16,
+          cursorRadius: const Radius.circular(4),
+          decoration: InputDecoration(
+            hintText: hintText,
+            hintStyle:
+                hintStyle ??
+                const TextStyle(fontSize: 14, color: AppColors.gray40),
+            isDense: true,
+            labelText: labelText,
+            labelStyle:
+                labelStyle ??
+                AppStyles.title3Regular.copyWith(color: AppColors.gray40),
+            floatingLabelBehavior: FloatingLabelBehavior.auto,
+            floatingLabelStyle: AppStyles.title3Regular.copyWith(
+              fontSize: 18,
+              color: AppColors.gray40,
+            ),
+            enabled: enabled ?? true,
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 12,
+              vertical: 0,
+            ),
+            prefixIcon: Padding(
+              padding: const EdgeInsets.only(right: 8),
+              child: SvgPicture.asset(
+                iconLeading ?? AppImages.icSearch,
+                color: AppColors.gray40,
+                width: 16,
+                height: 16,
+              ),
+            ),
+            prefixIconConstraints: const BoxConstraints(
+              minWidth: 16,
+              minHeight: 16,
+            ),
+            // 👇 chỉ hiện khi có text
+            suffixIcon:
+                value.text.isNotEmpty
+                    ? IconButton(
+                      icon: const Icon(
+                        Icons.clear,
+                        size: 18,
+                        color: Colors.grey,
+                      ),
+                      onPressed: () {
+                        effectiveController.clear();
+                      },
+                    )
+                    : null,
+            fillColor: AppColors.gray20,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: BorderSide.none,
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: BorderSide.none,
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: BorderSide.none,
+            ),
+          ),
+        );
+      },
+    ),
+  );
+}
+
 Widget cricleColorImage({
   Widget? childWidget,
   double? size,
   bool hasReels = true,
+  bool hasReelsBorder = true,
+  double? paddingImage,
 }) {
   final double finalSize = size ?? 78;
   double xSize = 6;
@@ -114,37 +233,38 @@ Widget cricleColorImage({
       alignment: Alignment.center,
       children: [
         // Viền gradient
-        Container(
-          width: finalSize,
-          height: finalSize,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            gradient:
-                (hasReels)
-                    ? LinearGradient(
-                      colors: [
-                        Color(0xFF7638FA), // Purple
-                        Color(0xFFD300C5), // Pink
-                        Color(0xFFFF0069), // Red
-                        Color(0xFFFF7A00), // Orange
-                        Color(0xFFFFD600), // Yellow
-                        Color(0xFF7638FA), // Purple repeat
-                      ],
-                      begin: Alignment.topRight,
-                      end: Alignment.bottomLeft,
-                    )
-                    : LinearGradient(
-                      colors: [AppColors.gray30, AppColors.gray20],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
+        if (hasReelsBorder)
+          Container(
+            width: finalSize,
+            height: finalSize,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              gradient:
+                  (hasReels)
+                      ? LinearGradient(
+                        colors: [
+                          Color(0xFF7638FA), // Purple
+                          Color(0xFFD300C5), // Pink
+                          Color(0xFFFF0069), // Red
+                          Color(0xFFFF7A00), // Orange
+                          Color(0xFFFFD600), // Yellow
+                          Color(0xFF7638FA), // Purple repeat
+                        ],
+                        begin: Alignment.topRight,
+                        end: Alignment.bottomLeft,
+                      )
+                      : LinearGradient(
+                        colors: [AppColors.gray30, AppColors.gray20],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+            ),
           ),
-        ),
         // Nền trắng bên trong
         Container(
           width: finalSize - xSize,
           height: finalSize - xSize,
-          padding: EdgeInsets.all(2),
+          padding: EdgeInsets.all(paddingImage ?? 2),
           decoration: const BoxDecoration(
             shape: BoxShape.circle,
             color: Colors.white,
@@ -247,6 +367,77 @@ Widget userNote({String? img, String? note, String? subTitle}) {
           child: Text(subTitle, style: AppStyles.footnoteRegular),
         ),
     ],
+  );
+}
+
+Widget commonTileItem({
+  String? imageLeading,
+  String? title,
+  String? subtitle,
+  TextStyle? titleStyle,
+  TextStyle? subTitleStyle,
+  EdgeInsets? margin,
+  Widget? titleWidget,
+  Widget? trallingWidget,
+  Widget? leadingWidget,
+  double? sizeImage,
+  bool? hasReels,
+  bool? hasReelsBorder,
+  VoidCallback? onTapLeading,
+  VoidCallback? onTapTralling,
+  VoidCallback? onTap,
+}) {
+  return GestureDetector(
+    onTap: onTap,
+    child: Padding(
+      padding: margin ?? const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+      child: Row(
+        children: [
+          leadingWidget ??
+              GestureDetector(
+                onTap: onTapLeading,
+                child: cricleColorImage(
+                  size: sizeImage ?? 34,
+                  hasReelsBorder: hasReelsBorder ?? true,
+                  hasReels: hasReels ?? true,
+                  childWidget: Image.asset(
+                    imageLeading ?? AppImages.imgAvatarDefault, // ảnh PNG/JPG
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+              child:
+                  titleWidget ??
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title ?? '',
+                        style: titleStyle ?? AppStyles.headlineBold,
+                      ),
+                      Text(
+                        subtitle ?? '',
+                        style: subTitleStyle ?? AppStyles.footnoteRegular,
+                      ),
+                    ],
+                  ),
+            ),
+          ),
+          GestureDetector(
+            onTap: onTapTralling,
+            child:
+                trallingWidget ??
+                Transform.rotate(
+                  angle: 90 * 3.1415926535 / 180, // xoay 90 độ (radian)
+                  child: SvgPicture.asset(AppImages.icOption),
+                ),
+          ),
+        ],
+      ),
+    ),
   );
 }
 

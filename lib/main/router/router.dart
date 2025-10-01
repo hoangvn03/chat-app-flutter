@@ -10,6 +10,10 @@ class AppPath {
   static const String fogotPassword = "/fogotPassword";
   static const String profilePage = "/profilePage";
   static const String chatPage = "/chatPage";
+  static const String chatRoomPage = "/chatRoomPage";
+  static const String profileListFollowerPage = "/profileListFollowerPage";
+  static const String searchResultPage = "/searchResultPage";
+  static const String createReelsPage = "/createReelsPage";
 
   ///context.gp(AppPath.homePage)
 }
@@ -26,6 +30,10 @@ class PathName {
   static const String fogotPassword = "fogotPassword";
   static const String profilePage = "profilePage";
   static const String chatPage = "chatPage";
+  static const String chatRoomPage = "chatRoomPage";
+  static const String profileListFollowerPage = "profileListFollowerPage";
+  static const String searchResultPage = "searchResultPage";
+  static const String createReelsPage = "createReelsPage";
 
   ///context.goNamed(PathName.homePage)
 }

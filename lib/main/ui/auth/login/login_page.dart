@@ -105,6 +105,7 @@ class _LoginPageState extends State<LoginPage> {
             onPressed: () {
               showModalBottomSheet(
                 context: context,
+                useSafeArea: true,
                 shape: const RoundedRectangleBorder(
                   borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
                 ),
@@ -155,9 +156,11 @@ class _LoginPageState extends State<LoginPage> {
           text: "Tạo tài khoản mới",
           color: AppColors.white,
           textColor: AppColors.blue60,
+          colorBorder: AppColors.blue60,
           onTap: () {
             showModalBottomSheet(
               context: context,
+              useSafeArea: true,
               isScrollControlled: true,
               shape: const RoundedRectangleBorder(
                 borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
@@ -204,6 +207,7 @@ class _LoginPageState extends State<LoginPage> {
           onTap: () {
             showModalBottomSheet(
               context: context,
+              useSafeArea: true,
               isScrollControlled: true,
               backgroundColor:
                   Colors.transparent, // 👈 để dễ custom border radius
@@ -269,6 +273,7 @@ class _LoginPageState extends State<LoginPage> {
                     onTap: () {
                       showModalBottomSheet(
                         context: context,
+                        useSafeArea: true,
                         isScrollControlled: true,
                         shape: const RoundedRectangleBorder(
                           borderRadius: BorderRadius.vertical(
@@ -350,6 +355,7 @@ class _LoginPageState extends State<LoginPage> {
               context.pop();
               showModalBottomSheet(
                 context: context,
+                useSafeArea: true,
                 isScrollControlled: true,
                 shape: const RoundedRectangleBorder(
                   borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
@@ -363,10 +369,7 @@ class _LoginPageState extends State<LoginPage> {
               padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
               decoration: BoxDecoration(
                 borderRadius: const BorderRadius.all(Radius.circular(16)),
-                border: Border.all(
-                  color: AppColors.gray20,
-                  width: 1,
-                ),
+                border: Border.all(color: AppColors.gray20, width: 1),
               ),
               child: Text(
                 "Gỡ trang cá nhân khỏi thiết bị này",
@@ -594,6 +597,7 @@ class _LoginPageState extends State<LoginPage> {
             onTap: () {
               showModalBottomSheet(
                 context: context,
+                useSafeArea: true,
                 isScrollControlled: true,
                 shape: const RoundedRectangleBorder(
                   borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
