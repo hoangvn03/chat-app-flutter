@@ -38,7 +38,7 @@ Widget commonButton({
         borderRadius: BorderRadius.circular(radius ?? 25),
         border:
             isBoxBorder ??
-            Border.all(color: colorBorder ?? AppColors.blue60, width: 1),
+            Border.all(color: colorBorder ?? Colors.transparent, width: 1),
         color: color ?? AppColors.blue60,
       ),
       child: Center(

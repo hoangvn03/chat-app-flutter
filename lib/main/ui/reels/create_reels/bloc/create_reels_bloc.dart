@@ -1,0 +1,80 @@
+import 'dart:async';
+import 'package:bloc/bloc.dart';
+import 'package:chat_app/main/helper/image/media_helper.dart';
+import 'package:chat_app/main/networks/model/reels.dart';
+import 'package:chat_app/main/networks/model/user.dart';
+import 'package:chat_app/main/ui/reels/create_reels/bloc/create_reels_event.dart';
+import 'package:chat_app/main/ui/reels/create_reels/bloc/create_reels_state.dart';
+
+import 'package:photo_manager/photo_manager.dart';
+
+class CreateReelsBloc extends Bloc<CreateReelsEvent, CreateReelsState> {
+  CreateReelsBloc() : super(CreateReelsLoading()) {
+    on<LoadReelsMedia>(_loadMediaPicked);
+  }
+  List<AssetPathEntity> albumList = [];
+  List<AssetPathEntity> albumAll = [];
+  List<AssetEntity> assetList = [];
+  List<AssetEntity> selectedAssetList = [];
+  Future<void> _loadMediaPicked(
+    LoadReelsMedia event,
+    Emitter<CreateReelsState> emit,
+  ) async {
+    final mediaPicked  = event.assetList ??[];
+    if(mediaPicked.isEmpty){
+      emit(CreateReelsWithCamera());
+      return;
+    }
+
+    final UserModel user = UserModel(
+      name: 'John Doe',
+      avatar: 'https://wallpapercave.com/wp/AYWg3iu.jpg',
+    );
+    final List<ReelModel> stories = [
+      ReelModel(
+        url:
+            'https://images.unsplash.com/photo-1534103362078-d07e750bd0c4?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=634&q=80',
+        media: MediaType.image,
+        duration: const Duration(seconds: 10),
+        user: user,
+      ),
+      ReelModel(
+        url: 'https://media.giphy.com/media/moyzrwjUIkdNe/giphy.gif',
+        media: MediaType.image,
+        user: UserModel(
+          name: 'John Doe',
+          avatar: 'https://wallpapercave.com/wp/AYWg3iu.jpg',
+        ),
+        duration: const Duration(seconds: 7),
+      ),
+      ReelModel(
+        url:
+            'https://static.videezy.com/system/resources/previews/000/005/529/original/Reaviling_Sjusj%C3%B8en_Ski_Senter.mp4',
+        media: MediaType.video,
+        duration: const Duration(seconds: 0),
+        user: user,
+      ),
+      ReelModel(
+        url:
+            'https://images.unsplash.com/photo-1531694611353-d4758f86fa6d?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=564&q=80',
+        media: MediaType.image,
+        duration: const Duration(seconds: 5),
+        user: user,
+      ),
+      ReelModel(
+        url:
+            'https://static.videezy.com/system/resources/previews/000/007/536/original/rockybeach.mp4',
+        media: MediaType.video,
+        duration: const Duration(seconds: 0),
+        user: user,
+      ),
+      ReelModel(
+        url: 'https://media2.giphy.com/media/M8PxVICV5KlezP1pGE/giphy.gif',
+        media: MediaType.image,
+        duration: const Duration(seconds: 8),
+        user: user,
+      ),
+    ];
+    emit(CreateReelsWithMediaPicked(mediaPicked:mediaPicked,stories: stories));
+  }
+}

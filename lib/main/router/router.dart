@@ -14,6 +14,8 @@ class AppPath {
   static const String profileListFollowerPage = "/profileListFollowerPage";
   static const String searchResultPage = "/searchResultPage";
   static const String createReelsPage = "/createReelsPage";
+  static const String mediaPickedPage = "/mediaPickedPage";
+  static const String listReelsPage = "/listReelsPage";
 
   ///context.gp(AppPath.homePage)
 }
@@ -34,6 +36,8 @@ class PathName {
   static const String profileListFollowerPage = "profileListFollowerPage";
   static const String searchResultPage = "searchResultPage";
   static const String createReelsPage = "createReelsPage";
+  static const String mediaPickedPage = "mediaPickedPage";
+  static const String listReelsPage = "listReelsPage";
 
   ///context.goNamed(PathName.homePage)
 }

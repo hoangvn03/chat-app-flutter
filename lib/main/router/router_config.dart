@@ -1,5 +1,6 @@
 import 'package:chat_app/main/main_page.dart';
 import 'package:chat_app/main/networks/model/message.dart';
+import 'package:chat_app/main/networks/model/reels.dart';
 import 'package:chat_app/main/networks/model/user.dart';
 import 'package:chat_app/main/router/router.dart';
 import 'package:chat_app/main/ui/auth/login/login_page.dart';
@@ -10,13 +11,16 @@ import 'package:chat_app/main/ui/personal/personal_page.dart';
 import 'package:chat_app/main/ui/post/post_page.dart';
 import 'package:chat_app/main/ui/profile/profile_list_follower.dart';
 import 'package:chat_app/main/ui/profile/profile_page.dart';
-import 'package:chat_app/main/ui/reels/create_reel/create_reel_page.dart';
-import 'package:chat_app/main/ui/reels/reels_page.dart';
+import 'package:chat_app/main/ui/reels/create_reels/create_reels_page.dart';
+import 'package:chat_app/main/ui/reels/list_reels/list_reels_page.dart';
+import 'package:chat_app/main/ui/reels/media_picked/media_picked_page.dart';
+import 'package:chat_app/main/ui/reels/create_reels/reels_page.dart';
 import 'package:chat_app/main/ui/search/search_page.dart';
 import 'package:chat_app/main/ui/search/search_result_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:photo_manager/photo_manager.dart';
 
 class AppGoRouter {
   static GoRouter get router => _goRouter;
@@ -83,7 +87,24 @@ class AppGoRouter {
         name: PathName.createReelsPage,
         path: AppPath.createReelsPage,
         builder: (context, state) {
-          return CreateReelsPage();
+          final assetList = state.extra as List<AssetEntity>?;
+          return CreateReelsPage(assetList: assetList);
+        },
+      ),
+
+      GoRoute(
+        name: PathName.mediaPickedPage,
+        path: AppPath.mediaPickedPage,
+        builder: (context, state) {
+          return MediaPickedPage();
+        },
+      ),
+      GoRoute(
+        name: PathName.listReelsPage,
+        path: AppPath.listReelsPage,
+        builder: (context, state) {
+          final assetList = state.extra as List<ReelModel>;
+          return StoryScreen(stories: assetList);
         },
       ),
       //Bottom Bar

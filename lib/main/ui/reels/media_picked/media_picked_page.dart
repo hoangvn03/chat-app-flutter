@@ -1,7 +1,9 @@
-import 'package:chat_app/main/ui/reels/create_reel/bloc/create_reel_bloc.dart';
-import 'package:chat_app/main/ui/reels/create_reel/bloc/create_reel_event.dart';
-import 'package:chat_app/main/ui/reels/create_reel/bloc/create_reel_state.dart';
-import 'package:chat_app/main/ui/reels/create_reel/media_picked.dart';
+import 'package:chat_app/main/router/router.dart';
+import 'package:chat_app/main/ui/reels/media_picked/bloc/media_picked_bloc.dart';
+import 'package:chat_app/main/ui/reels/media_picked/bloc/media_picked_event.dart';
+import 'package:chat_app/main/ui/reels/media_picked/bloc/media_picked_state.dart';
+import 'package:chat_app/main/ui/reels/media_picked/media_picked.dart';
+import 'package:chat_app/main/utils/common_widget.dart';
 import 'package:chat_app/res/app_colors.dart';
 import 'package:chat_app/res/app_images.dart';
 import 'package:chat_app/res/app_styles.dart';
@@ -13,19 +15,23 @@ import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:photo_manager_image_provider/photo_manager_image_provider.dart';
 
-class CreateReelsPage extends StatefulWidget {
-  const CreateReelsPage({super.key});
+class MediaPickedPage extends StatefulWidget {
+  const MediaPickedPage({super.key});
 
   @override
-  State<CreateReelsPage> createState() => _CreateReelPageState();
+  State<MediaPickedPage> createState() => _CreateReelPageState();
 }
 
-class _CreateReelPageState extends State<CreateReelsPage> {
+class _CreateReelPageState extends State<MediaPickedPage> {
   final PageController _pageController = PageController();
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => CreateReelsBloc()..add(LoadRequest(RequestType.common, 5)),
+      create:
+          (_) =>
+              MediaPickedBloc()..add(
+                LoadRequest(requestType: RequestType.common, maxCount: 5),
+              ),
       child: Scaffold(
         backgroundColor: AppColors.gray90,
         body: NestedScrollView(
@@ -80,214 +86,19 @@ class _CreateReelPageState extends State<CreateReelsPage> {
                   ),
                 ),
               ],
-          body: BlocBuilder<CreateReelsBloc, CreateReelsState>(
-            builder: (context, state) {
-              if (state is CreateReelsSuccess) {
-                return _buildListImage(state.asset);
-              }
-              if (state is CreateReelsFailure) {
-                return Center(
-                  child: Text(
-                    state.errorMessage,
-                    style: AppStyles.title1Bold.copyWith(
-                      color: AppColors.white,
-                    ),
-                  ),
-                );
-              } else {
-                return const CircularProgressIndicator();
-              }
-            },
+          body: Stack(
+            children: [
+              _buildListImage(context),
+              Positioned(
+                bottom: 0,
+                left: 0,
+                right: 0,
+                child: _buildListAssetSelected(context),
+              ),
+            ],
           ),
         ),
       ),
-    );
-  }
-
-  Widget _buildOptionHeadeMediaV2() {
-    return BlocBuilder<CreateReelsBloc, CreateReelsState>(
-      builder: (context, state) {
-        if (state is CreateReelsSuccess) {
-          return Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              PopupMenuButton(
-                constraints: const BoxConstraints(),
-                padding: const EdgeInsets.all(8),
-                color: AppColors.gray60.withOpacity(0.95),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                offset: const Offset(0, 60),
-                itemBuilder:
-                    (context) => [
-                      PopupMenuItem(
-                        onTap: () {
-                          final recentAlbum = state.album.firstWhere(
-                            (a) => a.type == RequestType.common,
-                            orElse: () => state.album.first,
-                          );
-                          context.read<CreateReelsBloc>().add(
-                            LoadRequest(
-                              RequestType.common,
-                              5,
-                              selectedAlbum: recentAlbum,
-                            ),
-                          );
-                        },
-                        child: Row(
-                          children: [
-                            SvgPicture.asset(
-                              AppImages.icLogoAppV2,
-                              color: AppColors.white,
-                            ),
-                            const SizedBox(width: 8),
-                            Text(
-                              "Mới đây",
-                              style: AppStyles.title2Regular.copyWith(
-                                color: AppColors.white,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      PopupMenuItem(
-                        onTap: () {
-                          final imageAlbum = state.album.firstWhere(
-                            (a) => a.type == RequestType.image,
-                            orElse: () => state.album.first,
-                          );
-                          context.read<CreateReelsBloc>().add(
-                            LoadRequest(
-                              RequestType.image,
-                              5,
-                              selectedAlbum: imageAlbum,
-                            ),
-                          );
-                        },
-                        child: Row(
-                          children: [
-                            SvgPicture.asset(
-                              AppImages.icPictureGallery,
-                              color: AppColors.white,
-                            ),
-                            const SizedBox(width: 8),
-                            Text(
-                              "Ảnh",
-                              style: AppStyles.title2Regular.copyWith(
-                                color: AppColors.white,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      PopupMenuItem(
-                        onTap: () {
-                          context.read<CreateReelsBloc>().add(
-                            LoadRequest(RequestType.video, 5),
-                          );
-                        },
-                        child: Row(
-                          children: [
-                            SvgPicture.asset(
-                              AppImages.icReelsActive,
-                              color: AppColors.white,
-                            ),
-                            const SizedBox(width: 8),
-                            Text(
-                              "Video",
-                              style: AppStyles.title2Regular.copyWith(
-                                color: AppColors.white,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      PopupMenuItem(
-                        onTap: () {
-                          showModalBottomSheet(
-                            backgroundColor: Colors.black,
-                            context: context,
-                            useSafeArea: true,
-                            isScrollControlled: true,
-                            shape: const RoundedRectangleBorder(
-                              borderRadius: BorderRadius.vertical(
-                                top: Radius.circular(16),
-                              ),
-                            ),
-                            builder: (_) {
-                              return BlocProvider.value(
-                                value: context.read<CreateReelsBloc>(),
-                                child: _buildBottomSheetAllAlbum(
-                                  context,
-                                  state.album,
-                                ),
-                              );
-                            },
-                          );
-                        },
-                        child: Row(
-                          children: [
-                            SvgPicture.asset(
-                              AppImages.icGridDark,
-                              color: AppColors.white,
-                            ),
-                            const SizedBox(width: 8),
-                            Text(
-                              "Tất cả album",
-                              style: AppStyles.title2Regular.copyWith(
-                                color: AppColors.white,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
-                  alignment: Alignment.centerLeft,
-                  child: Row(
-                    children: [
-                      Text(
-                        state.selectedAlbum.name,
-                        style: TextStyle(color: Colors.white),
-                      ),
-                      SizedBox(width: 8),
-                      Transform.flip(
-                        flipY: true,
-                        child: SvgPicture.asset(
-                          AppImages.icChevronUp,
-                          width: 16,
-                          height: 16,
-                          color: AppColors.white,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              GestureDetector(
-                onTap: () {},
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: AppColors.gray80,
-                    shape: BoxShape.circle,
-                  ),
-                  child: IconButton(
-                    color: AppColors.white,
-                    onPressed: () {},
-                    icon: SvgPicture.asset(
-                      AppImages.icGallery,
-                      color: AppColors.white,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          );
-        }
-        return Text('data');
-      },
     );
   }
 
@@ -345,69 +156,482 @@ class _CreateReelPageState extends State<CreateReelsPage> {
     );
   }
 
-  Widget _buildListImage(List<AssetEntity> assetList) {
-    return GridView.builder(
-      padding: const EdgeInsets.all(2),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 3,
-        crossAxisSpacing: 2,
-        mainAxisSpacing: 2,
-        childAspectRatio: 0.6,
-      ),
-      itemCount: assetList.length + 1,
-      itemBuilder: (context, index) {
-        if (index == 0) {
-          return GestureDetector(
-            onTap: () {
-              print("Chọn ảnh mới");
-            },
-            child: Container(
-              color: AppColors.gray60,
-              child: const Center(
-                child: Icon(Icons.camera_alt, size: 32, color: Colors.white),
+  Widget _buildOptionHeadeMediaV2() {
+    return BlocBuilder<MediaPickedBloc, MediaPickedState>(
+      builder: (context, state) {
+        if (state is MediaPickedSuccess) {
+          final isSelecting = (state.isSelecting) ?? false;
+
+          return Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              PopupMenuButton(
+                constraints: const BoxConstraints(),
+                padding: const EdgeInsets.all(8),
+                color: AppColors.gray60.withOpacity(0.95),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                offset: const Offset(0, 60),
+                itemBuilder:
+                    (context) => [
+                      PopupMenuItem(
+                        onTap: () {
+                          context.read<MediaPickedBloc>().add(
+                            LoadRequest(
+                              requestType: RequestType.common,
+                              maxCount: 5,
+
+                              nameRequestType: 'Mới đây',
+                            ),
+                          );
+                        },
+                        child: Row(
+                          children: [
+                            SvgPicture.asset(
+                              AppImages.icLogoAppV2,
+                              color: AppColors.white,
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              "Mới đây",
+                              style: AppStyles.title2Regular.copyWith(
+                                color: AppColors.white,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      PopupMenuItem(
+                        onTap: () {
+                          context.read<MediaPickedBloc>().add(
+                            LoadRequest(
+                              requestType: RequestType.image,
+                              maxCount: 5,
+
+                              nameRequestType: 'Ảnh',
+                            ),
+                          );
+                        },
+                        child: Row(
+                          children: [
+                            SvgPicture.asset(
+                              AppImages.icPictureGallery,
+                              color: AppColors.white,
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              "Ảnh",
+                              style: AppStyles.title2Regular.copyWith(
+                                color: AppColors.white,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      PopupMenuItem(
+                        onTap: () {
+                          context.read<MediaPickedBloc>().add(
+                            LoadRequest(
+                              requestType: RequestType.video,
+                              maxCount: 5,
+                              nameRequestType: 'Video',
+                            ),
+                          );
+                        },
+                        child: Row(
+                          children: [
+                            SvgPicture.asset(
+                              AppImages.icReelsActive,
+                              color: AppColors.white,
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              "Video",
+                              style: AppStyles.title2Regular.copyWith(
+                                color: AppColors.white,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      PopupMenuItem(
+                        onTap: () {
+                          showModalBottomSheet(
+                            backgroundColor: Colors.black,
+                            context: context,
+                            useSafeArea: true,
+                            isScrollControlled: true,
+                            shape: const RoundedRectangleBorder(
+                              borderRadius: BorderRadius.vertical(
+                                top: Radius.circular(16),
+                              ),
+                            ),
+                            builder: (_) {
+                              return BlocProvider.value(
+                                value: context.read<MediaPickedBloc>(),
+                                child: _buildBottomSheetAllAlbum(
+                                  context,
+                                  state.album,
+                                ),
+                              );
+                            },
+                          );
+                        },
+                        child: Row(
+                          children: [
+                            SvgPicture.asset(
+                              AppImages.icGridDark,
+                              color: AppColors.white,
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              "Tất cả album",
+                              style: AppStyles.title2Regular.copyWith(
+                                color: AppColors.white,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  alignment: Alignment.centerLeft,
+                  child: Row(
+                    children: [
+                      Text(
+                        state.nameRequestType == null
+                            ? state.selectedAlbum?.name ?? 'Mới đây'
+                            : state.nameRequestType ?? 'Mới đây',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      SizedBox(width: 8),
+                      Transform.flip(
+                        flipY: true,
+                        child: SvgPicture.asset(
+                          AppImages.icChevronUp,
+                          width: 16,
+                          height: 16,
+                          color: AppColors.white,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
-            ),
+              Container(
+                width: 32,
+                height: 32,
+                decoration: BoxDecoration(
+                  color: isSelecting ? AppColors.gray20 : AppColors.gray80,
+                  shape: BoxShape.circle,
+                ),
+                child: IconButton(
+                  color: AppColors.white,
+                  onPressed: () {
+                    if (isSelecting) {
+                      state.selectedAsset?.clear();
+                    }
+                    context.read<MediaPickedBloc>().add(
+                      ChooseMedia(isSelecting: !isSelecting),
+                    );
+                  },
+                  icon: SvgPicture.asset(
+                    AppImages.icGallery,
+                    color: isSelecting ? AppColors.gray80 : AppColors.white,
+                  ),
+                ),
+              ),
+            ],
           );
         }
-        final asset = assetList[index - 1];
-        return _assetWidget(asset);
+        return Text('data');
       },
     );
   }
 
-  Widget _assetWidget(AssetEntity asset) {
-    return Stack(
-      children: [
-        Positioned.fill(
-          child: Padding(
-            padding: EdgeInsets.all(0),
-            child: AssetEntityImage(
-              asset,
-              isOriginal: false, // dùng thumbnail cho nhanh
-              thumbnailSize: const ThumbnailSize.square(
-                250,
-              ), // kích thước thumbnail
-              fit: BoxFit.cover, // cách hiển thị
-              errorBuilder: (context, error, stackTrace) {
-                return const Center(
-                  child: Icon(Icons.error, color: Colors.red),
-                );
+  Widget _buildListImage(BuildContext context) {
+    return BlocListener<MediaPickedBloc, MediaPickedState>(
+      listener: (context, state) {
+        if (state is MediaPickedSuccess && state.errorMessage != null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(state.errorMessage!),
+              backgroundColor: Colors.red,
+              behavior: SnackBarBehavior.floating,
+              duration: const Duration(seconds: 2),
+            ),
+          );
+          Future.delayed(const Duration(seconds: 2), () {});
+        }
+      },
+      child: BlocBuilder<MediaPickedBloc, MediaPickedState>(
+        builder: (context, state) {
+          if (state is MediaPickedSuccess) {
+            final assetList = state.asset;
+            final mediaPickerList = state.selectedAsset;
+            final selectedAssets = state.selectedAsset ?? [];
+
+            return GridView.builder(
+              padding: const EdgeInsets.all(2),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 3,
+                crossAxisSpacing: 2,
+                mainAxisSpacing: 2,
+                childAspectRatio: 0.6,
+              ),
+              itemCount: assetList.length + 1,
+              itemBuilder: (context, index) {
+                if (index == 0) {
+                  return GestureDetector(
+                    onTap: () {
+                      // chuyển qua CreateReelsPage, truyền danh sách asset đã chọn
+                      if (selectedAssets.isEmpty) {
+                        context
+                            .pushNamed(
+                              PathName.createReelsPage,
+                              extra: mediaPickerList ?? [],
+                            )
+                            .then((_) {
+                              state.selectedAsset?.clear();
+                              state.isSelecting = false;
+                            });
+                      }
+                    },
+                    child: Container(
+                      color:
+                          selectedAssets.isEmpty
+                              ? AppColors.gray60
+                              : AppColors.gray80,
+                      child: const Center(
+                        child: Icon(
+                          Icons.camera_alt,
+                          size: 32,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  );
+                }
+
+                final asset = assetList[index - 1];
+                return _assetWidget(asset);
               },
+            );
+          } else if (state is MediaPickedFailure) {
+            return Center(
+              child: Text(
+                state.errorMessage,
+                style: AppStyles.bodyBold.copyWith(color: Colors.white),
+              ),
+            );
+          }
+          return const Center(child: CircularProgressIndicator());
+        },
+      ),
+    );
+  }
+
+  Widget _assetWidget(AssetEntity asset) {
+    return BlocBuilder<MediaPickedBloc, MediaPickedState>(
+      builder: (context, state) {
+        if (state is MediaPickedSuccess) {
+          final selectedAssets = state.selectedAsset ?? [];
+          final isSelected = selectedAssets.contains(asset);
+          final indexSelected =
+              isSelected ? selectedAssets.indexOf(asset) + 1 : null;
+
+          return GestureDetector(
+            onTap: () {
+              if (selectedAssets.isNotEmpty || state.isSelecting == true) {
+                context.read<MediaPickedBloc>().add(
+                  ChooseMedia(asset: asset, isSelecting: true),
+                );
+              } else {
+                context
+                    .pushNamed(PathName.createReelsPage, extra: [asset])
+                    .then((_) {
+                      state.selectedAsset?.clear();
+                      state.isSelecting = false;
+                    });
+              }
+            },
+            onLongPress: () {
+              context.read<MediaPickedBloc>().add(
+                ChooseMedia(asset: asset, isSelecting: true),
+              );
+            },
+            child: Stack(
+              children: [
+                // ảnh nền
+                Positioned.fill(
+                  child: AssetEntityImage(
+                    asset,
+                    isOriginal: false,
+                    thumbnailSize: const ThumbnailSize.square(250),
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return const Center(
+                        child: Icon(Icons.error, color: Colors.red),
+                      );
+                    },
+                  ),
+                ),
+
+                // icon video nếu có
+                if (asset.type == AssetType.video)
+                  Positioned(
+                    right: 5,
+                    bottom: 5,
+                    child: SvgPicture.asset(
+                      AppImages.icReelsActive,
+                      width: 24,
+                      height: 24,
+                      color: AppColors.gray30,
+                    ),
+                  ),
+
+                // vòng tròn số thứ tự chọn
+                if (state.isSelecting == true)
+                  Positioned(
+                    right: 5,
+                    top: 5,
+                    child: Container(
+                      width: 24,
+                      height: 24,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color:
+                              isSelected ? AppColors.blue40 : AppColors.gray60,
+                          width: 1,
+                        ),
+                        color:
+                            isSelected ? AppColors.blue40 : Colors.transparent,
+                      ),
+                      child: Center(
+                        child:
+                            isSelected
+                                ? Text(
+                                  '$indexSelected',
+                                  style: AppStyles.calloutRegular.copyWith(
+                                    color: Colors.white,
+                                  ),
+                                )
+                                : null,
+                      ),
+                    ),
+                  ),
+              ],
             ),
-          ),
-        ),
-        if (asset.type == AssetType.video)
-          Positioned(
-            right: 5,
-            bottom: 5,
-            child: SvgPicture.asset(
-              AppImages.icReelsActive,
-              width: 24,
-              height: 24,
-              color: AppColors.red100,
+          );
+        } else {
+          return const SizedBox();
+        }
+      },
+    );
+  }
+
+  Widget _buildListAssetSelected(BuildContext context) {
+    return BlocBuilder<MediaPickedBloc, MediaPickedState>(
+      builder: (context, state) {
+        if (state is MediaPickedSuccess &&
+            (state.selectedAsset?.isNotEmpty ?? false)) {
+          final assetList = state.selectedAsset!;
+
+          return Container(
+            height: 80,
+            decoration: BoxDecoration(color: AppColors.gray90.withOpacity(0.5)),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: GridView.builder(
+                    padding: const EdgeInsets.all(8),
+                    scrollDirection: Axis.horizontal,
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 1,
+                          crossAxisSpacing: 8,
+                          childAspectRatio: 1.4,
+                        ),
+                    itemCount: assetList.length,
+                    itemBuilder: (context, index) {
+                      final asset = assetList[index];
+                      return Stack(
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(6),
+                            child: AssetEntityImage(
+                              asset,
+                              width: 32,
+                              height: 64,
+                              isOriginal: false,
+                              thumbnailSize: const ThumbnailSize.square(250),
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                return const Center(
+                                  child: Icon(Icons.error, color: Colors.red),
+                                );
+                              },
+                            ),
+                          ),
+                          Positioned(
+                            top: 0,
+                            right: 8,
+                            child: Container(
+                              width: 16,
+                              height: 16,
+                              decoration: BoxDecoration(
+                                color: AppColors.gray60,
+                                shape: BoxShape.circle,
+                              ),
+                              child: IconButton(
+                                padding: EdgeInsets.zero,
+                                constraints: const BoxConstraints(),
+                                onPressed: () {
+                                  context.read<MediaPickedBloc>().add(
+                                    ChooseMedia(asset: asset),
+                                  );
+                                },
+                                icon: SvgPicture.asset(
+                                  AppImages.icClose,
+                                  width: 8,
+                                  height: 8,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                  ),
+                ),
+                commonButton(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  text: 'Tiếp',
+                  onTap: () {
+                    print('List Asset: ${state.selectedAsset ?? []}');
+                    context
+                        .pushNamed(
+                          PathName.createReelsPage,
+                          extra: state.selectedAsset,
+                        )
+                        .then((_) {
+                          state.selectedAsset?.clear();
+                          state.isSelecting = false;
+                        });
+                  },
+                  color: AppColors.white,
+                ),
+              ],
             ),
-          ),
-      ],
+          );
+        } else {
+          return const SizedBox.shrink(); // ẩn hoàn toàn khi không có asset
+        }
+      },
     );
   }
 
@@ -517,8 +741,8 @@ class _CreateReelPageState extends State<CreateReelsPage> {
               children: [
                 GestureDetector(
                   onTap: () {
-                    context.read<CreateReelsBloc>().add(
-                      LoadRequest(RequestType.common, 5),
+                    context.read<MediaPickedBloc>().add(
+                      LoadRequest(requestType: RequestType.common, maxCount: 5),
                     );
                     context.pop();
                   },
@@ -532,8 +756,11 @@ class _CreateReelPageState extends State<CreateReelsPage> {
                         child: IconButton(
                           color: AppColors.white,
                           onPressed: () {
-                            context.read<CreateReelsBloc>().add(
-                              LoadRequest(RequestType.common, 5),
+                            context.read<MediaPickedBloc>().add(
+                              LoadRequest(
+                                requestType: RequestType.common,
+                                maxCount: 5,
+                              ),
                             );
                             context.pop();
                           },
@@ -548,8 +775,8 @@ class _CreateReelPageState extends State<CreateReelsPage> {
                 const SizedBox(width: 12),
                 GestureDetector(
                   onTap: () {
-                    context.read<CreateReelsBloc>().add(
-                      LoadRequest(RequestType.image, 5),
+                    context.read<MediaPickedBloc>().add(
+                      LoadRequest(requestType: RequestType.image, maxCount: 5),
                     );
                     context.pop();
                     print('object');
@@ -564,8 +791,11 @@ class _CreateReelPageState extends State<CreateReelsPage> {
                         child: IconButton(
                           color: AppColors.white,
                           onPressed: () {
-                            context.read<CreateReelsBloc>().add(
-                              LoadRequest(RequestType.image, 5),
+                            context.read<MediaPickedBloc>().add(
+                              LoadRequest(
+                                requestType: RequestType.image,
+                                maxCount: 5,
+                              ),
                             );
                             context.pop();
                           },
@@ -581,8 +811,8 @@ class _CreateReelPageState extends State<CreateReelsPage> {
                 const SizedBox(width: 12),
                 GestureDetector(
                   onTap: () {
-                    context.read<CreateReelsBloc>().add(
-                      LoadRequest(RequestType.video, 5),
+                    context.read<MediaPickedBloc>().add(
+                      LoadRequest(requestType: RequestType.video, maxCount: 5),
                     );
                     context.pop();
                   },
@@ -596,8 +826,11 @@ class _CreateReelPageState extends State<CreateReelsPage> {
                         child: IconButton(
                           color: AppColors.white,
                           onPressed: () {
-                            context.read<CreateReelsBloc>().add(
-                              LoadRequest(RequestType.video, 5),
+                            context.read<MediaPickedBloc>().add(
+                              LoadRequest(
+                                requestType: RequestType.video,
+                                maxCount: 5,
+                              ),
                             );
                             context.pop();
                           },
@@ -654,8 +887,12 @@ class _CreateReelPageState extends State<CreateReelsPage> {
                             : null;
                     return GestureDetector(
                       onTap: () {
-                        context.read<CreateReelsBloc>().add(
-                          LoadRequest(e.type, 5, selectedAlbum: e),
+                        context.read<MediaPickedBloc>().add(
+                          LoadRequest(
+                            requestType: e.type,
+                            maxCount: 5,
+                            selectedAlbum: e,
+                          ),
                         );
                         context.pop();
                       },
@@ -800,8 +1037,12 @@ class _CreateReelPageState extends State<CreateReelsPage> {
                         : null;
                 return GestureDetector(
                   onTap: () {
-                    context.read<CreateReelsBloc>().add(
-                      LoadRequest(e.type, 5, selectedAlbum: e),
+                    context.read<MediaPickedBloc>().add(
+                      LoadRequest(
+                        requestType: e.type,
+                        maxCount: 5,
+                        selectedAlbum: e,
+                      ),
                     );
                     context.pop();
                   },

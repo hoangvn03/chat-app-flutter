@@ -62,6 +62,11 @@
 		<string>Allow access to microphone to record audio in videos</string>
 
 		<false/>
-		
+		<key>NSAppTransportSecurity</key>
+		<dict>
+			<key>NSAllowsArbitraryLoads</key>
+			<true/>
+		</dict>
+
 	</dict>
 </plist>

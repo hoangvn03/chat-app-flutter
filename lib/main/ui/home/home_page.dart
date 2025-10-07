@@ -129,55 +129,6 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildUserList(List<UserModel> users, BuildContext context) {
-    return ListView.builder(
-      itemCount: users.length,
-      itemBuilder: (context, index) {
-        final user = users[index];
-        return ListTile(
-          leading: Text(user.id.toString()),
-          title: Text(user.email ?? 'No username provided'),
-          subtitle: Text(user.name ?? 'No email provided'),
-          trailing: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              IconButton(
-                icon: Icon(Icons.edit),
-                onPressed: () {
-                  showDialog(
-                    context: context,
-                    builder: (dialogContext) {
-                      return buildEditDialog(
-                        context: context,
-                        onSave: () {
-                          final updatedUser = UserModel(
-                            id: user.id!,
-                            email: usernameController.text,
-                          );
-                          context.read<HomeBloc>().add(UpdateUser(updatedUser));
-                        },
-                      );
-                      ;
-                    },
-                  );
-                },
-              ),
-              IconButton(
-                icon: Icon(Icons.delete),
-                onPressed: () {
-                  context.read<HomeBloc>().add(DeletetUser(user.id ?? 0));
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Deleted user: ${user.email}')),
-                  );
-                },
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
   Widget buildEditDialog({
     required BuildContext context,
     required VoidCallback onSave,
@@ -229,8 +180,8 @@ class _HomePageState extends State<HomePage> {
           if (index == 0) {
             // item đầu tiên là "Your Story"
             return GestureDetector(
-              onTap: (){
-                context.pushNamed(PathName.createReelsPage);
+              onTap: () {
+                context.pushNamed(PathName.mediaPickedPage);
               },
               child: Padding(
                 padding: const EdgeInsets.only(right: 12),
@@ -240,7 +191,9 @@ class _HomePageState extends State<HomePage> {
                       clipBehavior: Clip.none,
                       children: [
                         Container(
-                          decoration: const BoxDecoration(shape: BoxShape.circle),
+                          decoration: const BoxDecoration(
+                            shape: BoxShape.circle,
+                          ),
                           child: Center(
                             child: ClipOval(
                               child: Image.asset(
