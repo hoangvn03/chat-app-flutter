@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chat_app/main/networks/model/reels.dart';
 import 'package:chat_app/main/networks/model/user.dart';
@@ -7,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:photo_manager/photo_manager.dart';
+import 'package:photo_manager_image_provider/photo_manager_image_provider.dart';
 import 'package:video_player/video_player.dart';
 
 // ignore: must_be_immutable
@@ -95,34 +98,57 @@ class _StoryScreenState extends State<StoryScreen>
               itemCount: widget.stories.length,
               itemBuilder: (context, i) {
                 final ReelModel story = widget.stories[i];
-                switch (story.media) {
-                  case MediaType.image:
-                    return CachedNetworkImage(
-                      imageUrl:
-                          story.url ??
-                          'https://images.unsplash.com/photo-1534103362078-d07e750bd0c4?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=634&q=80',
+                final listAsset = widget.stories[i].assetList;
+                return (listAsset?.first is String)
+                    ? Image.file(
+                      File(listAsset?[0]),
                       fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          color: Colors.grey,
+                          child: const Center(
+                            child: Icon(Icons.error, color: Colors.red),
+                          ),
+                        );
+                      },
+                    )
+                    : AssetEntityImage(
+                      listAsset?[0],
+                      isOriginal: false,
+                      thumbnailSize: const ThumbnailSize.square(250),
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return const Center(
+                          child: Icon(Icons.error, color: Colors.red),
+                        );
+                      },
                     );
-
-                  case MediaType.video:
-                    if (_videoController != null &&
-                        _videoController!.value.isInitialized) {
-                      return FittedBox(
-                        fit: BoxFit.cover,
-                        child: SizedBox(
-                          width: _videoController!.value.size.width,
-                          height: _videoController!.value.size.height,
-                          child: VideoPlayer(_videoController!),
-                        ),
-                      );
-                    } else {
-                      return const Center(child: CircularProgressIndicator());
-                    }
-
-                  case null:
-                    // Nếu story.media bị null → trả về widget mặc định
-                    return const SizedBox.shrink();
-                }
+                // switch (story.media) {
+                //   case MediaType.image:
+                //     return CachedNetworkImage(
+                //       imageUrl:
+                //           story.url ??
+                //           'https://images.unsplash.com/photo-1534103362078-d07e750bd0c4?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=634&q=80',
+                //       fit: BoxFit.cover,
+                //     );
+                //   case MediaType.video:
+                //     if (_videoController != null &&
+                //         _videoController!.value.isInitialized) {
+                //       return FittedBox(
+                //         fit: BoxFit.cover,
+                //         child: SizedBox(
+                //           width: _videoController!.value.size.width,
+                //           height: _videoController!.value.size.height,
+                //           child: VideoPlayer(_videoController!),
+                //         ),
+                //       );
+                //     } else {
+                //       return const Center(child: CircularProgressIndicator());
+                //     }
+                //   case null:
+                //     // Nếu story.media bị null → trả về widget mặc định
+                //     return const SizedBox.shrink();
+                // }
               },
             ),
             Positioned(

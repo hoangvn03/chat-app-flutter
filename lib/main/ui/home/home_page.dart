@@ -171,7 +171,7 @@ class _HomePageState extends State<HomePage> {
     final allReels = [null, ...reels]; // null đại diện cho "Your Story"
 
     return Container(
-      height: 120,
+      height: 100,
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: ListView.builder(
         scrollDirection: Axis.horizontal,

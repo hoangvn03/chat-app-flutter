@@ -16,6 +16,7 @@ class AppPath {
   static const String createReelsPage = "/createReelsPage";
   static const String mediaPickedPage = "/mediaPickedPage";
   static const String listReelsPage = "/listReelsPage";
+  static const String cameraPage = "/cameraPage";
 
   ///context.gp(AppPath.homePage)
 }
@@ -38,6 +39,7 @@ class PathName {
   static const String createReelsPage = "createReelsPage";
   static const String mediaPickedPage = "mediaPickedPage";
   static const String listReelsPage = "listReelsPage";
+  static const String cameraPage = "cameraPage";
 
   ///context.goNamed(PathName.homePage)
 }

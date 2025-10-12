@@ -15,23 +15,32 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     on<LoadRequest>(_loadRequest);
   }
   UserModel user = UserModel();
+  bool isCurrientUser = true;
+
   Future<void> _loadListUser(
     LoadRequest event,
     Emitter<ProfileState> emit,
   ) async {
     try {
-      var url = ApiEndPoints.USERINFO;
-      final response = await ApiUtil.post(url: url);
-      if (response['code'] == 0) {
-        user = UserModel.fromJson(response['user']);
+      if (isCurrientUser) {
+        final user = UserModel(
+          name: 'ngoc_hoang',
+          avatar: AppImages.imgAvatarDefault,
+        );
         emit(ProfileSuccess(user: user));
       } else {
-        emit(ProfileFailure());
+        var url = ApiEndPoints.USERINFO;
+        final response = await ApiUtil.post(url: url);
+        if (response['code'] == 0) {
+          user = UserModel.fromJson(response['user']);
+          emit(ProfileSuccess(user: user));
+        } else {
+          emit(ProfileFailure());
+        }
       }
     } catch (e) {
       emit(ProfileFailure());
     }
-    return;
   }
 
   Future<void> _loadRequest(
@@ -39,6 +48,10 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     Emitter<ProfileState> emit,
   ) async {
     try {
+              final user = UserModel(
+          name: 'ngoc_hoang',
+          avatar: AppImages.imgAvatarDefault,
+        );
       final List<PostModel> posts = [
         PostModel(
           id: "1",
@@ -161,7 +174,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
         ReelModel(user: UserModel(name: "Hoang")),
         ReelModel(user: UserModel(name: "Tuan Anh")),
       ];
-      emit(ProfileSuccess(reels: reels, posts: posts));
+      emit(ProfileSuccess(reels: reels, posts: posts,user: user));
     } catch (e) {
       emit(ProfileFailure());
     }

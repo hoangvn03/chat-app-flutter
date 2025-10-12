@@ -4,6 +4,7 @@ import 'package:chat_app/res/app_images.dart';
 import 'package:chat_app/res/app_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:go_router/go_router.dart';
 
 //Common
 Widget commonButton({
@@ -18,6 +19,7 @@ Widget commonButton({
   padding,
   margin,
   textStyle,
+  mainWidget,
   double? height,
   bool? hasHeight,
   bool? uppercase,
@@ -42,22 +44,24 @@ Widget commonButton({
         color: color ?? AppColors.blue60,
       ),
       child: Center(
-        child: Text(
-          textAlign: TextAlign.center,
-          text,
-          style:
-              textStyle ??
-              TextStyle(
-                color:
-                    textColor ??
-                    (color == AppColors.white
-                        ? AppColors.black
-                        : AppColors.white),
+        child:
+            mainWidget ??
+            Text(
+              textAlign: TextAlign.center,
+              text,
+              style:
+                  textStyle ??
+                  TextStyle(
+                    color:
+                        textColor ??
+                        (color == AppColors.white
+                            ? AppColors.black
+                            : AppColors.white),
 
-                fontSize: fontSize ?? 15,
-                fontWeight: FontWeight.w500,
-              ),
-        ),
+                    fontSize: fontSize ?? 15,
+                    fontWeight: FontWeight.w500,
+                  ),
+            ),
       ),
     ),
   );
@@ -441,6 +445,78 @@ Widget commonTileItem({
   );
 }
 
+Widget totalUserFollow({
+  VoidCallback? ontap,
+  bool isHideName = false,
+  required List<String> images,
+  required List<String> fistUser,
+}) {
+  return GestureDetector(
+    onTap: ontap,
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        SizedBox(
+          height: 28,
+          width: images.length * 20,
+          child: Stack(
+            clipBehavior: Clip.none,
+            children:
+                List.generate(images.length, (index) {
+                  return Positioned(
+                    left: index * 20, // 👈 khoảng cách chồng nhau
+                    child: Container(
+                      width: 28,
+                      height: 28,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Colors.white, width: 1),
+                      ),
+                      child: ClipOval(
+                        child: Image.asset(images[index], fit: BoxFit.cover),
+                      ),
+                    ),
+                  );
+                }).reversed.toList(),
+          ),
+        ),
+        const SizedBox(width: 12),
+        if (!isHideName)
+          GestureDetector(
+            onTap: () {
+              //Todo
+            },
+            child: RichText(
+              text: TextSpan(
+                text: 'Có',
+                style: AppStyles.bodyRegular,
+                children: [
+                  TextSpan(
+                    text: " ${fistUser[0]}", // 👈 text giống Insta
+                    style: AppStyles.bodyBold,
+                  ),
+                  TextSpan(
+                    text: " và", // 👈 text giống Insta
+                    style: AppStyles.bodyRegular,
+                  ),
+                  TextSpan(
+                    text:
+                        " ${fistUser.length} người khác", // 👈 text giống Insta
+                    style: AppStyles.bodyBold,
+                  ),
+                  TextSpan(
+                    text: " theo dõi", // 👈 text giống Insta
+                    style: AppStyles.bodyRegular,
+                  ),
+                ],
+              ),
+            ),
+          ),
+      ],
+    ),
+  );
+}
+
 //Icon
 Widget iconLikeNotification({bool isHasNotification = false}) {
   return Stack(
@@ -500,5 +576,23 @@ Widget iconMaintaining() {
       const SizedBox(height: 8),
       Text("Chức năng đang được phát triển"),
     ],
+  );
+}
+
+Widget iconCloseBottomSheet(BuildContext context) {
+  return InkWell(
+    onTap: () {
+      context.pop();
+    },
+    child: Container(
+      margin: EdgeInsets.only(bottom: 12),
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(15),
+        color: AppColors.gray30,
+      ),
+      height: 3,
+      width: 42,
+    ),
   );
 }

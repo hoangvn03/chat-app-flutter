@@ -11,10 +11,11 @@ import 'package:chat_app/main/ui/personal/personal_page.dart';
 import 'package:chat_app/main/ui/post/post_page.dart';
 import 'package:chat_app/main/ui/profile/profile_list_follower.dart';
 import 'package:chat_app/main/ui/profile/profile_page.dart';
+import 'package:chat_app/main/ui/reels/camera/camera_page.dart';
 import 'package:chat_app/main/ui/reels/create_reels/create_reels_page.dart';
 import 'package:chat_app/main/ui/reels/list_reels/list_reels_page.dart';
 import 'package:chat_app/main/ui/reels/media_picked/media_picked_page.dart';
-import 'package:chat_app/main/ui/reels/create_reels/reels_page.dart';
+import 'package:chat_app/main/ui/reels/reels_page.dart';
 import 'package:chat_app/main/ui/search/search_page.dart';
 import 'package:chat_app/main/ui/search/search_result_page.dart';
 import 'package:flutter/material.dart';
@@ -87,8 +88,8 @@ class AppGoRouter {
         name: PathName.createReelsPage,
         path: AppPath.createReelsPage,
         builder: (context, state) {
-          final assetList = state.extra as List<AssetEntity>?;
-          return CreateReelsPage(assetList: assetList);
+          final listImagePath = state.extra as List<dynamic>;
+          return CreateReelsPage(listImagePath: listImagePath);
         },
       ),
 
@@ -97,6 +98,13 @@ class AppGoRouter {
         path: AppPath.mediaPickedPage,
         builder: (context, state) {
           return MediaPickedPage();
+        },
+      ),
+      GoRoute(
+        name: PathName.cameraPage,
+        path: AppPath.cameraPage,
+        builder: (context, state) {
+          return CameraPage();
         },
       ),
       GoRoute(
@@ -177,7 +185,7 @@ class AppGoRouter {
                 name: PathName.personalPage,
                 path: AppPath.personalPage,
                 builder: (context, state) {
-                  return const PersonalPage();
+                  return ProfilePage();
                 },
               ),
             ],

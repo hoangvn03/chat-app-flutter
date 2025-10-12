@@ -5,19 +5,10 @@ abstract class CreateReelsState {}
 
 class CreateReelsLoading extends CreateReelsState {}
 
-class CreateReelsWithCamera extends CreateReelsState {
-  CreateReelsWithCamera();
-}
-
-class CreateReelsWithMediaPicked extends CreateReelsState {
+class CreateReelsSuccess extends CreateReelsState {
   List<AssetEntity> mediaPicked;
 List<ReelModel> stories;
-  CreateReelsWithMediaPicked({required this.mediaPicked,required this.stories});
-}
-
-class CreateReelsSuccess extends CreateReelsState {
-  CreateReelsSuccess();
-}
+  CreateReelsSuccess({required this.mediaPicked,required this.stories});}
 
 class CreateReelsFailure extends CreateReelsState {
   final String errorMessage;

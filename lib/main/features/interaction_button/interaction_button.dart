@@ -18,6 +18,7 @@ Widget interactionButton({
   Function? onTapState1,
   Function? onTapState2,
   Color? backgroundColor,
+  Color? colorBorder,
   TextStyle? textStyle,
   InteractionType? type,
 }) {
@@ -28,8 +29,40 @@ Widget interactionButton({
         switch (type) {
           case InteractionType.follow:
             return state.isFollowed
-                ? followButtonV2(context: context, text: 'Đang theo dõi')
-                : followButtonV2(context: context, text: 'Theo dõi');
+                ? commonButton(
+                  hasHeight: true,
+                  height: 28,
+                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 0),
+                  margin: EdgeInsets.zero,
+                  textStyle:
+                      textStyle ??
+                      AppStyles.bodyBold.copyWith(color: AppColors.gray80),
+                  color: backgroundColor ?? AppColors.gray30,
+                  colorBorder: colorBorder,
+                  text: 'Đang theo dõi',
+                  onTap: () {
+                    onTapState2;
+                    context.read<InteractionBloc>().add(FollowUser());
+                  },
+                  radius: 6,
+                )
+                : commonButton(
+                  hasHeight: true,
+                  height: 28,
+                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 0),
+                  margin: EdgeInsets.zero,
+                  textStyle:
+                      textStyle ??
+                      AppStyles.bodyBold.copyWith(color: AppColors.gray80),
+                  color: backgroundColor ?? AppColors.gray30,
+                  colorBorder: colorBorder,
+                  text: 'Theo dõi',
+                  onTap: () {
+                    onTapState2;
+                    context.read<InteractionBloc>().add(FollowUser());
+                  },
+                  radius: 6,
+                );
 
           case InteractionType.like:
             return likeButton(
@@ -80,6 +113,7 @@ Widget readMoreDescription(
         // Trường hợp đang mở rộng
         if (state.isReadMore) {
           return Text.rich(
+            textAlign: TextAlign.left,
             TextSpan(
               children: [
                 TextSpan(text: text, style: defaultStyle),
@@ -97,7 +131,7 @@ Widget readMoreDescription(
           );
         } else {
           // Đo text để biết có vượt numLine hay không
-          final span = TextSpan(text: text, style: defaultStyle);
+          final span = TextSpan(text: text, style: defaultStyle,);
           final tp = TextPainter(
             text: span,
             maxLines: numLine,
@@ -184,7 +218,7 @@ Widget saveButton({
 }) {
   return GestureDetector(
     onTap: () {
-      if (onTapState1 != null) onTapState1(); 
+      if (onTapState1 != null) onTapState1();
       context.read<InteractionBloc>().add(SavePost());
     },
     child: SvgPicture.asset(icon ?? AppImages.icSave, width: 24, height: 24),

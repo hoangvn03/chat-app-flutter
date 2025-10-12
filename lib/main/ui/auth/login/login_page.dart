@@ -6,6 +6,7 @@ import 'package:chat_app/main/ui/auth/login/bloc/login_bloc.dart';
 import 'package:chat_app/main/ui/auth/login/bloc/login_event.dart';
 import 'package:chat_app/main/ui/auth/login/bloc/login_state.dart';
 import 'package:chat_app/main/utils/common_widget.dart';
+import 'package:chat_app/main/utils/shared_preference.dart';
 import 'package:chat_app/res/app_colors.dart';
 import 'package:chat_app/res/app_fonts.dart';
 import 'package:chat_app/res/app_images.dart';
@@ -114,9 +115,10 @@ class _LoginPageState extends State<LoginPage> {
             },
           ),
         ),
-        CircleAvatar(
-          radius: 60,
-          backgroundColor: AppColors.gray30, // màu nền
+        Container(
+          width: 86,
+          height: 86,
+          decoration: BoxDecoration(shape: BoxShape.circle),
           child: Image.asset(
             AppImages.imgAvatarDefault, // đường dẫn svg
             fit: BoxFit.cover,
@@ -128,8 +130,13 @@ class _LoginPageState extends State<LoginPage> {
           text: "Tiếp tục",
           color: AppColors.blue60,
           margin: EdgeInsets.symmetric(vertical: 16),
-          onTap: () {
-            context.go(AppPath.homePage);
+          onTap: () async {
+            final UserModel user = UserModel(
+              name: 'ngoc_hoang',
+              avatar: AppImages.imgAvatarDefault,
+            );
+            await AppStorage.saveUser(user);
+            context.go(AppPath.homePage, extra: user);
           },
         ),
         InkWell(

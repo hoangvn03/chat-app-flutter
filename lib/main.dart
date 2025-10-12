@@ -1,3 +1,4 @@
+import 'package:camera/camera.dart';
 import 'package:chat_app/main/networks/api_util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -7,8 +8,11 @@ import 'main/router/router_config.dart';
 
 import 'package:flutter_localizations/flutter_localizations.dart';
 
+late List<CameraDescription> cameras;
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  cameras = await availableCameras();
   runApp(
     MultiBlocProvider(
       providers: [BlocProvider(create: (_) => LocaleCubit())],

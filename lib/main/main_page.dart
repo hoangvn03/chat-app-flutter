@@ -1,3 +1,6 @@
+import 'package:chat_app/main/networks/model/user.dart';
+import 'package:chat_app/main/router/router.dart';
+import 'package:chat_app/main/utils/shared_preference.dart';
 import 'package:chat_app/res/app_colors.dart';
 import 'package:chat_app/res/app_images.dart';
 import 'package:chat_app/res/app_styles.dart';
@@ -35,7 +38,7 @@ class _MainPageState extends State<MainPage> {
           BottomNavigationBarItem(
             icon: SvgPicture.asset(AppImages.icCreate),
             activeIcon: SvgPicture.asset(AppImages.icCreateActive),
-            label: "Home",
+            label: "Create Reels",
           ),
           BottomNavigationBarItem(
             icon: SvgPicture.asset(AppImages.icReels),
@@ -53,9 +56,14 @@ class _MainPageState extends State<MainPage> {
         unselectedItemColor: AppColors.white,
         // selectedLabelStyle: AppStyles.inter12w500CenterH18,
         currentIndex: widget.navigationShell.currentIndex,
-        onTap: (index) {
-          widget.navigationShell.goBranch(index, initialLocation: true);
+        onTap: (index) async {
+          if (index == 2) {
+            context.pushNamed(PathName.cameraPage);
+          }else {
+            widget.navigationShell.goBranch(index, initialLocation: true);
+          }
         },
+
         type: BottomNavigationBarType.fixed,
       ),
     );

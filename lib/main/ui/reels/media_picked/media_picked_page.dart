@@ -370,7 +370,6 @@ class _CreateReelPageState extends State<MediaPickedPage> {
         builder: (context, state) {
           if (state is MediaPickedSuccess) {
             final assetList = state.asset;
-            final mediaPickerList = state.selectedAsset;
             final selectedAssets = state.selectedAsset ?? [];
 
             return GridView.builder(
@@ -386,17 +385,11 @@ class _CreateReelPageState extends State<MediaPickedPage> {
                 if (index == 0) {
                   return GestureDetector(
                     onTap: () {
-                      // chuyển qua CreateReelsPage, truyền danh sách asset đã chọn
                       if (selectedAssets.isEmpty) {
-                        context
-                            .pushNamed(
-                              PathName.createReelsPage,
-                              extra: mediaPickerList ?? [],
-                            )
-                            .then((_) {
-                              state.selectedAsset?.clear();
-                              state.isSelecting = false;
-                            });
+                        context.pushNamed(PathName.cameraPage).then((_) {
+                          state.selectedAsset?.clear();
+                          state.isSelecting = false;
+                        });
                       }
                     },
                     child: Container(
@@ -611,6 +604,17 @@ class _CreateReelPageState extends State<MediaPickedPage> {
                 commonButton(
                   padding: const EdgeInsets.symmetric(horizontal: 12),
                   text: 'Tiếp',
+                  mainWidget: Row(
+                    children: [
+                      Text('Tiếp', style: AppStyles.title2Regular),
+                      const SizedBox(width: 2),
+                      SvgPicture.asset(
+                        AppImages.icChevronRight,
+                        width: 16,
+                        height: 16,
+                      ),
+                    ],
+                  ),
                   onTap: () {
                     print('List Asset: ${state.selectedAsset ?? []}');
                     context

@@ -41,6 +41,14 @@ class AppImages {
   static const String icAddHighlight = 'assets/icons/ic_add_highlight.svg';
   static const String icLive = 'assets/icons/ic_live.svg';
   static const String icNote = 'assets/icons/ic_note.svg';
+  static const String icText = 'assets/icons/ic_text.svg';
+  static const String icInfinity = 'assets/icons/ic_infinity.svg';
+  static const String icLayout = 'assets/icons/ic_layout.svg';
+  static const String icRotateCamera = 'assets/icons/ic_rotate_camera.svg';
+  static const String icStickers = 'assets/icons/ic_stickers.svg';
+  static const String icMusic = 'assets/icons/ic_music.svg';
+  static const String icFilters = 'assets/icons/ic_filters.svg';
+  static const String icStartRoundWhite = 'assets/icons/ic_start_round_white.svg';
   //png
     static const String icMetaPng = 'assets/icons/ic_meta.png';
 
