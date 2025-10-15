@@ -1,5 +1,5 @@
-import 'package:chat_app/main/features/interaction_button/bloc/interaction_bloc.dart';
-import 'package:chat_app/main/features/post/post_item_widget.dart';
+import 'package:chat_app/main/ui/widget/interaction_button/bloc/interaction_cubit.dart';
+import 'package:chat_app/main/ui/widget/post/post_item_widget.dart';
 import 'package:chat_app/main/networks/model/post.dart';
 import 'package:chat_app/main/networks/model/reels.dart';
 import 'package:chat_app/main/networks/model/user.dart';
@@ -96,7 +96,9 @@ class _HomePageState extends State<HomePage> {
                     ),
                     actions: [
                       IconButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          context.pushNamed(PathName.notificationPage);
+                        },
                         icon: iconLikeNotification(isHasNotification: true),
                       ),
                       IconButton(
@@ -244,7 +246,7 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
           const SizedBox(height: 4),
-          Text(reel.user!.name ?? "Unknown", style: AppStyles.footnoteRegular),
+          Text(reel.user!.username ?? "Unknown", style: AppStyles.footnoteRegular),
         ],
       ),
     );

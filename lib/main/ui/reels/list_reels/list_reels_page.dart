@@ -183,7 +183,7 @@ class _StoryScreenState extends State<StoryScreen>
                       user:
                           story.user ??
                           UserModel(
-                            name: 'Unknown',
+                            username: 'Unknown',
                             avatar: 'https://wallpapercave.com/wp/AYWg3iu.jpg',
                           ),
                     ),
@@ -351,7 +351,7 @@ class UserInfo extends StatelessWidget {
         const SizedBox(width: 10.0),
         Expanded(
           child: Text(
-            user.name ?? 'Unknown',
+            user.username ?? 'Unknown',
             style: const TextStyle(
               color: Colors.white,
               fontSize: 18.0,

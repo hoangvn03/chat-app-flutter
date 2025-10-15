@@ -1,5 +1,5 @@
-import 'package:chat_app/main/features/account_suggest/account_suggest_widget.dart';
-import 'package:chat_app/main/features/post/post_item_widget.dart';
+import 'package:chat_app/main/ui/widget/account_suggest/account_suggest_widget.dart';
+import 'package:chat_app/main/ui/widget/post/post_item_widget.dart';
 import 'package:chat_app/main/networks/model/message.dart';
 import 'package:chat_app/main/networks/model/post.dart';
 import 'package:chat_app/main/networks/model/reels.dart';
@@ -179,31 +179,28 @@ class _ChatPageState extends State<ChatPage> {
                       const SizedBox(height: 16),
                       _buildListMessage([
                         MessageModel(
-                          status: 'Đã gửi',
-                          userModel: UserModel(
-                            name: 'hieu_pham',
-                            avatar: AppImages.imgAvatarDefault,
-                          ),
-                          userMessage: ['Hello'],
-                          userContactMessage: ['Hi'],
+                          messageId: 1,
+                          conversationId: 101,
+                          senderId: 1,
+                          content: 'Hello',
+                          createdAt: DateTime.now(),
+                          isRead: true,
                         ),
                         MessageModel(
-                          status: 'Đã gửi',
-                          userModel: UserModel(
-                            name: 'tuan_anh',
-                            avatar: AppImages.imgAvatarDefault,
-                          ),
-                          userMessage: ['Hello'],
-                          userContactMessage: ['Hi'],
+                          messageId: 2,
+                          conversationId: 101,
+                          senderId: 2,
+                          content: 'Hi',
+                          createdAt: DateTime.now(),
+                          isRead: true,
                         ),
                         MessageModel(
-                          status: 'Có lỗi khi gửi',
-                          userModel: UserModel(
-                            name: 'thanh_nguyen',
-                            avatar: AppImages.imgAvatarDefault,
-                          ),
-                          userMessage: ['Hello'],
-                          userContactMessage: ['Hi'],
+                          messageId: 3,
+                          conversationId: 102,
+                          senderId: 3,
+                          content: 'Hello',
+                          createdAt: DateTime.now(),
+                          isRead: false,
                         ),
                       ]),
                       const SizedBox(height: 8),
@@ -212,23 +209,23 @@ class _ChatPageState extends State<ChatPage> {
                         title: 'Tài khoản nên theo dõi',
                         users: [
                           UserModel(
-                            name: 'hieu_pham',
+                            username: 'hieu_pham',
                             avatar: AppImages.imgAvatarDefault,
                           ),
                           UserModel(
-                            name: 'tuan_anh',
+                            username: 'tuan_anh',
                             avatar: AppImages.imgAvatarDefault,
                           ),
                           UserModel(
-                            name: 'nguyen_nguyen',
+                            username: 'nguyen_nguyen',
                             avatar: AppImages.imgAvatarDefault,
                           ),
                           UserModel(
-                            name: 'ngoc_hoang',
+                            username: 'ngoc_hoang',
                             avatar: AppImages.imgAvatarDefault,
                           ),
                           UserModel(
-                            name: 'minh_hieu',
+                            username: 'minh_hieu',
                             avatar: AppImages.imgAvatarDefault,
                           ),
                         ],
@@ -298,14 +295,9 @@ class _ChatPageState extends State<ChatPage> {
       onTap: () {
         context.pushNamed(PathName.chatRoomPage, extra: message);
       },
-      title: Text(
-        message.userModel != null
-            ? message.userModel!.name ?? 'Unknown'
-            : 'Unknown',
-        style: AppStyles.title2Regular,
-      ),
+      title: Text(message.content, style: AppStyles.title2Regular),
       subtitle: Text(
-        message.status ?? 'Có lỗi khi gửi',
+        message.isRead ? 'Đã xem' : 'Đã gửi',
         style: AppStyles.bodyRegular,
       ),
     );

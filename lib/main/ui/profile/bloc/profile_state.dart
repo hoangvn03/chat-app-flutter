@@ -10,4 +10,7 @@ class ProfileSuccess extends ProfileState {
   List<PostModel>? posts;
   ProfileSuccess({this.user,this.reels,this.posts});
 }
-class ProfileFailure extends ProfileState {}
+class ProfileFailure extends ProfileState {
+  String? erroMessage;
+  ProfileFailure({this.erroMessage});
+}

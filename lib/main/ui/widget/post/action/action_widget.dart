@@ -1,8 +1,8 @@
-import 'package:chat_app/main/features/interaction_button/bloc/interaction_bloc.dart';
-import 'package:chat_app/main/features/interaction_button/interaction_button.dart';
-import 'package:chat_app/main/features/post/action/bloc/action_bloc.dart';
-import 'package:chat_app/main/features/post/action/bloc/action_event.dart';
-import 'package:chat_app/main/features/post/action/bloc/action_state.dart';
+import 'package:chat_app/main/ui/widget/interaction_button/bloc/interaction_cubit.dart';
+import 'package:chat_app/main/ui/widget/interaction_button/interaction_button.dart';
+import 'package:chat_app/main/ui/widget/post/action/bloc/action_bloc.dart';
+import 'package:chat_app/main/ui/widget/post/action/bloc/action_event.dart';
+import 'package:chat_app/main/ui/widget/post/action/bloc/action_state.dart';
 import 'package:chat_app/main/networks/model/comment.dart';
 import 'package:chat_app/main/utils/common_widget.dart';
 import 'package:chat_app/res/app_colors.dart';
@@ -122,7 +122,7 @@ Widget commentItem(CommentItemModel item) {
                   style: AppStyles.bodyRegular, // 👈 cần có style
                   children: [
                     TextSpan(
-                      text: item.user.name ?? 'Unknown',
+                      text: item.user.username ?? 'Unknown',
                       style: AppStyles.calloutBold,
                     ),
                     TextSpan(

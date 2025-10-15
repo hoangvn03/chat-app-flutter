@@ -6,6 +6,7 @@ import 'package:chat_app/main/networks/model/reels.dart';
 import 'package:chat_app/main/networks/model/user.dart';
 import 'package:chat_app/main/ui/profile/bloc/profile_event.dart';
 import 'package:chat_app/main/ui/profile/bloc/profile_state.dart';
+import 'package:chat_app/main/utils/shared_preference.dart';
 import 'package:chat_app/res/app_images.dart';
 
 import '../../../networks/api_util.dart';
@@ -13,30 +14,24 @@ import '../../../networks/api_util.dart';
 class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
   ProfileBloc() : super(ProfileLoading()) {
     on<LoadRequest>(_loadRequest);
+    on<ClearStrogeUser>(_clearUser);
   }
   UserModel user = UserModel();
   bool isCurrientUser = true;
 
-  Future<void> _loadListUser(
-    LoadRequest event,
+  Future<void> _clearUser(
+    ClearStrogeUser event,
     Emitter<ProfileState> emit,
   ) async {
     try {
-      if (isCurrientUser) {
-        final user = UserModel(
-          name: 'ngoc_hoang',
-          avatar: AppImages.imgAvatarDefault,
-        );
-        emit(ProfileSuccess(user: user));
-      } else {
-        var url = ApiEndPoints.USERINFO;
-        final response = await ApiUtil.post(url: url);
-        if (response['code'] == 0) {
-          user = UserModel.fromJson(response['user']);
-          emit(ProfileSuccess(user: user));
-        } else {
-          emit(ProfileFailure());
-        }
+      emit(ProfileLoading());
+      final token = await AppStorage.getToken();
+      var url = ApiEndPoints.SIGNIN;
+      var data = {'token': token};
+      final response = await ApiUtil.post(url: url, data: data);
+      if (response['message'] == 'Logout successful') {
+        final res = response['message'];
+        await AppStorage.clearUser();
       }
     } catch (e) {
       emit(ProfileFailure());
@@ -48,15 +43,15 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     Emitter<ProfileState> emit,
   ) async {
     try {
-              final user = UserModel(
-          name: 'ngoc_hoang',
-          avatar: AppImages.imgAvatarDefault,
-        );
+      final user = UserModel(
+        username: 'ngoc_hoang',
+        avatar: AppImages.imgAvatarDefault,
+      );
       final List<PostModel> posts = [
         PostModel(
           id: "1",
           user: UserModel(
-            name: 'hieu_pham',
+            username: 'hieu_pham',
             avatar: AppImages.imgAvatarDefault,
           ),
           postImage: "https://picsum.photos/400/400?random=1",
@@ -68,7 +63,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
         PostModel(
           id: "2",
           user: UserModel(
-            name: 'linh_nguyen',
+            username: 'linh_nguyen',
             avatar: AppImages.imgAvatarDefault,
           ),
           postImage: "https://picsum.photos/400/400?random=2",
@@ -78,7 +73,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
         ),
         PostModel(
           id: "3",
-          user: UserModel(name: 'lisa', avatar: AppImages.imgAvatarDefault),
+          user: UserModel(username: 'lisa', avatar: AppImages.imgAvatarDefault),
           postImage: "https://picsum.photos/400/400?random=3",
           caption: "Coding all day 💻🔥",
           likes: 300,
@@ -87,7 +82,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
         PostModel(
           id: "4",
           user: UserModel(
-            name: 'thanh_nguyen',
+            username: 'thanh_nguyen',
             avatar: AppImages.imgAvatarDefault,
           ),
           postImage: "https://picsum.photos/400/400?random=4",
@@ -97,7 +92,10 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
         ),
         PostModel(
           id: "5",
-          user: UserModel(name: 'tuan_anh', avatar: AppImages.imgAvatarDefault),
+          user: UserModel(
+            username: 'tuan_anh',
+            avatar: AppImages.imgAvatarDefault,
+          ),
           postImage: "https://picsum.photos/400/400?random=5",
           caption: "Du lịch biển 🌊",
           likes: 240,
@@ -107,7 +105,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
           id: "6",
           typePost: "reels",
           user: UserModel(
-            name: 'minh_hieu',
+            username: 'minh_hieu',
             avatar: AppImages.imgAvatarDefault,
           ),
           postImage: "https://picsum.photos/400/400?random=6",
@@ -118,7 +116,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
         PostModel(
           id: "7",
           typePost: "reels",
-          user: UserModel(name: 'rosé', avatar: AppImages.imgAvatarDefault),
+          user: UserModel(username: 'rosé', avatar: AppImages.imgAvatarDefault),
           postImage: "https://picsum.photos/400/400?random=7",
           caption: "Du lịch biển 🌊",
           likes: 240,
@@ -127,7 +125,10 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
         PostModel(
           id: "8",
           typePost: "video",
-          user: UserModel(name: 'david', avatar: AppImages.imgAvatarDefault),
+          user: UserModel(
+            username: 'david',
+            avatar: AppImages.imgAvatarDefault,
+          ),
           postImage: "https://picsum.photos/400/400?random=8",
           caption: "Du lịch biển 🌊",
           likes: 240,
@@ -135,7 +136,10 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
         ),
         PostModel(
           id: "9",
-          user: UserModel(name: 'yasuo', avatar: AppImages.imgAvatarDefault),
+          user: UserModel(
+            username: 'yasuo',
+            avatar: AppImages.imgAvatarDefault,
+          ),
           postImage: "https://picsum.photos/400/400?random=9",
           caption: "Du lịch biển 🌊",
           likes: 240,
@@ -143,7 +147,10 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
         ),
         PostModel(
           id: "10",
-          user: UserModel(name: 'hasagi', avatar: AppImages.imgAvatarDefault),
+          user: UserModel(
+            username: 'hasagi',
+            avatar: AppImages.imgAvatarDefault,
+          ),
           postImage: "https://picsum.photos/400/400?random=10",
           caption: "Du lịch biển 🌊",
           likes: 240,
@@ -151,7 +158,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
         ),
         PostModel(
           id: "11",
-          user: UserModel(name: 'anna', avatar: AppImages.imgAvatarDefault),
+          user: UserModel(username: 'anna', avatar: AppImages.imgAvatarDefault),
           postImage: "https://picsum.photos/400/400?random=11",
           caption: "Du lịch biển 🌊",
           likes: 240,
@@ -160,7 +167,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
         PostModel(
           id: "12",
           user: UserModel(
-            name: 'hieu_pham',
+            username: 'hieu_pham',
             avatar: AppImages.imgAvatarDefault,
           ),
           postImage: "https://picsum.photos/400/400?random=4",
@@ -171,10 +178,35 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
       ];
 
       final reels = [
-        ReelModel(user: UserModel(name: "Hoang")),
-        ReelModel(user: UserModel(name: "Tuan Anh")),
+        ReelModel(user: UserModel(username: "Hoang")),
+        ReelModel(user: UserModel(username: "Tuan Anh")),
       ];
-      emit(ProfileSuccess(reels: reels, posts: posts,user: user));
+      emit(ProfileSuccess(reels: reels, posts: posts, user: user));
+    } catch (e) {
+      emit(ProfileFailure());
+    }
+    return;
+  }
+  Future<void> _loadRequest1(
+    LoadRequest event,
+    Emitter<ProfileState> emit,
+  ) async {
+    try {
+      emit(ProfileLoading());
+            final token = await AppStorage.getToken();
+      var url = ApiEndPoints.SIGNOUT;
+      var data = {'token': token};
+      ApiResponse res = await ApiUtil.post(url: url, data: data);
+      if (res.statusCode == 200) {
+        emit(ProfileSuccess(user: res.body['message']));
+      } else {
+        emit(
+          ProfileFailure(erroMessage: 
+            'Error ${res.statusCode}: ${res.body?['message'] ?? 'Unknown'}',
+          ),
+        );
+      }
+      emit(ProfileSuccess(user: user));
     } catch (e) {
       emit(ProfileFailure());
     }

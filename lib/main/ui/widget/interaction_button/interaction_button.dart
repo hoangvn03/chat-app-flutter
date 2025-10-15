@@ -1,6 +1,5 @@
-import 'package:chat_app/main/features/interaction_button/bloc/interaction_bloc.dart';
-import 'package:chat_app/main/features/interaction_button/bloc/interaction_event.dart';
-import 'package:chat_app/main/features/interaction_button/bloc/interaction_state.dart';
+import 'package:chat_app/main/ui/widget/interaction_button/bloc/interaction_cubit.dart';
+import 'package:chat_app/main/ui/widget/interaction_button/bloc/interaction_state.dart';
 import 'package:chat_app/main/utils/common_widget.dart';
 import 'package:chat_app/res/app_colors.dart';
 import 'package:chat_app/res/app_images.dart';
@@ -23,9 +22,10 @@ Widget interactionButton({
   InteractionType? type,
 }) {
   return BlocProvider(
-    create: (_) => InteractionBloc(),
-    child: BlocBuilder<InteractionBloc, InteractionState>(
+    create: (_) => InteractionCubit(),
+    child: BlocBuilder<InteractionCubit, InteractionState>(
       builder: (context, state) {
+        final cubit = context.read<InteractionCubit>();
         switch (type) {
           case InteractionType.follow:
             return state.isFollowed
@@ -41,8 +41,7 @@ Widget interactionButton({
                   colorBorder: colorBorder,
                   text: 'Đang theo dõi',
                   onTap: () {
-                    onTapState2;
-                    context.read<InteractionBloc>().add(FollowUser());
+                    cubit.toggleFollow();
                   },
                   radius: 6,
                 )
@@ -58,8 +57,7 @@ Widget interactionButton({
                   colorBorder: colorBorder,
                   text: 'Theo dõi',
                   onTap: () {
-                    onTapState2;
-                    context.read<InteractionBloc>().add(FollowUser());
+                    cubit.toggleFollow();
                   },
                   radius: 6,
                 );
@@ -68,13 +66,20 @@ Widget interactionButton({
             return likeButton(
               context: context,
               icon: state.isLiked ? AppImages.icLikeDark : AppImages.icLike,
+              onTap: () {
+                if (onTapState2 != null) onTapState2();
+                cubit.toggleLike();
+              },
             );
 
           case InteractionType.save:
             return saveButton(
               context: context,
-              onTapState1: onTapState1,
               icon: state.isSaved ? AppImages.icSaveDark : AppImages.icSave,
+              onTap: () {
+                if (onTapState1 != null) onTapState1();
+                cubit.toggleSave();
+              },
             );
 
           // case InteractionType.readMore:
@@ -103,9 +108,10 @@ Widget readMoreDescription(
   int numLine = 3,
 }) {
   return BlocProvider(
-    create: (_) => InteractionBloc(),
-    child: BlocBuilder<InteractionBloc, InteractionState>(
+    create: (_) => InteractionCubit(),
+    child: BlocBuilder<InteractionCubit, InteractionState>(
       builder: (context, state) {
+        final cubit = context.read<InteractionCubit>();
         final defaultStyle = textStyle ?? AppStyles.bodyRegular;
         final linkStyle = AppStyles.bodyRegular.copyWith(
           color: AppColors.gray40,
@@ -123,7 +129,7 @@ Widget readMoreDescription(
                   recognizer:
                       TapGestureRecognizer()
                         ..onTap = () {
-                          context.read<InteractionBloc>().add(ReadMore());
+                          cubit.toggleReadMore();
                         },
                 ),
               ],
@@ -131,7 +137,7 @@ Widget readMoreDescription(
           );
         } else {
           // Đo text để biết có vượt numLine hay không
-          final span = TextSpan(text: text, style: defaultStyle,);
+          final span = TextSpan(text: text, style: defaultStyle);
           final tp = TextPainter(
             text: span,
             maxLines: numLine,
@@ -155,7 +161,7 @@ Widget readMoreDescription(
                   recognizer:
                       TapGestureRecognizer()
                         ..onTap = () {
-                          context.read<InteractionBloc>().add(ReadMore());
+                          cubit.toggleReadMore();
                         },
                 ),
               ],
@@ -170,8 +176,7 @@ Widget readMoreDescription(
 Widget followButtonV2({
   Widget? initWidget,
   Widget? onClickWidget,
-  Function? onTapState1,
-  Function? onTapState2,
+  VoidCallback? onTap,
   Color? backgroundColor,
   TextStyle? textStyle,
   String? text,
@@ -187,123 +192,29 @@ Widget followButtonV2({
     color: backgroundColor ?? AppColors.gray30,
     colorBorder: backgroundColor ?? AppColors.gray30,
     text: text ?? 'Đang theo dõi',
-    onTap: () {
-      onTapState2;
-      context.read<InteractionBloc>().add(FollowUser());
-    },
+    onTap: onTap,
     radius: 6,
   );
 }
 
 Widget likeButton({
   String? icon,
-  Function? onTapState1,
-  Function? onTapState2,
+  VoidCallback? onTap,
   required BuildContext context,
 }) {
   return GestureDetector(
-    onTap: () {
-      onTapState1;
-      context.read<InteractionBloc>().add(LikePost());
-    },
+    onTap: onTap,
     child: SvgPicture.asset(icon ?? AppImages.icLike, width: 24, height: 24),
   );
 }
 
 Widget saveButton({
   String? icon,
-  Function? onTapState1,
-  Function? onTapState2,
+  VoidCallback? onTap,
   required BuildContext context,
 }) {
   return GestureDetector(
-    onTap: () {
-      if (onTapState1 != null) onTapState1();
-      context.read<InteractionBloc>().add(SavePost());
-    },
+    onTap: onTap,
     child: SvgPicture.asset(icon ?? AppImages.icSave, width: 24, height: 24),
   );
 }
-
-// Widget saveButton({
-//   Widget? initWidget,
-//   Widget? onClickWidget,
-//   Function? onTapState1,
-//   Function? onTapState2,
-// }) {
-//   return BlocBuilder<InteractionBloc, InteractionState>(
-//     builder: (context, state) {
-//       if (!state.isSaved) {
-//         return GestureDetector(
-//           onTap: () {
-//             onTapState1;
-//             context.read<InteractionBloc>().add(SavePost());
-//           },
-//           child:
-//               initWidget ??
-//               SvgPicture.asset(AppImages.icSave, width: 24, height: 24),
-//         );
-//       } else {
-//         return GestureDetector(
-//           onTap: () {
-//             onTapState2;
-//             context.read<InteractionBloc>().add(SavePost());
-//           },
-//           child:
-//               onClickWidget ??
-//               SvgPicture.asset(AppImages.icSaveDark, width: 24, height: 24),
-//         );
-//       }
-//     },
-//   );
-// }
-// Widget followButton({
-//   Widget? initWidget,
-//   Widget? onClickWidget,
-//   Function? onTapState1,
-//   Function? onTapState2,
-//   Color? backgroundColor,
-//   TextStyle? textStyle,
-// }) {
-//   return BlocBuilder<InteractionBloc, InteractionState>(
-//     builder: (context, state) {
-//       if (!state.isFollowed) {
-//         return initWidget ??
-//             commonButton(
-//               hasHeight: true,
-//               height: 28,
-//               padding: EdgeInsets.symmetric(horizontal: 12, vertical: 0),
-//               margin: EdgeInsets.zero,
-//               textStyle: AppStyles.bodyBold.copyWith(color: AppColors.gray80),
-//               color: backgroundColor ?? AppColors.gray30,
-//               colorBorder: backgroundColor ?? AppColors.gray30,
-//               text: 'Theo dõi',
-//               onTap: () {
-//                 onTapState1;
-//                 context.read<InteractionBloc>().add(FollowUser());
-//               },
-//               radius: 6,
-//             );
-//       } else {
-//         return onClickWidget ??
-//             commonButton(
-//               hasHeight: true,
-//               height: 28,
-//               padding: EdgeInsets.symmetric(horizontal: 12, vertical: 0),
-//               margin: EdgeInsets.zero,
-//               textStyle:
-//                   textStyle ??
-//                   AppStyles.bodyBold.copyWith(color: AppColors.gray80),
-//               color: backgroundColor ?? AppColors.gray30,
-//               colorBorder: backgroundColor ?? AppColors.gray30,
-//               text: 'Đang theo dõi',
-//               onTap: () {
-//                 onTapState2;
-//                 context.read<InteractionBloc>().add(FollowUser());
-//               },
-//               radius: 6,
-//             );
-//       }
-//     },
-//   );
-// }

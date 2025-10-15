@@ -25,6 +25,7 @@ Widget commonButton({
   bool? uppercase,
   double? radius,
   double? fontSize,
+  int? maxLine,
 }) {
   return InkWell(
     highlightColor: Colors.transparent,
@@ -49,6 +50,8 @@ Widget commonButton({
             Text(
               textAlign: TextAlign.center,
               text,
+              maxLines: maxLine,
+              overflow: TextOverflow.ellipsis,
               style:
                   textStyle ??
                   TextStyle(
@@ -445,6 +448,70 @@ Widget commonTileItem({
   );
 }
 
+Widget commonTileItemV2({
+  String? imageLeading,
+  String? title,
+  String? subtitle,
+  TextStyle? titleStyle,
+  TextStyle? subTitleStyle,
+  EdgeInsets? margin,
+  Widget? titleWidget,
+  Widget? trallingWidget,
+  Widget? leadingWidget,
+  double? sizeImage,
+  bool isHideSubTitle = false,
+  bool istrallingWidget = false,
+  bool? hasReels,
+  bool? hasReelsBorder,
+  VoidCallback? onTapLeading,
+  VoidCallback? onTapTralling,
+  VoidCallback? onTap,
+}) {
+  return GestureDetector(
+    onTap: onTap,
+    child: Padding(
+      padding: margin ?? EdgeInsets.zero,
+      child: Row(
+        children: [
+          leadingWidget ??
+              SvgPicture.asset(
+                imageLeading ?? AppImages.imgAvatarDefault, // ảnh PNG/JPG
+                fit: BoxFit.cover,
+              ),
+          const SizedBox(width: 12),
+          Expanded(
+            child:
+                titleWidget ??
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title ?? '',
+                      style: titleStyle ?? AppStyles.title2Regular,
+                    ),
+                    if (subtitle != null)
+                      Text(
+                        subtitle,
+                        style:
+                            subTitleStyle ??
+                            AppStyles.title3Regular.copyWith(
+                              color: AppColors.gray40,
+                            ),
+                      ),
+                  ],
+                ),
+          ),
+          if (!istrallingWidget)
+            GestureDetector(
+              onTap: onTapTralling,
+              child: SvgPicture.asset(AppImages.icChevronRight),
+            ),
+        ],
+      ),
+    ),
+  );
+}
+
 Widget totalUserFollow({
   VoidCallback? ontap,
   bool isHideName = false,
@@ -594,5 +661,16 @@ Widget iconCloseBottomSheet(BuildContext context) {
       height: 3,
       width: 42,
     ),
+  );
+}
+
+Widget iconMeta() {
+  return Row(
+    mainAxisAlignment: MainAxisAlignment.center,
+    children: [
+      Image.asset(AppImages.icMetaPng, width: 26, height: 16),
+      const SizedBox(width: 4),
+      Text("Meta", style: AppStyles.title3Bold),
+    ],
   );
 }

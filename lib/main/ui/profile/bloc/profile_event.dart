@@ -6,9 +6,7 @@ class LoadRequest extends ProfileEvent {
   
 }
 
-class DeletetUser extends ProfileEvent {
-  final int userId;
-  DeletetUser(this.userId);
+class ClearStrogeUser extends ProfileEvent {
 }
 
 class UpdateUser extends ProfileEvent {

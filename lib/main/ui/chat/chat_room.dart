@@ -35,16 +35,9 @@ class _ChatRoomState extends State<ChatRoom> {
               width: 28,
               height: 28,
             ),
-            title: Text(
-              widget.data.userModel != null
-                  ? widget.data.userModel!.name ?? 'Unknown'
-                  : 'Unknown',
-              style: AppStyles.title2Bold,
-            ),
+            title: Text(widget.data.content, style: AppStyles.title2Bold),
             subtitle: Text(
-              widget.data.userModel != null
-                  ? widget.data.userModel!.email ?? 'Unknown Email'
-                  : 'Unknown Email',
+              widget.data.content,
               style: AppStyles.headlineRegular,
             ),
           ),
@@ -67,10 +60,12 @@ class _ChatRoomState extends State<ChatRoom> {
               const SizedBox(height: 38),
               _buildInfoUserContact(
                 MessageModel(
-                  status: 'Đã gửi',
-                  userModel: widget.data.userModel,
-                  userMessage: ['Hello'],
-                  userContactMessage: ['Hi'],
+                  messageId: 1,
+                  conversationId: 1,
+                  senderId: 1,
+                  content: 'Hello',
+                  createdAt: DateTime.now(),
+                  isRead: true,
                 ),
               ),
             ],
@@ -81,56 +76,52 @@ class _ChatRoomState extends State<ChatRoom> {
   }
 
   Widget _buildInfoUserContact(MessageModel data) {
-    return data.userModel != null
-        ? Column(
-          children: [
-            Image.asset(
-              AppImages.imgAvatarDefault,
-              width: 86,
-              height: 86,
-              fit: BoxFit.fill,
-            ),
-            const SizedBox(height: 16),
+    return Column(
+      children: [
+        Image.asset(
+          AppImages.imgAvatarDefault,
+          width: 86,
+          height: 86,
+          fit: BoxFit.fill,
+        ),
+        const SizedBox(height: 16),
 
-            Text(
-              data.userModel!.name ?? 'Unknown',
-              style: AppStyles.title2Bold,
-            ),
+        Text(data.content, style: AppStyles.title2Bold),
 
-            Text(
-              data.userModel!.email ?? 'Unknown Email',
-              style: AppStyles.title3Regular,
-            ),
-            RichText(
-              text: TextSpan(
-                text: '106 triệu người theo dõi . ',
-                style: AppStyles.title3Regular.copyWith(
-                  color: AppColors.gray60,
-                ),
-                children: [TextSpan(text: '1,1k bài viết')],
+        Text(data.content, style: AppStyles.title3Regular),
+        RichText(
+          text: TextSpan(
+            text: '106 triệu người theo dõi . ',
+            style: AppStyles.title3Regular.copyWith(color: AppColors.gray60),
+            children: [TextSpan(text: '1,1k bài viết')],
+          ),
+        ),
+        Text(
+          'Bạn đã theo dõi tài khoản Instagram này từ năm 2020',
+          style: AppStyles.title3Regular.copyWith(color: AppColors.gray60),
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: 16),
+
+        commonButton(
+          hasHeight: true,
+          height: 28,
+          margin: EdgeInsets.zero,
+          color: AppColors.gray30,
+          textStyle: AppStyles.bodyBold,
+          text: 'Xem trang cá nhân',
+          onTap: () {
+            context.pushNamed(
+              PathName.profilePage,
+              extra: UserModel(
+                username: 'hieu_pham',
+                avatar: AppImages.imgAvatarDefault,
               ),
-            ),
-            Text(
-              'Bạn đã theo dõi tài khoản Instagram này từ năm 2020',
-              style: AppStyles.title3Regular.copyWith(color: AppColors.gray60),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 16),
-
-            commonButton(
-              hasHeight: true,
-              height: 28,
-              margin: EdgeInsets.zero,
-              color: AppColors.gray30,
-              textStyle: AppStyles.bodyBold,
-              text: 'Xem trang cá nhân',
-              onTap: () {
-                context.pushNamed(PathName.profilePage, extra: data.userModel);
-              },
-              radius: 6,
-            ),
-          ],
-        )
-        : Container();
+            );
+          },
+          radius: 6,
+        ),
+      ],
+    );
   }
 }

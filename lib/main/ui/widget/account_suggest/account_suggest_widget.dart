@@ -1,3 +1,4 @@
+import 'package:chat_app/main/ui/widget/interaction_button/interaction_button.dart';
 import 'package:chat_app/main/networks/model/user.dart';
 import 'package:chat_app/main/router/router.dart';
 import 'package:chat_app/main/utils/common_widget.dart';
@@ -63,21 +64,21 @@ class AccountSuggestWidget extends StatelessWidget {
       dense: true,
       leading: Image.asset(AppImages.imgAvatarDefault),
       title: Text(user.email ?? 'Unknown', style: AppStyles.title2Bold),
-      subtitle: Text(user.name ?? 'Unknown', style: AppStyles.bodyRegular),
+      subtitle: Text(user.username ?? 'Unknown', style: AppStyles.bodyRegular),
       onTap: () {
         context.pushNamed(PathName.profilePage, extra: user);
       },
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          commonButton(
-            hasHeight: true,
-            height: 28,
-            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 0),
-            textStyle: AppStyles.bodyBold.copyWith(color: AppColors.white),
-            text: 'Theo dõi',
-            onTap: () {},
-            radius: 6,
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: interactionButton(
+              type: InteractionType.follow,
+              backgroundColor: AppColors.blue40,
+              colorBorder: AppColors.blue40,
+              textStyle: AppStyles.bodyBold.copyWith(color: AppColors.white),
+            ),
           ),
           GestureDetector(
             onTap: () {},
@@ -127,7 +128,7 @@ class AccountSuggestWidget extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 8),
-            Text(user.name ?? 'Unknown', style: AppStyles.headlineBold),
+            Text(user.username ?? 'Unknown', style: AppStyles.headlineBold),
             const SizedBox(height: 2),
             Text(user.email ?? 'Unknown', style: AppStyles.calloutRegular),
             const SizedBox(height: 16),

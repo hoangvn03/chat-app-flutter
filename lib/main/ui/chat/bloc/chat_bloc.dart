@@ -44,7 +44,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
         PostModel(
           id: "1",
           user: UserModel(
-            name: 'hieu_pham',
+            username: 'hieu_pham',
             avatar: AppImages.imgAvatarDefault,
           ),
           postImage: "https://picsum.photos/400/400?random=1",
@@ -55,7 +55,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
         PostModel(
           id: "2",
                    user: UserModel(
-            name: 'hieu_pham',
+            username: 'hieu_pham',
             avatar: AppImages.imgAvatarDefault,
           ),
           postImage: "https://picsum.photos/400/400?random=2",
@@ -66,7 +66,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
         PostModel(
           id: "3",
                   user: UserModel(
-            name: 'hieu_pham',
+            username: 'hieu_pham',
             avatar: AppImages.imgAvatarDefault,
           ),
           postImage: "https://picsum.photos/400/400?random=3",
@@ -77,7 +77,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
         PostModel(
           id: "4",
             user: UserModel(
-            name: 'hieu_pham',
+            username: 'hieu_pham',
             avatar: AppImages.imgAvatarDefault,
           ),
           postImage: "https://picsum.photos/400/400?random=4",
@@ -88,8 +88,8 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
       ];
 
       final reels = [
-        ReelModel(user: UserModel(name: "Hoang")),
-        ReelModel(user: UserModel(name: "Tuan Anh")),
+        ReelModel(user: UserModel(username: "Hoang")),
+        ReelModel(user: UserModel(username: "Tuan Anh")),
       ];
       emit(ChatSuccess(reels: reels, posts: posts));
     } catch (e) {
@@ -106,7 +106,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   //     final List<PostModel> posts = [
   //       PostModel(
   //         id: "1",
-  //         username: "ngoc_hoang",
+  //         userusername: "ngoc_hoang",
   //         userAvatar: "https://randomuser.me/api/portraits/men/1.jpg",
   //         postImage: "https://picsum.photos/400/400?random=1",
   //         caption: "Cuối tuần chill 😎",
@@ -115,7 +115,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   //       ),
   //       PostModel(
   //         id: "2",
-  //         username: "linh_nguyen",
+  //         userusername: "linh_nguyen",
   //         userAvatar: "https://randomuser.me/api/portraits/women/2.jpg",
   //         postImage: "https://picsum.photos/400/400?random=2",
   //         caption: "Cà phê sáng ☕",
@@ -124,7 +124,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   //       ),
   //       PostModel(
   //         id: "3",
-  //         username: "david",
+  //         userusername: "david",
   //         userAvatar: "https://randomuser.me/api/portraits/men/3.jpg",
   //         postImage: "https://picsum.photos/400/400?random=3",
   //         caption: "Coding all day 💻🔥",
@@ -133,7 +133,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   //       ),
   //       PostModel(
   //         id: "4",
-  //         username: "anna",
+  //         userusername: "anna",
   //         userAvatar: "https://randomuser.me/api/portraits/women/4.jpg",
   //         postImage: "https://picsum.photos/400/400?random=4",
   //         caption: "Du lịch biển 🌊",

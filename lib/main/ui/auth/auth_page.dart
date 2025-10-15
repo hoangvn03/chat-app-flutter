@@ -2,9 +2,9 @@ import 'package:chat_app/main/networks/api_end_point.dart';
 import 'package:chat_app/main/networks/api_util.dart';
 import 'package:chat_app/main/networks/model/user.dart';
 import 'package:chat_app/main/router/router.dart';
-import 'package:chat_app/main/ui/auth/login/bloc/login_bloc.dart';
-import 'package:chat_app/main/ui/auth/login/bloc/login_event.dart';
-import 'package:chat_app/main/ui/auth/login/bloc/login_state.dart';
+import 'package:chat_app/main/ui/auth/bloc/auth_bloc.dart';
+import 'package:chat_app/main/ui/auth/bloc/auth_event.dart';
+import 'package:chat_app/main/ui/auth/bloc/auth_state.dart';
 import 'package:chat_app/main/utils/common_widget.dart';
 import 'package:chat_app/main/utils/shared_preference.dart';
 import 'package:chat_app/res/app_colors.dart';
@@ -25,77 +25,113 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final _formKey = GlobalKey<FormState>();
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final PageController _pageController = PageController();
 
   @override
   Widget build(BuildContext context) {
-    double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
     return BlocProvider(
-      create: (_) => LoginBloc(),
-      child: Scaffold(
-        body: Stack(
-          children: [
-            Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  stops: [0.0, 0.17, 0.36, 0.63, 0.83],
-                  colors: [
-                    Color(0xFF7638FA), // tím
-                    Color(0xFFD300C5), // hồng tím
-                    Color(0xFFFF7A00), // cam
-                    Color(0xFFFFD600), // vàng
-                    Color(0xFFFF0069), // hồng đậm
-                  ],
+      create: (_) => AuthBloc()..add(CheckUser()),
+      child: BlocListener<AuthBloc, AuthState>(
+        listener: (context, state) {
+          if (state is AuthSuccess && state.hasLocalUser == false) {
+            context.goNamed(PathName.homePage, extra: state.user);
+          } else if (state is AuthFailure) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  state.erroMessage,
+                  style: AppStyles.bodyRegular.copyWith(color: AppColors.white),
                 ),
               ),
-            ),
-            Positioned(
-              left: 0,
-              right: 0,
-              top: height * 0.10,
-              child: SvgPicture.asset(
-                AppImages.icLogoAppV2,
-                width: 58,
-                height: 58,
-                color: Colors.white,
-              ),
-            ),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              margin: EdgeInsets.only(top: height * 0.25),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(32),
-                  topRight: Radius.circular(32),
+            );
+          } else if (state is AuthInit && state.erroMessage != null) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  state.erroMessage!,
+                  style: AppStyles.bodyRegular.copyWith(color: AppColors.white),
                 ),
               ),
-              child: PageView(
-                controller: _pageController,
-                physics: const NeverScrollableScrollPhysics(),
-
-                children: [_buildCurrientAccount(), _buildLogin()],
+            );
+          }
+        },
+        child: Scaffold(
+          resizeToAvoidBottomInset: false,
+          body: Stack(
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    stops: [0.0, 0.17, 0.36, 0.63, 0.83],
+                    colors: [
+                      Color(0xFF7638FA),
+                      Color(0xFFD300C5),
+                      Color(0xFFFF7A00),
+                      Color(0xFFFFD600),
+                      Color(0xFFFF0069),
+                    ],
+                  ),
+                ),
               ),
-            ),
-            Positioned(
-              left: 0,
-              right: 0,
-              bottom: 24,
-              child: _buildCreateNewAccount(),
-            ),
-          ],
+              Positioned(
+                left: 0,
+                right: 0,
+                top: height * 0.10,
+                child: SvgPicture.asset(
+                  AppImages.icLogoAppV2,
+                  width: 58,
+                  height: 58,
+                  color: Colors.white,
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                margin: EdgeInsets.only(top: height * 0.25),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(32),
+                    topRight: Radius.circular(32),
+                  ),
+                ),
+                child: BlocBuilder<AuthBloc, AuthState>(
+                  builder: (context, state) {
+                    if (state is AuthInit || state is AuthFailure) {
+                      return _buildLogin(isHidebackButton: true);
+                    } else if (state is AuthSuccess) {
+                      return PageView(
+                        controller: _pageController,
+                        physics: const NeverScrollableScrollPhysics(),
+                        children: [
+                          _buildCurrientAccount(state.user as UserModel),
+                          _buildLogin(),
+                        ],
+                      );
+                    } else {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+                  },
+                ),
+              ),
+              Positioned(
+                left: 0,
+                right: 0,
+                bottom: 24,
+                child: _buildCreateNewAccount(),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildCurrientAccount() {
+  Widget _buildCurrientAccount(UserModel user) {
     return Column(
       children: [
         Container(
@@ -125,18 +161,13 @@ class _LoginPageState extends State<LoginPage> {
           ),
         ),
         const SizedBox(height: 16),
-        const Text("hoang_vn03", style: AppStyles.title1Bold),
+        Text(user.username ?? 'Unknown', style: AppStyles.title1Bold),
         commonButton(
           text: "Tiếp tục",
           color: AppColors.blue60,
           margin: EdgeInsets.symmetric(vertical: 16),
           onTap: () async {
-            final UserModel user = UserModel(
-              name: 'ngoc_hoang',
-              avatar: AppImages.imgAvatarDefault,
-            );
-            await AppStorage.saveUser(user);
-            context.go(AppPath.homePage, extra: user);
+            context.goNamed(PathName.homePage, extra: user);
           },
         ),
         InkWell(
@@ -178,38 +209,33 @@ class _LoginPageState extends State<LoginPage> {
         ),
         const SizedBox(height: 12),
 
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Image.asset(AppImages.icMetaPng, width: 28, height: 18),
-            const SizedBox(width: 4),
-            Text("Meta", style: AppStyles.title3Bold),
-          ],
-        ),
+        iconMeta(),
       ],
     );
   }
 
-  Widget _buildLogin() {
+  Widget _buildLogin({bool isHidebackButton = false}) {
     return Column(
       children: [
-        Container(
-          alignment: Alignment.centerLeft,
-          margin: const EdgeInsets.only(top: 24),
-          child: IconButton(
-            icon: Transform.flip(
-              flipX: true,
-              child: SvgPicture.asset(AppImages.icNextRight),
-            ),
-            onPressed: () {
-              _pageController.animateToPage(
-                0,
-                duration: Duration(milliseconds: 300),
-                curve: Curves.easeInOut,
-              );
-            },
-          ),
-        ),
+        (!isHidebackButton)
+            ? Container(
+              alignment: Alignment.centerLeft,
+              margin: const EdgeInsets.only(top: 24),
+              child: IconButton(
+                icon: Transform.flip(
+                  flipX: true,
+                  child: SvgPicture.asset(AppImages.icNextRight),
+                ),
+                onPressed: () {
+                  _pageController.animateToPage(
+                    0,
+                    duration: Duration(milliseconds: 300),
+                    curve: Curves.easeInOut,
+                  );
+                },
+              ),
+            )
+            : const SizedBox(height: 24),
         InkWell(
           onTap: () {
             showModalBottomSheet(
@@ -242,65 +268,53 @@ class _LoginPageState extends State<LoginPage> {
         ),
         const SizedBox(height: 16),
 
-        BlocListener<LoginBloc, LoginState>(
-          listener: (context, state) {
-            if (state is LoginSuccess) {
-              context.go(AppPath.homePage);
-            } else if (state is LoginFailure) {
-              ScaffoldMessenger.of(
-                context,
-              ).showSnackBar(SnackBar(content: Text('state.message')));
-            }
-          },
-          child: BlocBuilder<LoginBloc, LoginState>(
-            builder: (context, state) {
-              return Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  commonTextField(
-                    labelText: "Tên người dùng,email/số di động",
-                    controller: _usernameController,
-                  ),
-                  const SizedBox(height: 16),
-                  commonTextField(
-                    labelText: "Mật khẩu",
-                    controller: _passwordController,
-                    obscureText: true,
-                  ),
-                  commonButton(
-                    text: "Đăng nhập",
-                    margin: EdgeInsets.symmetric(vertical: 16),
-                    onTap: () {
-                      final username = _usernameController.text;
-                      final password = _passwordController.text;
-                      context.read<LoginBloc>().add(Login(username, password));
-                    },
-                  ),
-                  InkWell(
-                    onTap: () {
-                      showModalBottomSheet(
-                        context: context,
-                        useSafeArea: true,
-                        isScrollControlled: true,
-                        shape: const RoundedRectangleBorder(
-                          borderRadius: BorderRadius.vertical(
-                            top: Radius.circular(16),
-                          ),
+        BlocBuilder<AuthBloc, AuthState>(
+          builder: (context, state) {
+            return Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                commonTextField(
+                  labelText: "Tên người dùng,email/số di động",
+                  controller: _usernameController,
+                ),
+                const SizedBox(height: 16),
+                commonTextField(
+                  labelText: "Mật khẩu",
+                  controller: _passwordController,
+                  obscureText: true,
+                ),
+                commonButton(
+                  text: "Đăng nhập",
+                  margin: EdgeInsets.symmetric(vertical: 16),
+                  onTap: () {
+                    final username = _usernameController.text;
+                    final password = _passwordController.text;
+                    context.read<AuthBloc>().add(Login(username, password));
+                  },
+                ),
+                InkWell(
+                  onTap: () {
+                    showModalBottomSheet(
+                      context: context,
+                      useSafeArea: true,
+                      isScrollControlled: true,
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.vertical(
+                          top: Radius.circular(16),
                         ),
-                        builder:
-                            (context) =>
-                                _buildBottomSheetForgotPassword(context),
-                      );
-                    },
-                    child: Align(
-                      alignment: Alignment.center,
-                      child: Text("Quên mật khẩu?"),
-                    ),
+                      ),
+                      builder:
+                          (context) => _buildBottomSheetForgotPassword(context),
+                    );
+                  },
+                  child: Align(
+                    alignment: Alignment.center,
+                    child: Text("Quên mật khẩu?"),
                   ),
-                ],
-              );
-            },
-          ),
+                ),
+              ],
+            );
+          },
         ),
       ],
     );
@@ -477,7 +491,20 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   child: InkWell(
                     child: Text('Gỡ/Xóa', style: AppStyles.title3Regular),
-                    onTap: () {},
+                    onTap: () {
+                      showModalBottomSheet(
+                        context: context,
+                        useSafeArea: true,
+                        isScrollControlled: true,
+                        shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.vertical(
+                            top: Radius.circular(16),
+                          ),
+                        ),
+                        builder:
+                            (context) => _buildBottomSheetDeleteOption(context),
+                      );
+                    },
                   ),
                 ),
               ],
@@ -593,7 +620,7 @@ class _LoginPageState extends State<LoginPage> {
             onTap: () {
               final username = _usernameController.text;
               final password = _passwordController.text;
-              context.read<LoginBloc>().add(Login(username, password));
+              context.read<AuthBloc>().add(Login(username, password));
             },
           ),
           commonButton(
@@ -683,6 +710,66 @@ class _LoginPageState extends State<LoginPage> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildBottomSheetDeleteOption(BuildContext context) {
+    final height = MediaQuery.of(context).size.height;
+    return Container(
+      height: height * 0.75,
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(32),
+          topRight: Radius.circular(32),
+        ),
+      ),
+
+      child: Column(
+        children: [
+          iconCloseBottomSheet(context),
+          Container(
+            alignment: Alignment.centerRight,
+            child: IconButton(
+              icon: SvgPicture.asset(AppImages.icClose),
+              onPressed: () {
+                context.pop();
+              },
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 24),
+            child: Text('Gỡ hoang_vn03?', style: AppStyles.title1Bold),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 24),
+            child: Text(
+              'Bạn cần đăng nhập tên người dùng và mật khẩu vào lần đăng nhập tới.',
+              style: AppStyles.title1Bold,
+            ),
+          ),
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: commonButton(
+              text: "Tiếp tục",
+              color: AppColors.blue60,
+              margin: EdgeInsets.symmetric(vertical: 16),
+              onTap: () {},
+            ),
+          ),
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: commonButton(
+              text: "Tiếp tục",
+              color: AppColors.white,
+              colorBorder: AppColors.gray30,
+              margin: EdgeInsets.symmetric(vertical: 16),
+              onTap: () {},
+            ),
+          ),
+        ],
       ),
     );
   }

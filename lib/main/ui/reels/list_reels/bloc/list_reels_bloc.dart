@@ -21,7 +21,7 @@ class ListReelsBloc extends Bloc<ListReelsEvent, ListReelsState> {
     Emitter<ListReelsState> emit,
   ) async {
     final UserModel user = UserModel(
-      name: 'John Doe',
+      username: 'John Doe',
       avatar: 'https://wallpapercave.com/wp/AYWg3iu.jpg',
     );
     final List<ReelModel> stories = [
@@ -36,7 +36,7 @@ class ListReelsBloc extends Bloc<ListReelsEvent, ListReelsState> {
         url: 'https://media.giphy.com/media/moyzrwjUIkdNe/giphy.gif',
         media: MediaType.image,
         user: UserModel(
-          name: 'John Doe',
+          username: 'John Doe',
           avatar: 'https://wallpapercave.com/wp/AYWg3iu.jpg',
         ),
         duration: const Duration(seconds: 7),

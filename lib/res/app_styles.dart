@@ -66,14 +66,14 @@ class AppStyles {
   // Body
   static const TextStyle bodyBold = TextStyle(
     fontFamily: fontFamily,
-    fontSize: 13,
+    fontSize: 14,
     fontWeight: FontWeight.bold,
     letterSpacing: 0.01,
   );
 
   static const TextStyle bodyRegular = TextStyle(
     fontFamily: fontFamily,
-    fontSize: 13,
+    fontSize: 14,
     fontWeight: FontWeight.w400,
     letterSpacing: 0.02,
   );

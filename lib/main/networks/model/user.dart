@@ -7,49 +7,91 @@ class RoleData {
 
   factory RoleData.fromJson(Map<String, dynamic> json) {
     return RoleData(
-      id: json['id'],
+      id: json['user_id'],
       code: json['code'],
       value: json['value'],
     );
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'code': code,
-      'value': value,
-    };
+    return {'user_id': id, 'code': code, 'value': value};
   }
 }
 
 class UserModel {
   int? id;
-  String? name;
+  String? username;
   String? email;
   String? avatar;
-  RoleData? roleData;
+  String? status;
+  String? createdAt;
+  // RoleData? roleData;
 
-  UserModel({this.id, this.name, this.email, this.avatar, this.roleData});
+  UserModel({
+    this.id,
+    this.username,
+    this.email,
+    this.avatar,
+    // this.roleData,
+    this.status,
+    this.createdAt,
+  });
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
     return UserModel(
-      id: json['id'],
-      name: json['name'],
+      id: json['user_id'],
+      username: json['username'],
       email: json['email'],
-      avatar: json['avatar'],
-      roleData: json['roleData'] != null
-          ? RoleData.fromJson(json['roleData'])
-          : null,
+      avatar: json['avatar_url'],
+      status: json['status'],
+      createdAt: json['created_at'],
+      // roleData: json['roleData'] != null
+      //     ? RoleData.fromJson(json['roleData'])
+      //     : null,
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'id': id,
-      'name': name,
+      'user_id': id,
+      'username': username,
       'email': email,
-      'avatar': avatar,
-      'roleData': roleData?.toJson(),
+      'avatar_url': avatar,
     };
   }
 }
+
+class UserContact {
+  final int contactId;
+  final int userId;
+  final int friendId;
+  final DateTime createdAt;
+
+  UserContact({
+    required this.contactId,
+    required this.userId,
+    required this.friendId,
+    required this.createdAt,
+  });
+
+  // Tạo từ JSON
+  factory UserContact.fromJson(Map<String, dynamic> json) {
+    return UserContact(
+      contactId: json['contact_id'] as int,
+      userId: json['user_id'] as int,
+      friendId: json['friend_id'] as int,
+      createdAt: DateTime.parse(json['created_at'] as String),
+    );
+  }
+
+  // Chuyển sang JSON
+  Map<String, dynamic> toJson() {
+    return {
+      'contact_id': contactId,
+      'user_id': userId,
+      'friend_id': friendId,
+      'created_at': createdAt.toIso8601String(),
+    };
+  }
+}
+

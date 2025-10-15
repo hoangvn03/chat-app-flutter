@@ -49,6 +49,10 @@ class AppImages {
   static const String icMusic = 'assets/icons/ic_music.svg';
   static const String icFilters = 'assets/icons/ic_filters.svg';
   static const String icStartRoundWhite = 'assets/icons/ic_start_round_white.svg';
+  static const String icLock = 'assets/icons/ic_lock.svg';
+  static const String icMenu = 'assets/icons/ic_menu.svg';
+  static const String icAddUser = 'assets/icons/ic_add_user.svg';
+  static const String icStarRound = 'assets/icons/ic_star_round.svg';
   //png
     static const String icMetaPng = 'assets/icons/ic_meta.png';
 

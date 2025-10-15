@@ -3,14 +3,16 @@ import 'package:chat_app/main/networks/model/message.dart';
 import 'package:chat_app/main/networks/model/reels.dart';
 import 'package:chat_app/main/networks/model/user.dart';
 import 'package:chat_app/main/router/router.dart';
-import 'package:chat_app/main/ui/auth/login/login_page.dart';
+import 'package:chat_app/main/ui/auth/auth_page.dart';
 import 'package:chat_app/main/ui/chat/chat_page.dart';
 import 'package:chat_app/main/ui/chat/chat_room.dart';
 import 'package:chat_app/main/ui/home/home_page.dart';
+import 'package:chat_app/main/ui/notification/notification_page.dart';
 import 'package:chat_app/main/ui/personal/personal_page.dart';
 import 'package:chat_app/main/ui/post/post_page.dart';
 import 'package:chat_app/main/ui/profile/profile_list_follower.dart';
 import 'package:chat_app/main/ui/profile/profile_page.dart';
+import 'package:chat_app/main/ui/profile/setting_page.dart';
 import 'package:chat_app/main/ui/reels/camera/camera_page.dart';
 import 'package:chat_app/main/ui/reels/create_reels/create_reels_page.dart';
 import 'package:chat_app/main/ui/reels/list_reels/list_reels_page.dart';
@@ -18,6 +20,7 @@ import 'package:chat_app/main/ui/reels/media_picked/media_picked_page.dart';
 import 'package:chat_app/main/ui/reels/reels_page.dart';
 import 'package:chat_app/main/ui/search/search_page.dart';
 import 'package:chat_app/main/ui/search/search_result_page.dart';
+import 'package:chat_app/main/utils/shared_preference.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -46,6 +49,21 @@ class AppGoRouter {
     initialLocation: AppPath.loginPage,
     navigatorKey: _rootNavigatorKey,
     debugLogDiagnostics: true,
+    redirect: (context, state) async {
+      final token = await AppStorage.getIsLogin();
+      final isLoggingIn = state.matchedLocation == AppPath.loginPage;
+      final isLoggedIn = token;
+
+      if (!isLoggedIn && !isLoggingIn) {
+        return AppPath.loginPage;
+      }
+
+      if (isLoggedIn && isLoggingIn) {
+        return AppPath.homePage;
+      }
+
+      return null;
+    },
     routes: <RouteBase>[
       GoRoute(
         name: PathName.loginPage,
@@ -115,6 +133,7 @@ class AppGoRouter {
           return StoryScreen(stories: assetList);
         },
       ),
+
       //Bottom Bar
       StatefulShellRoute.indexedStack(
         builder:
@@ -127,6 +146,15 @@ class AppGoRouter {
               GoRoute(
                 name: PathName.homePage,
                 path: AppPath.homePage,
+                routes: [
+                  GoRoute(
+                    name: PathName.notificationPage,
+                    path: AppPath.notificationPage,
+                    builder: (context, state) {
+                      return NotificationPage();
+                    },
+                  ),
+                ],
                 builder: (context, state) {
                   return HomePage();
                 },
@@ -184,6 +212,15 @@ class AppGoRouter {
               GoRoute(
                 name: PathName.personalPage,
                 path: AppPath.personalPage,
+                routes: [
+                  GoRoute(
+                    name: PathName.settingpage,
+                    path: AppPath.settingpage,
+                    builder: (context, state) {
+                      return SettingPage();
+                    },
+                  ),
+                ],
                 builder: (context, state) {
                   return ProfilePage();
                 },

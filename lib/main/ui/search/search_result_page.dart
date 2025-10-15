@@ -99,7 +99,7 @@ class SearchResultPage extends StatelessWidget {
         dense: true,
         leading: Image.asset(AppImages.imgAvatarDefault),
         title: Text(user.email ?? 'Unknown', style: AppStyles.title2Bold),
-        subtitle: Text(user.name ?? 'Unknown', style: AppStyles.bodyRegular),
+        subtitle: Text(user.username ?? 'Unknown', style: AppStyles.bodyRegular),
         onTap: () {
           context.pushNamed(PathName.profilePage, extra: user);
         },

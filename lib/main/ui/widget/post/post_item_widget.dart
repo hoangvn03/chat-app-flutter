@@ -1,10 +1,10 @@
-import 'package:chat_app/main/features/interaction_button/bloc/interaction_state.dart';
-import 'package:chat_app/main/features/interaction_button/interaction_button.dart';
-import 'package:chat_app/main/features/interaction_button/bloc/interaction_bloc.dart';
-import 'package:chat_app/main/features/post/action/action_widget.dart';
-import 'package:chat_app/main/features/post/action/bloc/action_bloc.dart';
-import 'package:chat_app/main/features/post/action/bloc/action_event.dart';
-import 'package:chat_app/main/features/post/action/bloc/action_state.dart';
+import 'package:chat_app/main/ui/widget/interaction_button/bloc/interaction_state.dart';
+import 'package:chat_app/main/ui/widget/interaction_button/interaction_button.dart';
+import 'package:chat_app/main/ui/widget/interaction_button/bloc/interaction_cubit.dart';
+import 'package:chat_app/main/ui/widget/post/action/action_widget.dart';
+import 'package:chat_app/main/ui/widget/post/action/bloc/action_bloc.dart';
+import 'package:chat_app/main/ui/widget/post/action/bloc/action_event.dart';
+import 'package:chat_app/main/ui/widget/post/action/bloc/action_state.dart';
 import 'package:chat_app/main/networks/model/post.dart';
 import 'package:chat_app/main/networks/model/user.dart';
 import 'package:chat_app/main/router/router.dart';
@@ -30,7 +30,7 @@ class PostWidget extends StatelessWidget {
         // Header
         // _buildHeaderPost(context),
         commonTileItem(
-          title: post.user.name ?? 'Unknown',
+          title: post.user.username ?? 'Unknown',
           subtitle: post.timePost ?? '1 ngày trước',
           titleWidget: GestureDetector(
             onTap: () {
@@ -43,7 +43,7 @@ class PostWidget extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      post.user.name ?? 'Unknown',
+                      post.user.username ?? 'Unknown',
                       style: AppStyles.headlineBold,
                     ),
                     Text(
@@ -80,14 +80,14 @@ class PostWidget extends StatelessWidget {
         //User Like
         _buildListUserLikePost(
           users: [
-            UserModel(name: 'hieu_pham', avatar: AppImages.imgAvatarDefault),
-            UserModel(name: 'tuan_anh', avatar: AppImages.imgAvatarDefault),
+            UserModel(username: 'hieu_pham', avatar: AppImages.imgAvatarDefault),
+            UserModel(username: 'tuan_anh', avatar: AppImages.imgAvatarDefault),
             UserModel(
-              name: 'nguyen_nguyen',
+              username: 'nguyen_nguyen',
               avatar: AppImages.imgAvatarDefault,
             ),
-            UserModel(name: 'ngoc_hoang', avatar: AppImages.imgAvatarDefault),
-            UserModel(name: 'minh_hieu', avatar: AppImages.imgAvatarDefault),
+            UserModel(username: 'ngoc_hoang', avatar: AppImages.imgAvatarDefault),
+            UserModel(username: 'minh_hieu', avatar: AppImages.imgAvatarDefault),
           ],
         ),
         // Caption
@@ -224,7 +224,7 @@ class PostWidget extends StatelessWidget {
                         style: AppStyles.bodyRegular,
                         children: [
                           TextSpan(
-                            text: " ${users[0].name}",
+                            text: " ${users[0].username}",
                             style: AppStyles.bodyBold,
                           ),
                           TextSpan(
@@ -254,7 +254,7 @@ class PostWidget extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('${post.user.name ?? ''} ', style: AppStyles.headlineBold),
+          Text('${post.user.username ?? ''} ', style: AppStyles.headlineBold),
           Expanded(
             child: readMoreDescription(
               " ${post.caption}",
@@ -436,7 +436,7 @@ class PostWidget extends StatelessWidget {
   //             crossAxisAlignment: CrossAxisAlignment.start,
   //             children: [
   //               Text(
-  //                 post.user.name ?? 'Unknown',
+  //                 post.user.username ?? 'Unknown',
   //                 style: AppStyles.headlineBold,
   //               ),
   //               Text(

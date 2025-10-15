@@ -43,7 +43,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       final List<PostModel> posts = [
         PostModel(
           id: "1",
-          user: UserModel(name: 'david', avatar: AppImages.imgAvatarDefault),
+          user: UserModel(username: 'david', avatar: AppImages.imgAvatarDefault),
           postImage: "https://picsum.photos/400/400?random=1",
           caption: "Cuối tuần chill 😎",
           likes: 120,
@@ -52,7 +52,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         PostModel(
           id: "2",
           user: UserModel(
-            name: 'hieu_thu_2',
+            username: 'hieu_thu_2',
             avatar: AppImages.imgAvatarDefault,
           ),
           postImage: "https://picsum.photos/400/400?random=2",
@@ -62,7 +62,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         ),
         PostModel(
           id: "3",
-          user: UserModel(name: 'lisa', avatar: AppImages.imgAvatarDefault),
+          user: UserModel(username: 'lisa', avatar: AppImages.imgAvatarDefault),
           postImage: "https://picsum.photos/400/400?random=3",
           caption: "Coding all day 💻🔥",
           likes: 300,
@@ -70,7 +70,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         ),
         PostModel(
           id: "4",
-          user: UserModel(name: 'rose', avatar: AppImages.imgAvatarDefault),
+          user: UserModel(username: 'rose', avatar: AppImages.imgAvatarDefault),
           postImage: "https://picsum.photos/400/400?random=4",
           caption: "Du lịch biển 🌊",
           likes: 240,
@@ -79,8 +79,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       ];
 
       final reels = [
-        ReelModel(user: UserModel(name: "Hoang")),
-        ReelModel(user: UserModel(name: "Tuan Anh")),
+        ReelModel(user: UserModel(username: "Hoang")),
+        ReelModel(user: UserModel(username: "Tuan Anh")),
       ];
       emit(HomeSuccess(reels: reels, posts: posts));
     } catch (e) {
@@ -97,7 +97,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   //     final List<PostModel> posts = [
   //       PostModel(
   //         id: "1",
-  //         username: "ngoc_hoang",
+  //         userusername: "ngoc_hoang",
   //         userAvatar: "https://randomuser.me/api/portraits/men/1.jpg",
   //         postImage: "https://picsum.photos/400/400?random=1",
   //         caption: "Cuối tuần chill 😎",
@@ -106,7 +106,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   //       ),
   //       PostModel(
   //         id: "2",
-  //         username: "linh_nguyen",
+  //         userusername: "linh_nguyen",
   //         userAvatar: "https://randomuser.me/api/portraits/women/2.jpg",
   //         postImage: "https://picsum.photos/400/400?random=2",
   //         caption: "Cà phê sáng ☕",
@@ -115,7 +115,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   //       ),
   //       PostModel(
   //         id: "3",
-  //         username: "david",
+  //         userusername: "david",
   //         userAvatar: "https://randomuser.me/api/portraits/men/3.jpg",
   //         postImage: "https://picsum.photos/400/400?random=3",
   //         caption: "Coding all day 💻🔥",
@@ -124,7 +124,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   //       ),
   //       PostModel(
   //         id: "4",
-  //         username: "anna",
+  //         userusername: "anna",
   //         userAvatar: "https://randomuser.me/api/portraits/women/4.jpg",
   //         postImage: "https://picsum.photos/400/400?random=4",
   //         caption: "Du lịch biển 🌊",

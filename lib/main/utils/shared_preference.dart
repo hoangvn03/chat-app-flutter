@@ -5,7 +5,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class AppStorage {
   static const String _tokenKey = "auth_token";
-  static const String _keyUser = "auth_token";
+  static const String _keyUser = "auth_user";
+  static const String _keyCheckLogin = "keyCheckLogin";
 
   /// Lưu token
   static Future<void> saveToken(String token) async {
@@ -17,6 +18,17 @@ class AppStorage {
   static Future<String?> getToken() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString(_tokenKey);
+  }
+  /// Lưu đăng nhập
+  static Future<void> saveIsLogin(bool token) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_keyCheckLogin, token);
+  }
+
+  /// Lấy đăng nhập
+  static Future<bool> getIsLogin() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(_keyCheckLogin) ?? false;
   }
 
   /// Xóa token (logout)
