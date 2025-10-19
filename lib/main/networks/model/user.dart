@@ -1,3 +1,5 @@
+import 'package:chat_app/main/networks/model/reels.dart';
+
 class RoleData {
   int? id;
   String? code;
@@ -21,15 +23,22 @@ class RoleData {
 class UserModel {
   int? id;
   String? username;
+  String? fullname;
+  bool? isPrivate;
+  String? bio;
   String? email;
   String? avatar;
   String? status;
   String? createdAt;
+  List<ReelModel>? reels;
   // RoleData? roleData;
 
   UserModel({
     this.id,
     this.username,
+    this.fullname,
+    this.isPrivate,
+    this.bio,
     this.email,
     this.avatar,
     // this.roleData,
@@ -41,6 +50,9 @@ class UserModel {
     return UserModel(
       id: json['user_id'],
       username: json['username'],
+      fullname: json['full_name'],
+      isPrivate: json['is_private'],
+      bio: json['bio'],
       email: json['email'],
       avatar: json['avatar_url'],
       status: json['status'],
@@ -94,4 +106,3 @@ class UserContact {
     };
   }
 }
-

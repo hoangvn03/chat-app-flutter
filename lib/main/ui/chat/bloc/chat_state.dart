@@ -1,13 +1,18 @@
-import 'package:chat_app/main/networks/model/post.dart';
-import 'package:chat_app/main/networks/model/reels.dart';
-import 'package:chat_app/main/networks/model/user.dart';
+import 'package:chat_app/main/networks/model/converation.dart';
+import 'package:chat_app/main/networks/model/message.dart';
 
 abstract class ChatState {}
+
 class ChatLoading extends ChatState {}
+
 class ChatSuccess extends ChatState {
-  UserModel? user;
-  List<ReelModel>? reels;
-  List<PostModel>? posts;
-  ChatSuccess({this.user,this.reels,this.posts});
+  ConversationResponse? data;
+  MessageData? message;
+  MessageModel? messageModel;
+  ChatSuccess({this.data,this.message,this.messageModel});
 }
-class ChatFailure extends ChatState {}
+
+class ChatFailure extends ChatState {
+  String errorMessage;
+  ChatFailure(this.errorMessage);
+}

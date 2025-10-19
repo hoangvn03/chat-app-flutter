@@ -166,8 +166,8 @@ class _LoginPageState extends State<LoginPage> {
           text: "Tiếp tục",
           color: AppColors.blue60,
           margin: EdgeInsets.symmetric(vertical: 16),
-          onTap: () async {
-            context.goNamed(PathName.homePage, extra: user);
+          onTap: () {
+            context.goNamed(PathName.homePage);
           },
         ),
         InkWell(
@@ -303,8 +303,7 @@ class _LoginPageState extends State<LoginPage> {
                           top: Radius.circular(16),
                         ),
                       ),
-                      builder:
-                          (context) => _buildBottomSheetForgotPassword(context),
+                      builder: (x) => _buildBottomSheetForgotPassword(context),
                     );
                   },
                   child: Align(

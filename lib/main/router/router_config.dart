@@ -12,7 +12,7 @@ import 'package:chat_app/main/ui/personal/personal_page.dart';
 import 'package:chat_app/main/ui/post/post_page.dart';
 import 'package:chat_app/main/ui/profile/profile_list_follower.dart';
 import 'package:chat_app/main/ui/profile/profile_page.dart';
-import 'package:chat_app/main/ui/profile/setting_page.dart';
+import 'package:chat_app/main/ui/profile/settings/setting_page.dart';
 import 'package:chat_app/main/ui/reels/camera/camera_page.dart';
 import 'package:chat_app/main/ui/reels/create_reels/create_reels_page.dart';
 import 'package:chat_app/main/ui/reels/list_reels/list_reels_page.dart';
@@ -50,13 +50,8 @@ class AppGoRouter {
     navigatorKey: _rootNavigatorKey,
     debugLogDiagnostics: true,
     redirect: (context, state) async {
-      final token = await AppStorage.getIsLogin();
+      final isLoggedIn = await AppStorage.getIsLogin();
       final isLoggingIn = state.matchedLocation == AppPath.loginPage;
-      final isLoggedIn = token;
-
-      if (!isLoggedIn && !isLoggingIn) {
-        return AppPath.loginPage;
-      }
 
       if (isLoggedIn && isLoggingIn) {
         return AppPath.homePage;
@@ -91,10 +86,21 @@ class AppGoRouter {
         name: PathName.chatRoomPage,
         path: AppPath.chatRoomPage,
         builder: (context, state) {
-          final data = state.extra as MessageModel;
-          return ChatRoom(data: data);
+          final data = state.extra as List; // 👈 Nhận dạng List
+          final int conversationId = data[0];
+          final sender = data[1];
+          return ChatRoom(conversationId: conversationId, sender: sender);
         },
       ),
+      // GoRoute(
+      //   name: PathName.chatScreen,
+      //   path: AppPath.chatScreen,
+      //   builder: (context, state) {
+      //     return ChatScreen(
+
+      //     );
+      //   },
+      // ),
       GoRoute(
         name: PathName.profileListFollowerPage,
         path: AppPath.profileListFollowerPage,
@@ -106,8 +112,8 @@ class AppGoRouter {
         name: PathName.createReelsPage,
         path: AppPath.createReelsPage,
         builder: (context, state) {
-          final listImagePath = state.extra as List<dynamic>;
-          return CreateReelsPage(listImagePath: listImagePath);
+          final listMediaPath = state.extra as List<dynamic>;
+          return CreateReelsPage(listMediaPath: listMediaPath);
         },
       ),
 

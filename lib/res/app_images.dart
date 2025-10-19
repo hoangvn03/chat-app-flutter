@@ -53,6 +53,7 @@ class AppImages {
   static const String icMenu = 'assets/icons/ic_menu.svg';
   static const String icAddUser = 'assets/icons/ic_add_user.svg';
   static const String icStarRound = 'assets/icons/ic_star_round.svg';
+  static const String icCamera = 'assets/icons/ic_camera.svg';
   //png
     static const String icMetaPng = 'assets/icons/ic_meta.png';
 

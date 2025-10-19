@@ -1,16 +1,21 @@
-import 'package:chat_app/main/networks/model/reels.dart';
 import 'package:photo_manager/photo_manager.dart';
+import 'package:video_player/video_player.dart';
 
 abstract class CreateReelsState {}
 
 class CreateReelsLoading extends CreateReelsState {}
 
-class CreateReelsSuccess extends CreateReelsState {
-  List<AssetEntity> mediaPicked;
-List<ReelModel> stories;
-  CreateReelsSuccess({required this.mediaPicked,required this.stories});}
+class CreateReelsLoadedVideo extends CreateReelsState {
+  final VideoPlayerController controller;
+  CreateReelsLoadedVideo({required this.controller});
+}
 
-class CreateReelsFailure extends CreateReelsState {
-  final String errorMessage;
-  CreateReelsFailure(this.errorMessage);
+class CreateReelsLoadedImage extends CreateReelsState {
+  final AssetEntity asset;
+  CreateReelsLoadedImage({required this.asset});
+}
+
+class CreateReelsError extends CreateReelsState {
+  final String message;
+  CreateReelsError(this.message);
 }

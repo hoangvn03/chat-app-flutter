@@ -4,8 +4,8 @@ import 'package:photo_manager/photo_manager.dart';
 abstract class CreateReelsEvent {}
 
 class LoadReelsMedia extends CreateReelsEvent {
-  List<dynamic>? assetList;
-  LoadReelsMedia({this.assetList});
+  List<dynamic> assetList;
+  LoadReelsMedia(this.assetList);
 }
 
 class ChooseMedia extends CreateReelsEvent {

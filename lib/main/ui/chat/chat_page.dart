@@ -1,3 +1,4 @@
+import 'package:chat_app/main/networks/model/converation.dart';
 import 'package:chat_app/main/ui/widget/account_suggest/account_suggest_widget.dart';
 import 'package:chat_app/main/ui/widget/post/post_item_widget.dart';
 import 'package:chat_app/main/networks/model/message.dart';
@@ -16,6 +17,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 
 class ChatPage extends StatefulWidget {
   const ChatPage({super.key});
@@ -177,32 +179,7 @@ class _ChatPageState extends State<ChatPage> {
                         subTitle: 'Ghi chú của bạn',
                       ),
                       const SizedBox(height: 16),
-                      _buildListMessage([
-                        MessageModel(
-                          messageId: 1,
-                          conversationId: 101,
-                          senderId: 1,
-                          content: 'Hello',
-                          createdAt: DateTime.now(),
-                          isRead: true,
-                        ),
-                        MessageModel(
-                          messageId: 2,
-                          conversationId: 101,
-                          senderId: 2,
-                          content: 'Hi',
-                          createdAt: DateTime.now(),
-                          isRead: true,
-                        ),
-                        MessageModel(
-                          messageId: 3,
-                          conversationId: 102,
-                          senderId: 3,
-                          content: 'Hello',
-                          createdAt: DateTime.now(),
-                          isRead: false,
-                        ),
-                      ]),
+                      _buildListMessage(state.data!.conversations),
                       const SizedBox(height: 8),
                       AccountSuggestWidget(
                         isHorirontal: false,
@@ -235,7 +212,7 @@ class _ChatPageState extends State<ChatPage> {
                 ),
               );
             } else if (state is ChatFailure) {
-              return const Center(child: Text('Failed to load users'));
+              return Center(child: Text(state.errorMessage));
             }
             return const Center(child: Text('Welcome to the Chat Page!'));
           },
@@ -262,7 +239,7 @@ class _ChatPageState extends State<ChatPage> {
     );
   }
 
-  Widget _buildListMessage(List<MessageModel> messages) {
+  Widget _buildListMessage(List<Conversation> messages) {
     return Column(
       children: [
         Row(
@@ -287,19 +264,28 @@ class _ChatPageState extends State<ChatPage> {
     );
   }
 
-  Widget _itemMessage(MessageModel message) {
+  Widget _itemMessage(Conversation con) {
     return ListTile(
       contentPadding: EdgeInsets.zero,
       dense: true,
       leading: Image.asset(AppImages.imgAvatarDefault),
       onTap: () {
-        context.pushNamed(PathName.chatRoomPage, extra: message);
+        // context.pushNamed(PathName.chatScreen);
+        context.pushNamed(
+          PathName.chatRoomPage,
+          extra: [con.conversationId, con.lastMessage!],
+        );
       },
-      title: Text(message.content, style: AppStyles.title2Regular),
-      subtitle: Text(
-        message.isRead ? 'Đã xem' : 'Đã gửi',
-        style: AppStyles.bodyRegular,
+      title: Text(
+        con.lastMessage!.sender.username ?? 'Unkown',
+        style: AppStyles.title2Regular,
       ),
+      subtitle: Text(con.lastMessage!.content, style: AppStyles.bodyRegular),
+      // title: Text(con.lastMessage!.content, style: AppStyles.title2Regular),
+      // subtitle: Text(
+      //   DateFormat.Hm().format(con.createdAt),
+      //   style: AppStyles.bodyRegular,
+      // ),
     );
   }
 }

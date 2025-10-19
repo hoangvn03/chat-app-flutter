@@ -15,10 +15,12 @@ import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:photo_manager_image_provider/photo_manager_image_provider.dart';
+import 'package:video_player/video_player.dart';
 
+// ignore: must_be_immutable
 class CreateReelsPage extends StatefulWidget {
-  CreateReelsPage({required this.listImagePath, super.key});
-  List<dynamic> listImagePath;
+  CreateReelsPage({required this.listMediaPath, super.key});
+  List<dynamic> listMediaPath;
   @override
   State<CreateReelsPage> createState() => _CreateReelsPageState();
 }
@@ -31,14 +33,12 @@ class _CreateReelsPageState extends State<CreateReelsPage> {
     return SafeArea(
       child: BlocProvider(
         create:
-            (_) =>
-                CreateReelsBloc()
-                  ..add(LoadReelsMedia(assetList: widget.listImagePath)),
+            (_) => CreateReelsBloc()..add(LoadReelsMedia(widget.listMediaPath)),
         child: Scaffold(
           backgroundColor: AppColors.black,
           body: Column(
             children: [
-              _buildImagePreview(context),
+              _buildMediaPlayer(context),
               Expanded(
                 child: Align(
                   alignment: Alignment.bottomCenter,
@@ -52,7 +52,7 @@ class _CreateReelsPageState extends State<CreateReelsPage> {
     );
   }
 
-  Widget _buildImagePreview(BuildContext context) {
+  Widget _buildMediaPlayer(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
     return ClipRRect(
       borderRadius: BorderRadius.circular(24),
@@ -61,32 +61,71 @@ class _CreateReelsPageState extends State<CreateReelsPage> {
           SizedBox(
             height: height * 0.8,
             width: double.infinity,
-            child:
-                (widget.listImagePath.first is String)
-                    ? Image.file(
-                      File(widget.listImagePath[0]),
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Container(
-                          color: Colors.grey,
-                          child: const Center(
-                            child: Icon(Icons.error, color: Colors.red),
-                          ),
-                        );
-                      },
-                    )
-                    : AssetEntityImage(
-                      widget.listImagePath.first,
-                      isOriginal: false,
-                      thumbnailSize: const ThumbnailSize.square(250),
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        return const Center(
-                          child: Icon(Icons.error, color: Colors.red),
-                        );
-                      },
+            child: BlocBuilder<CreateReelsBloc, CreateReelsState>(
+              builder: (context, state) {
+                if (state is CreateReelsLoading) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (state is CreateReelsError) {
+                  return Center(
+                    child: Text(
+                      state.message,
+                      style: AppStyles.bodyBold.copyWith(
+                        color: AppColors.white,
+                      ),
                     ),
+                  );
+                } else if (state is CreateReelsLoadedVideo) {
+                  return _videoMedia(height, state.controller);
+                } else if (state is CreateReelsLoadedImage) {
+                  return _imageMedia(height);
+                }
+                return const SizedBox.shrink();
+
+                // ClipRRect(
+                //   borderRadius: BorderRadius.circular(24),
+                //   child: Stack(
+                //     children: [
+                //       (widget.listMediaPath.first is AssetEntity &&
+                //               widget.listMediaPath.first.type == AssetType.video)
+                //           ? _videoMedia(height)
+                //           : _imageMedia(height),
+                //       Positioned(
+                //         left: 0,
+                //         right: 0,
+                //         bottom: 0,
+                //         height: 120, // chiều cao vùng phủ
+                //         child: Container(
+                //           decoration: const BoxDecoration(
+                //             gradient: LinearGradient(
+                //               begin: Alignment.topCenter,
+                //               end: Alignment.bottomCenter,
+                //               colors: [
+                //                 Colors.transparent,
+                //                 Colors.black54, // đen trong suốt 50%
+                //               ],
+                //             ),
+                //           ),
+                //         ),
+                //       ),
+                //       Positioned(
+                //         left: 8,
+                //         right: 8,
+                //         top: 12,
+                //         child: _buildListHeaderIcon(),
+                //       ),
+                //       Positioned(
+                //         left: 16,
+                //         right: 16,
+                //         bottom: 16,
+                //         child: _buildAddNote(),
+                //       ),
+                //     ],
+                //   ),
+                // );
+              },
+            ),
           ),
+
           Positioned(
             left: 0,
             right: 0,
@@ -109,6 +148,36 @@ class _CreateReelsPageState extends State<CreateReelsPage> {
           Positioned(left: 16, right: 16, bottom: 16, child: _buildAddNote()),
         ],
       ),
+    );
+  }
+
+  Widget _imageMedia(double height) {
+    return (widget.listMediaPath.first is String)
+        ? Image.file(
+          File(widget.listMediaPath[0]),
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) {
+            return Container(
+              color: Colors.grey,
+              child: const Center(child: Icon(Icons.error, color: Colors.red)),
+            );
+          },
+        )
+        : AssetEntityImage(
+          widget.listMediaPath.first,
+          isOriginal: false,
+          thumbnailSize: const ThumbnailSize.square(250),
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) {
+            return const Center(child: Icon(Icons.error, color: Colors.red));
+          },
+        );
+  }
+
+  Widget _videoMedia(double height, VideoPlayerController controller) {
+    return AspectRatio(
+      aspectRatio: controller.value.aspectRatio,
+      child: VideoPlayer(controller),
     );
   }
 
@@ -220,15 +289,13 @@ class _CreateReelsPageState extends State<CreateReelsPage> {
                 textAlignVertical: TextAlignVertical.center,
                 controller: _textEditingController,
                 style: AppStyles.bodyRegular.copyWith(color: AppColors.white),
-                onChanged:(_){
-                  
-                },
+                onChanged: (_) {},
                 decoration: InputDecoration(
                   hintText: 'Thêm chú thích...',
                   hintStyle: AppStyles.bodyRegular.copyWith(
                     color: AppColors.white,
                   ),
-                  
+
                   contentPadding: const EdgeInsets.symmetric(
                     horizontal: 12,
                     vertical: 12,
@@ -255,7 +322,7 @@ class _CreateReelsPageState extends State<CreateReelsPage> {
                               _textEditingController.clear();
                             },
                           )
-                          : null, 
+                          : null,
                 ),
               ),
             ),
@@ -327,7 +394,7 @@ class _CreateReelsPageState extends State<CreateReelsPage> {
           GestureDetector(
             onTap: () {
               final data = ReelModel(
-                assetList: widget.listImagePath,
+                assetList: widget.listMediaPath,
                 media: MediaType.image,
                 duration: Duration(seconds: 20),
               );

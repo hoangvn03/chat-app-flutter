@@ -1,3 +1,49 @@
+import 'package:chat_app/main/networks/model/converation.dart';
+import 'package:chat_app/main/networks/model/user.dart';
+
+class MessageResponse {
+  final MessageData data;
+
+  MessageResponse({required this.data});
+
+  factory MessageResponse.fromJson(Map<String, dynamic> json) {
+    return MessageResponse(
+      data: MessageData.fromJson(json['data'] ?? {}),
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+        'data': data.toJson(),
+      };
+}
+
+class MessageData {
+  final List<MessageModel> messages;
+  final Pagination? pagination;
+
+  MessageData({
+    required this.messages,
+    this.pagination,
+  });
+
+  factory MessageData.fromJson(Map<String, dynamic> json) {
+    return MessageData(
+      messages: (json['messages'] as List?)
+              ?.map((e) => MessageModel.fromJson(e))
+              .toList() ??
+          [],
+      pagination: json['pagination'] != null
+          ? Pagination.fromJson(json['pagination'])
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+        'messages': messages.map((e) => e.toJson()).toList(),
+        if (pagination != null) 'pagination': pagination!.toJson(),
+      };
+}
+
 class MessageModel {
   final int messageId;
   final int conversationId;
@@ -5,6 +51,9 @@ class MessageModel {
   final String content;
   final DateTime createdAt;
   final bool isRead;
+  final UserModel? sender;
+  List<Attachment>? attachments;
+  List<Status>? statuses;
 
   MessageModel({
     required this.messageId,
@@ -13,114 +62,157 @@ class MessageModel {
     required this.content,
     required this.createdAt,
     required this.isRead,
+    this.sender,
+    this.attachments,
+    this.statuses,
   });
 
-  // Tạo đối tượng từ JSON
   factory MessageModel.fromJson(Map<String, dynamic> json) {
     return MessageModel(
-      messageId: json['message_id'] is int
-          ? json['message_id']
-          : int.parse(json['message_id'].toString()),
-      conversationId: json['conversation_id'] is int
-          ? json['conversation_id']
-          : int.parse(json['conversation_id'].toString()),
-      senderId: json['sender_id'] is int
-          ? json['sender_id']
-          : int.parse(json['sender_id'].toString()),
+      messageId: json['message_id'] ?? 0,
+      conversationId: json['conversation_id'] ?? 0,
+      senderId: json['sender_id'] ?? 0,
       content: json['content'] ?? '',
-      createdAt: DateTime.parse(json['created_at'].toString()),
-      isRead: json['is_read'].toString() == '1' || json['is_read'] == true,
+      createdAt: json['created_at'] != null
+          ? DateTime.parse(json['created_at'])
+          : DateTime.now(),
+      isRead: json['is_read'] ?? false,
+      sender:
+          json['sender'] != null ? UserModel.fromJson(json['sender']) : null,
+      attachments: (json['attachments'] as List?)
+              ?.map((e) => Attachment.fromJson(e))
+              .toList() ??
+          [],
+      statuses: (json['statuses'] as List?)
+              ?.map((e) => Status.fromJson(e))
+              .toList() ??
+          [],
     );
   }
 
-  // Chuyển đối tượng sang JSON
-  Map<String, dynamic> toJson() {
-    return {
-      'message_id': messageId,
-      'conversation_id': conversationId,
-      'sender_id': senderId,
-      'content': content,
-      'created_at': createdAt.toIso8601String(),
-      'is_read': isRead ? 1 : 0, // hoặc true/false tùy backend
-    };
-  }
-
-  // Sao chép đối tượng với thay đổi một số trường
-  MessageModel copyWith({
-    int? messageId,
-    int? conversationId,
-    int? senderId,
-    String? content,
-    DateTime? createdAt,
-    bool? isRead,
-  }) {
-    return MessageModel(
-      messageId: messageId ?? this.messageId,
-      conversationId: conversationId ?? this.conversationId,
-      senderId: senderId ?? this.senderId,
-      content: content ?? this.content,
-      createdAt: createdAt ?? this.createdAt,
-      isRead: isRead ?? this.isRead,
-    );
-  }
+  Map<String, dynamic> toJson() => {
+        'message_id': messageId,
+        'conversation_id': conversationId,
+        'sender_id': senderId,
+        'content': content,
+        'created_at': createdAt.toIso8601String(),
+        'is_read': isRead,
+        'sender': sender?.toJson(),
+        'attachments': attachments!.map((e) => e.toJson()).toList(),
+        'statuses': statuses!.map((e) => e.toJson()).toList(),
+      };
 }
-class MessageStatusModel {
+
+class Attachment {
+  Attachment();
+
+  factory Attachment.fromJson(Map<String, dynamic> json) {
+    return Attachment();
+  }
+
+  Map<String, dynamic> toJson() => {};
+}
+
+class Status {
   final int statusId;
   final int messageId;
   final int receiverId;
   final String status;
   final DateTime updatedAt;
+  final Receiver? receiver;
 
-  MessageStatusModel({
+  Status({
     required this.statusId,
     required this.messageId,
     required this.receiverId,
     required this.status,
     required this.updatedAt,
+    this.receiver,
   });
 
-  // Chuyển từ JSON sang đối tượng Dart
-  factory MessageStatusModel.fromJson(Map<String, dynamic> json) {
-    return MessageStatusModel(
-      statusId: json['status_id'] is int
-          ? json['status_id']
-          : int.parse(json['status_id'].toString()),
-      messageId: json['message_id'] is int
-          ? json['message_id']
-          : int.parse(json['message_id'].toString()),
-      receiverId: json['receiver_id'] is int
-          ? json['receiver_id']
-          : int.parse(json['receiver_id'].toString()),
+  factory Status.fromJson(Map<String, dynamic> json) {
+    return Status(
+      statusId: json['status_id'] ?? 0,
+      messageId: json['message_id'] ?? 0,
+      receiverId: json['receiver_id'] ?? 0,
       status: json['status'] ?? '',
-      updatedAt: DateTime.parse(json['updated_at'].toString()),
+      updatedAt: json['updated_at'] != null
+          ? DateTime.parse(json['updated_at'])
+          : DateTime.now(),
+      receiver: json['receiver'] != null
+          ? Receiver.fromJson(json['receiver'])
+          : null,
     );
   }
 
-  // Chuyển đối tượng Dart sang JSON
+  Map<String, dynamic> toJson() => {
+        'status_id': statusId,
+        'message_id': messageId,
+        'receiver_id': receiverId,
+        'status': status,
+        'updated_at': updatedAt.toIso8601String(),
+        if (receiver != null) 'receiver': receiver!.toJson(),
+      };
+}
+
+class Receiver {
+  final int userId;
+  final String username;
+
+  Receiver({
+    required this.userId,
+    required this.username,
+  });
+
+  factory Receiver.fromJson(Map<String, dynamic> json) {
+    return Receiver(
+      userId: json['user_id'] ?? 0,
+      username: json['username'] ?? '',
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+        'user_id': userId,
+        'username': username,
+      };
+}
+
+class ChatMessage {
+  final String id;
+  final String fromId;
+  final String fromName;
+  final String text;
+  final DateTime createdAt;
+  final bool mine;
+
+  ChatMessage({
+    required this.id,
+    required this.fromId,
+    required this.fromName,
+    required this.text,
+    required this.createdAt,
+    required this.mine,
+  });
+
+  factory ChatMessage.fromJson(Map<String, dynamic> json, String myId) {
+    return ChatMessage(
+      id: json['id'] ?? json['createdAt'] ?? '',
+      fromId: json['fromId'] ?? '',
+      fromName: json['fromName'] ?? '',
+      text: json['text'] ?? '',
+      createdAt: DateTime.parse(json['createdAt']),
+      mine: (json['fromId'] ?? '') == myId,
+    );
+  }
+
   Map<String, dynamic> toJson() {
     return {
-      'status_id': statusId,
-      'message_id': messageId,
-      'receiver_id': receiverId,
-      'status': status,
-      'updated_at': updatedAt.toIso8601String(),
+      'id': id,
+      'fromId': fromId,
+      'fromName': fromName,
+      'text': text,
+      'createdAt': createdAt.toIso8601String(),
     };
   }
-
-  // copyWith để tạo bản sao dễ chỉnh sửa
-  MessageStatusModel copyWith({
-    int? statusId,
-    int? messageId,
-    int? receiverId,
-    String? status,
-    DateTime? updatedAt,
-  }) {
-    return MessageStatusModel(
-      statusId: statusId ?? this.statusId,
-      messageId: messageId ?? this.messageId,
-      receiverId: receiverId ?? this.receiverId,
-      status: status ?? this.status,
-      updatedAt: updatedAt ?? this.updatedAt,
-    );
-  }
 }
+

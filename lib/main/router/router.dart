@@ -11,6 +11,7 @@ class AppPath {
   static const String profilePage = "/profilePage";
   static const String chatPage = "/chatPage";
   static const String chatRoomPage = "/chatRoomPage";
+  static const String chatScreen = "/chatScreen";
   static const String profileListFollowerPage = "/profileListFollowerPage";
   static const String searchResultPage = "/searchResultPage";
   static const String createReelsPage = "/createReelsPage";
@@ -36,6 +37,7 @@ class PathName {
   static const String profilePage = "profilePage";
   static const String chatPage = "chatPage";
   static const String chatRoomPage = "chatRoomPage";
+  static const String chatScreen = "chatScreen";
   static const String profileListFollowerPage = "profileListFollowerPage";
   static const String searchResultPage = "searchResultPage";
   static const String createReelsPage = "createReelsPage";

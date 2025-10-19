@@ -2,9 +2,9 @@ import 'package:chat_app/main/router/router.dart';
 import 'package:chat_app/main/ui/auth/bloc/auth_bloc.dart';
 import 'package:chat_app/main/ui/auth/bloc/auth_event.dart';
 import 'package:chat_app/main/ui/auth/bloc/auth_state.dart';
-import 'package:chat_app/main/ui/profile/bloc/profile_bloc.dart';
-import 'package:chat_app/main/ui/profile/bloc/profile_event.dart';
-import 'package:chat_app/main/ui/profile/bloc/profile_state.dart';
+import 'package:chat_app/main/ui/profile/settings/bloc/settings_bloc.dart';
+import 'package:chat_app/main/ui/profile/settings/bloc/settings_event.dart';
+import 'package:chat_app/main/ui/profile/settings/bloc/settings_state.dart';
 import 'package:chat_app/main/utils/common_widget.dart';
 import 'package:chat_app/res/app_colors.dart';
 import 'package:chat_app/res/app_images.dart';
@@ -25,7 +25,7 @@ class SettingPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider(create: (_) => ProfileBloc()..add(LoadRequest())),
+        BlocProvider(create: (_) => SettingBloc()..add(LoadRequest())),
         BlocProvider(create: (_) => AuthBloc()),
       ],
       child: Scaffold(
@@ -62,11 +62,11 @@ class SettingPage extends StatelessWidget {
               );
             }
           },
-          child: BlocBuilder<ProfileBloc, ProfileState>(
+          child: BlocBuilder<SettingBloc, SettingState>(
             builder: (context, state) {
-              if (state is ProfileLoading) {
+              if (state is SettingLoading) {
                 return const Center(child: CircularProgressIndicator());
-              } else if (state is ProfileSuccess) {
+              } else if (state is SettingSuccess) {
                 return SingleChildScrollView(
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
@@ -87,7 +87,7 @@ class SettingPage extends StatelessWidget {
                     ],
                   ),
                 );
-              } else if (state is ProfileFailure) {
+              } else if (state is SettingFailure) {
                 return const Center(child: Text('Failed to load users'));
               }
               return const Center(child: Text('Welcome to the Chat Page!'));
@@ -213,7 +213,7 @@ class SettingPage extends StatelessWidget {
 
   Widget _buildAuthAction() {
     // Bỏ tham số parentContext
-    return BlocBuilder<ProfileBloc, ProfileState>(
+    return BlocBuilder<SettingBloc, SettingState>(
       builder: (context, state) {
         return _buildFunctionAccount(
           headerText: 'Đăng nhập',

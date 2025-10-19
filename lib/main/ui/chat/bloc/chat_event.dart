@@ -4,9 +4,15 @@ abstract class ChatEvent {}
 
 class LoadRequest extends ChatEvent {}
 
-class DeletetUser extends ChatEvent {
-  final int userId;
-  DeletetUser(this.userId);
+class LoadDetailConveration extends ChatEvent {
+  int id;
+  LoadDetailConveration(this.id);
+}
+
+class SendMessage extends ChatEvent {
+  final int conversationId;
+  final String message;
+  SendMessage(this.conversationId, this.message);
 }
 
 class UpdateUser extends ChatEvent {

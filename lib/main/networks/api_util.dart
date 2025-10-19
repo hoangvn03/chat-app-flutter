@@ -17,10 +17,14 @@ class ApiUtil {
     return ApiResponse(statusCode, body);
   }
 
-  static Future<dynamic> get(String url) async {
+  static Future<dynamic> get(String url, {Map<String, dynamic>? params}) async {
     try {
-      final uri = Uri.parse(url);
+      final uri = Uri.parse(url).replace(queryParameters: params);
       final token = await AppStorage.getToken();
+
+      debugPrint('🔹 [GET] Request URL: $uri');
+      debugPrint('🔹 [GET] Token: $token');
+
       final response = await http.get(
         uri,
         headers: {
@@ -28,9 +32,14 @@ class ApiUtil {
           "Content-Type": 'application/json',
         },
       );
+
+      debugPrint('✅ [GET] Status code: ${response.statusCode}');
+      debugPrint('📦 [GET] Response body: ${response.body}');
+
       return await _handleResponse(response);
-    } catch (e) {
-      debugPrint('GET error: $e');
+    } catch (e, stackTrace) {
+      debugPrint('❌ [GET] error: $e');
+      debugPrintStack(stackTrace: stackTrace);
       rethrow;
     }
   }

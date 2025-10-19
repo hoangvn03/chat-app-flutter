@@ -5,10 +5,10 @@ import 'package:chat_app/main/networks/model/user.dart';
 abstract class ProfileState {}
 class ProfileLoading extends ProfileState {}
 class ProfileSuccess extends ProfileState {
-  UserModel? user;
+  UserModel user;
   List<ReelModel>? reels;
   List<PostModel>? posts;
-  ProfileSuccess({this.user,this.reels,this.posts});
+  ProfileSuccess({required this.user,this.reels,this.posts});
 }
 class ProfileFailure extends ProfileState {
   String? erroMessage;

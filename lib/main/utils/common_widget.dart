@@ -21,6 +21,7 @@ Widget commonButton({
   textStyle,
   mainWidget,
   double? height,
+  double? width,
   bool? hasHeight,
   bool? uppercase,
   double? radius,
@@ -37,6 +38,7 @@ Widget commonButton({
 
       height: hasHeight == null ? 50 : height,
       padding: padding,
+      alignment: Alignment.center,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(radius ?? 25),
         border:
@@ -44,28 +46,26 @@ Widget commonButton({
             Border.all(color: colorBorder ?? Colors.transparent, width: 1),
         color: color ?? AppColors.blue60,
       ),
-      child: Center(
-        child:
-            mainWidget ??
-            Text(
-              textAlign: TextAlign.center,
-              text,
-              maxLines: maxLine,
-              overflow: TextOverflow.ellipsis,
-              style:
-                  textStyle ??
-                  TextStyle(
-                    color:
-                        textColor ??
-                        (color == AppColors.white
-                            ? AppColors.black
-                            : AppColors.white),
+      child:
+          mainWidget ??
+          Text(
+            textAlign: TextAlign.center,
+            text,
+            maxLines: maxLine,
+            overflow: TextOverflow.ellipsis,
+            style:
+                textStyle ??
+                TextStyle(
+                  color:
+                      textColor ??
+                      (color == AppColors.white
+                          ? AppColors.black
+                          : AppColors.white),
 
-                    fontSize: fontSize ?? 15,
-                    fontWeight: FontWeight.w500,
-                  ),
-            ),
-      ),
+                  fontSize: fontSize ?? 15,
+                  fontWeight: FontWeight.w500,
+                ),
+          ),
     ),
   );
 }
@@ -126,6 +126,10 @@ Widget commonTextFieldV2({
   bool? enabled,
   Color? color,
   TextInputType? keyboardType,
+  Widget? suffixIcon,
+  Widget? leadingIcon,
+  Widget? onPressSuffixIcon,
+  Widget? onPressPrefixIcon,
   VoidCallback? onTap,
   ValueChanged<String>? onChanged,
 }) {
@@ -176,12 +180,16 @@ Widget commonTextFieldV2({
             ),
             prefixIcon: Padding(
               padding: const EdgeInsets.only(right: 8),
-              child: SvgPicture.asset(
-                iconLeading ?? AppImages.icSearch,
-                color: AppColors.gray40,
-                width: 16,
-                height: 16,
-              ),
+              child:
+                  value.text.isNotEmpty
+                      ? onPressPrefixIcon
+                      : leadingIcon ??
+                          SvgPicture.asset(
+                            iconLeading ?? AppImages.icSearch,
+                            color: AppColors.gray40,
+                            width: 16,
+                            height: 16,
+                          ),
             ),
             prefixIconConstraints: const BoxConstraints(
               minWidth: 16,
@@ -190,17 +198,18 @@ Widget commonTextFieldV2({
             // 👇 chỉ hiện khi có text
             suffixIcon:
                 value.text.isNotEmpty
-                    ? IconButton(
-                      icon: const Icon(
-                        Icons.clear,
-                        size: 18,
-                        color: Colors.grey,
-                      ),
-                      onPressed: () {
-                        effectiveController.clear();
-                      },
-                    )
-                    : null,
+                    ? onPressSuffixIcon ??
+                        IconButton(
+                          icon: const Icon(
+                            Icons.clear,
+                            size: 18,
+                            color: Colors.grey,
+                          ),
+                          onPressed: () {
+                            effectiveController.clear();
+                          },
+                        )
+                    : suffixIcon,
             fillColor: AppColors.gray20,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),

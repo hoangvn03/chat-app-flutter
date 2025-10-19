@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chat_app/main/ui/widget/account_suggest/account_suggest_widget.dart';
 import 'package:chat_app/main/ui/widget/interaction_button/bloc/interaction_cubit.dart';
 import 'package:chat_app/main/ui/widget/interaction_button/interaction_button.dart';
@@ -319,7 +320,219 @@ class _ProfilePageState extends State<ProfilePage>
                 ),
               );
             } else if (state is ProfileFailure) {
-              return const Center(child: Text('Failed to load users'));
+              return NestedScrollView(
+                headerSliverBuilder:
+                    (context, innerBoxIsScrolled) => [
+                      SliverAppBar(
+                        backgroundColor: AppColors.white,
+                        surfaceTintColor: AppColors.white,
+                        floating: true,
+                        snap: true,
+                        pinned: true,
+                        title:
+                            !isCurrientUser
+                                ? Row(
+                                  children: [
+                                    SvgPicture.asset(AppImages.icLock),
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 8,
+                                      ),
+                                      child: Text(
+                                        'Unkonwn',
+                                        style: AppStyles.title1Bold,
+                                      ),
+                                    ),
+                                    Transform.flip(
+                                      flipY: true,
+                                      child: SvgPicture.asset(
+                                        AppImages.icChevronUp,
+                                        width: 16,
+                                        height: 16,
+                                      ),
+                                    ),
+                                  ],
+                                )
+                                : Text(
+                                  widget.user!.username ?? 'Unkonwn',
+                                  style: AppStyles.title1Bold,
+                                ),
+                        leading:
+                            isCurrientUser
+                                ? IconButton(
+                                  onPressed: () {
+                                    context.pop();
+                                  },
+                                  icon: Transform.flip(
+                                    flipX: true,
+                                    child: SvgPicture.asset(
+                                      AppImages.icNextRight,
+                                    ),
+                                  ),
+                                )
+                                : null,
+                        actions: [
+                          if (isCurrientUser) ...[
+                            PopupMenuButton(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 12,
+                              ),
+                              constraints: const BoxConstraints(),
+                              color: Colors.white.withOpacity(0.95),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              offset: const Offset(40, 40),
+                              itemBuilder:
+                                  (context) => [
+                                    PopupMenuItem(
+                                      padding: EdgeInsets.only(left: 24),
+                                      enabled: false, // tắt click
+                                      child: Text(
+                                        "Thông báo từ ${(isCurrientUser) ? widget.user!.username ?? 'Unkonwn' : 'Unkonwn'}",
+                                        style: AppStyles.bodyRegular,
+                                      ),
+                                    ),
+                                    PopupMenuItem(
+                                      onTap: () {},
+                                      child: ListTile(
+                                        dense: true,
+                                        leading: SvgPicture.asset(
+                                          AppImages.icPictureGallery,
+                                        ),
+                                        title: Text(
+                                          "Bài biết",
+                                          style: AppStyles.title2Regular,
+                                        ),
+                                        subtitle: Text(
+                                          "Phù hợp nhất",
+                                          style: AppStyles.bodyRegular,
+                                        ),
+                                        trailing: SvgPicture.asset(
+                                          AppImages.icChevronRight,
+                                        ),
+                                      ),
+                                    ),
+                                    PopupMenuItem(
+                                      onTap: () {},
+                                      child: ListTile(
+                                        dense: true,
+                                        leading: SvgPicture.asset(
+                                          AppImages.icAddHighlight,
+                                        ),
+                                        title: Text(
+                                          "Tin",
+                                          style: AppStyles.title2Regular,
+                                        ),
+                                        subtitle: Text(
+                                          "Phù hợp nhất",
+                                          style: AppStyles.bodyRegular,
+                                        ),
+                                        trailing: SvgPicture.asset(
+                                          AppImages.icChevronRight,
+                                        ),
+                                      ),
+                                    ),
+                                    PopupMenuItem(
+                                      onTap: () {},
+                                      child: ListTile(
+                                        dense: true,
+
+                                        leading: SvgPicture.asset(
+                                          AppImages.icReels,
+                                        ),
+                                        title: Text(
+                                          "Reels",
+                                          style: AppStyles.title2Regular,
+                                        ),
+                                        subtitle: Text(
+                                          "Phù hợp nhất",
+                                          style: AppStyles.bodyRegular,
+                                        ),
+                                        trailing: SvgPicture.asset(
+                                          AppImages.icChevronRight,
+                                        ),
+                                      ),
+                                    ),
+                                    PopupMenuItem(
+                                      onTap: () {},
+                                      child: ListTile(
+                                        dense: true,
+
+                                        leading: SvgPicture.asset(
+                                          AppImages.icLive,
+                                        ),
+                                        title: Text(
+                                          "Video trực tiếp",
+                                          style: AppStyles.title2Regular,
+                                        ),
+                                        subtitle: Text(
+                                          "Phù hợp nhất",
+                                          style: AppStyles.bodyRegular,
+                                        ),
+                                        trailing: SvgPicture.asset(
+                                          AppImages.icChevronRight,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                              child: Transform.flip(
+                                flipX: true,
+                                child: SvgPicture.asset(
+                                  AppImages.icNotificationsOff,
+                                ),
+                              ),
+                            ),
+                            IconButton(
+                              onPressed: () {
+                                showModalBottomSheet(
+                                  context: context,
+                                  useSafeArea: true,
+                                  useRootNavigator: true,
+                                  backgroundColor: AppColors.white,
+                                  isScrollControlled: true,
+                                  shape: const RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.vertical(
+                                      top: Radius.circular(16),
+                                    ),
+                                  ),
+                                  builder:
+                                      (context) =>
+                                          _buildBottomSheetProfileOption(
+                                            context,
+                                          ),
+                                );
+                              },
+                              icon: Transform.rotate(
+                                angle:
+                                    90 *
+                                    3.1415926535 /
+                                    180, // xoay 90 độ (radian)
+                                child: SvgPicture.asset(AppImages.icOption),
+                              ),
+                            ),
+                          ] else ...[
+                            IconButton(
+                              onPressed: () {},
+                              icon: SvgPicture.asset(AppImages.icThreads),
+                            ),
+                            IconButton(
+                              onPressed: () {},
+                              icon: SvgPicture.asset(AppImages.icCreate),
+                            ),
+                            IconButton(
+                              onPressed: () {
+                                context.pushNamed(PathName.settingpage);
+                              },
+                              icon: SvgPicture.asset(AppImages.icMenu),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ],
+                body: const Center(child: Text('Failed to load users')),
+              );
             }
             return const Center(child: Text('Welcome to the Profile Page!'));
           },
@@ -328,7 +541,7 @@ class _ProfilePageState extends State<ProfilePage>
     );
   }
 
-  Widget _buildProfileInfo(UserModel? user, bool isCurrientUser) {
+  Widget _buildProfileInfo(UserModel user, bool isCurrientUser) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -339,12 +552,26 @@ class _ProfilePageState extends State<ProfilePage>
             children: [
               cricleColorImage(
                 size: 86,
-                childWidget: Image.asset(
-                  (isCurrientUser)
-                      ? widget.user!.avatar ?? AppImages.imgAvatarDefault
-                      : user!.avatar ?? AppImages.imgAvatarDefault,
-
-                  fit: BoxFit.cover,
+                childWidget: ClipRRect(
+                  borderRadius: BorderRadius.circular(100),
+                  child:
+                      (user.avatar != null)
+                          ? SvgPicture.network(
+                            (isCurrientUser)
+                                ? widget.user!.avatar!
+                                : user!.avatar!,
+                            fit: BoxFit.cover,
+                            placeholderBuilder:
+                                (context) => Center(
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
+                                ),
+                          )
+                          : Image.asset(
+                            AppImages.imgAvatarDefault,
+                            fit: BoxFit.cover,
+                          ),
                 ),
               ),
               const SizedBox(width: 16),
@@ -355,8 +582,8 @@ class _ProfilePageState extends State<ProfilePage>
                     Text(
                       (isCurrientUser)
                           ? widget.user!.username ?? 'Unkonwn'
-                          : user!.username ?? 'Unkonwn',
-                      style: AppStyles.headlineBold,
+                          : user.fullname ?? 'Unkonwn',
+                      style: AppStyles.bodyBold,
                     ),
                     const SizedBox(height: 8),
                     Row(
@@ -407,16 +634,7 @@ class _ProfilePageState extends State<ProfilePage>
                 "Blogger",
                 style: AppStyles.bodyRegular.copyWith(color: AppColors.gray40),
               ),
-              readMoreDescription('''Everynight Alone
-Đừng để giọt nước mắt vẫn rơi tàn hoa khắp nơi thiếu em babe
-Everynight Alone
-Lại gọi tên những nổi nhớ đong đầyBao đam mê cũng đã chóng phai
-Yêu em ko biết đúng sai
-Chỉ bằng cảm xúc bằng lý trí bằng tất cả những gì anh có
-Hay em cho
-Khi hai con tim lệch nhịp
-Anh có cố gắng thế nào, em cũng không hiểu được em
-Như là bản thân chính em.'''),
+              readMoreDescription(user.bio ?? 'Hi User'),
               const SizedBox(height: 12),
               _bioLink([
                 "https://shop.me/hoang",
@@ -440,11 +658,12 @@ Như là bản thân chính em.'''),
               _totalUserFollow(),
               const SizedBox(height: 8),
               _buttonActionProfile(isCurrientUser),
-              _buildGalleryProfile([
-                ReelModel(user: UserModel(username: "Hoang")),
-                ReelModel(user: UserModel(username: "Hoang")),
-                ReelModel(user: UserModel(username: "Hoang")),
-              ]),
+              if (user.reels != null)
+                _buildGalleryProfile([
+                  ReelModel(user: UserModel(username: "Hoang")),
+                  ReelModel(user: UserModel(username: "Hoang")),
+                  ReelModel(user: UserModel(username: "Hoang")),
+                ]),
               const SizedBox(height: 8),
               AccountSuggestWidget(
                 isHorirontal: true,
