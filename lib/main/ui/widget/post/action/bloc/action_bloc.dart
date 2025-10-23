@@ -14,8 +14,6 @@ class ActionBloc extends Bloc<ActionEvent, ActionState> {
   ActionBloc() : super(ActionLoading()) {
     on<LoadRequest>(_loadRequest);
   }
-  UserModel user = UserModel();
-
   Future<void> _loadRequest(
     LoadRequest event,
     Emitter<ActionState> emit,

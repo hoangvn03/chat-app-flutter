@@ -38,7 +38,7 @@ class Conversation {
     return Conversation(
       conversationId: json['conversation_id'],
       conversationName: json['conversation_name'],
-      isGroup: json['is_group'] ?? false, // 👈 fix lỗi ở đây
+      isGroup: json['is_group'] ?? false,
       createdAt: DateTime.parse(json['created_at']),
       participants:
           (json['participants'] as List)

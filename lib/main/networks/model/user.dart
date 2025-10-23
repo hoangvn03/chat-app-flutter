@@ -1,5 +1,21 @@
+import 'package:chat_app/main/networks/model/converation.dart';
 import 'package:chat_app/main/networks/model/reels.dart';
+class UserResponse {
+  final List<UserModel> users;
+  final Pagination pagination;
 
+  UserResponse({required this.users, required this.pagination});
+
+  factory UserResponse.fromJson(Map<String, dynamic> json) {
+    return UserResponse(
+      users:
+          (json['users'] as List)
+              .map((x) => UserModel.fromJson(x))
+              .toList(),
+      pagination: Pagination.fromJson(json['pagination']),
+    );
+  }
+}
 class RoleData {
   int? id;
   String? code;
@@ -21,7 +37,7 @@ class RoleData {
 }
 
 class UserModel {
-  int? id;
+  int id;
   String? username;
   String? fullname;
   bool? isPrivate;
@@ -34,7 +50,7 @@ class UserModel {
   // RoleData? roleData;
 
   UserModel({
-    this.id,
+    required this.id,
     this.username,
     this.fullname,
     this.isPrivate,

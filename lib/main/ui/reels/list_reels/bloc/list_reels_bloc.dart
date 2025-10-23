@@ -1,16 +1,20 @@
 import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:chat_app/main/helper/image/media_helper.dart';
+import 'package:chat_app/main/networks/api_end_point.dart';
+import 'package:chat_app/main/networks/api_util.dart';
 import 'package:chat_app/main/networks/model/reels.dart';
 import 'package:chat_app/main/networks/model/user.dart';
 import 'package:chat_app/main/ui/reels/list_reels/bloc/list_reels_event.dart';
 import 'package:chat_app/main/ui/reels/list_reels/bloc/list_reels_state.dart';
+import 'package:chat_app/main/utils/shared_preference.dart';
 
 import 'package:photo_manager/photo_manager.dart';
 
 class ListReelsBloc extends Bloc<ListReelsEvent, ListReelsState> {
   ListReelsBloc() : super(ListReelsLoading()) {
     on<LoadReelsMedia>(_loadRequest);
+    on<LoadListReels>(_loadListStory);
   }
   List<AssetPathEntity> albumList = [];
   List<AssetPathEntity> albumAll = [];
@@ -20,7 +24,8 @@ class ListReelsBloc extends Bloc<ListReelsEvent, ListReelsState> {
     LoadReelsMedia event,
     Emitter<ListReelsState> emit,
   ) async {
-    final UserModel user = UserModel(
+    final UserModel user = UserModel( id:999,
+
       username: 'John Doe',
       avatar: 'https://wallpapercave.com/wp/AYWg3iu.jpg',
     );
@@ -35,7 +40,8 @@ class ListReelsBloc extends Bloc<ListReelsEvent, ListReelsState> {
       ReelModel(
         url: 'https://media.giphy.com/media/moyzrwjUIkdNe/giphy.gif',
         media: MediaType.image,
-        user: UserModel(
+        user: UserModel( id:999,
+
           username: 'John Doe',
           avatar: 'https://wallpapercave.com/wp/AYWg3iu.jpg',
         ),
@@ -70,5 +76,32 @@ class ListReelsBloc extends Bloc<ListReelsEvent, ListReelsState> {
       ),
     ];
     emit(ListReelsSuccess());
+  }
+
+  Future<void> _loadListStory(
+    LoadListReels event,
+    Emitter<ListReelsState> emit,
+  ) async {
+    emit(ListReelsLoading());
+    var url = ApiEndPoints.LISTSTORY;
+    var params = {
+      "msisdn": "+67076796381",
+      "timestamp": "12283842983",
+      "security":
+          "Pktc6GbmXot%2BRwhbxPLvBU8hdd092XXgaoS6H2WhTg5f5jzToF1ooF1iuXRH1vL2mgFOppO7TmCRndy%2B45rCVcoPOou2YEBBxxQ61XcOAJXlVSOZeA3sjx0gC3BpoqvZShQcDFtggIDi3VqM6GIsuP18xYpRB4snkT23N6Vx%2FWs%3D",
+      "page": "0",
+      "size": "10",
+    };
+    ApiResponse res = await ApiUtil.get(url,params: params);
+    if (res.statusCode == 200) {
+      
+      emit(ListReelsSuccess());
+    } else {
+      emit(
+        ListReelsFailure(
+          'Error ${res.statusCode}: ${res.body?['message'] ?? 'Unknown'}',
+        ),
+      );
+    }
   }
 }

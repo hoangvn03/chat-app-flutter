@@ -183,6 +183,7 @@ class _StoryScreenState extends State<StoryScreen>
                       user:
                           story.user ??
                           UserModel(
+                            id: 999,
                             username: 'Unknown',
                             avatar: 'https://wallpapercave.com/wp/AYWg3iu.jpg',
                           ),

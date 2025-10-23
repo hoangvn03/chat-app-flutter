@@ -8,6 +8,7 @@ import 'package:chat_app/main/ui/home/bloc/home_bloc.dart';
 import 'package:chat_app/main/ui/home/bloc/home_event.dart';
 import 'package:chat_app/main/ui/home/bloc/home_state.dart';
 import 'package:chat_app/main/utils/common_widget.dart';
+import 'package:chat_app/main/utils/shared_preference.dart';
 import 'package:chat_app/res/app_colors.dart';
 import 'package:chat_app/res/app_images.dart';
 import 'package:chat_app/res/app_styles.dart';
@@ -26,6 +27,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final usernameController = TextEditingController();
   final passwordController = TextEditingController();
+  final ipController = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
@@ -103,7 +105,10 @@ class _HomePageState extends State<HomePage> {
                       ),
                       IconButton(
                         onPressed: () {
-                          context.pushNamed(PathName.chatPage);
+                          context.pushNamed(
+                            PathName.chatPage,
+                            extra: state.user,
+                          );
                         },
                         icon: iconShareNotification(
                           num: 5,
@@ -246,7 +251,10 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
           const SizedBox(height: 4),
-          Text(reel.user!.username ?? "Unknown", style: AppStyles.footnoteRegular),
+          Text(
+            reel.user!.username ?? "Unknown",
+            style: AppStyles.footnoteRegular,
+          ),
         ],
       ),
     );

@@ -16,7 +16,8 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     on<LoadRequest>(_loadRequest);
     on<ClearStrogeUser>(_clearUser);
   }
-  UserModel user = UserModel();
+  UserModel user = UserModel( id:999,
+);
   bool isCurrientUser = true;
 
   Future<void> _clearUser(
@@ -51,7 +52,8 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
         final List<PostModel> posts = [
           PostModel(
             id: "1",
-            user: UserModel(
+            user: UserModel( id:999,
+
               username: 'hieu_pham',
               avatar: AppImages.imgAvatarDefault,
             ),
@@ -63,7 +65,8 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
           ),
           PostModel(
             id: "2",
-            user: UserModel(
+            user: UserModel( id:999,
+
               username: 'linh_nguyen',
               avatar: AppImages.imgAvatarDefault,
             ),
@@ -74,7 +77,8 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
           ),
           PostModel(
             id: "3",
-            user: UserModel(
+            user: UserModel( id:999,
+
               username: 'lisa',
               avatar: AppImages.imgAvatarDefault,
             ),
@@ -85,7 +89,8 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
           ),
           PostModel(
             id: "4",
-            user: UserModel(
+            user: UserModel( id:999,
+
               username: 'thanh_nguyen',
               avatar: AppImages.imgAvatarDefault,
             ),
@@ -96,7 +101,8 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
           ),
           PostModel(
             id: "5",
-            user: UserModel(
+            user: UserModel( id:999,
+
               username: 'tuan_anh',
               avatar: AppImages.imgAvatarDefault,
             ),
@@ -108,7 +114,8 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
           PostModel(
             id: "6",
             typePost: "reels",
-            user: UserModel(
+            user: UserModel( id:999,
+
               username: 'minh_hieu',
               avatar: AppImages.imgAvatarDefault,
             ),
@@ -120,7 +127,8 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
           PostModel(
             id: "7",
             typePost: "reels",
-            user: UserModel(
+            user: UserModel( id:999,
+
               username: 'rosé',
               avatar: AppImages.imgAvatarDefault,
             ),
@@ -132,7 +140,8 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
           PostModel(
             id: "8",
             typePost: "video",
-            user: UserModel(
+            user: UserModel( id:999,
+
               username: 'david',
               avatar: AppImages.imgAvatarDefault,
             ),
@@ -143,7 +152,8 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
           ),
           PostModel(
             id: "9",
-            user: UserModel(
+            user: UserModel( id:999,
+
               username: 'yasuo',
               avatar: AppImages.imgAvatarDefault,
             ),
@@ -154,7 +164,8 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
           ),
           PostModel(
             id: "10",
-            user: UserModel(
+            user: UserModel( id:999,
+
               username: 'hasagi',
               avatar: AppImages.imgAvatarDefault,
             ),
@@ -165,7 +176,8 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
           ),
           PostModel(
             id: "11",
-            user: UserModel(
+            user: UserModel( id:999,
+
               username: 'anna',
               avatar: AppImages.imgAvatarDefault,
             ),
@@ -176,7 +188,8 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
           ),
           PostModel(
             id: "12",
-            user: UserModel(
+            user: UserModel( id:999,
+
               username: 'hieu_pham',
               avatar: AppImages.imgAvatarDefault,
             ),
@@ -187,8 +200,10 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
           ),
         ];
         final reels = [
-          ReelModel(user: UserModel(username: "Hoang")),
-          ReelModel(user: UserModel(username: "Tuan Anh")),
+          ReelModel(user: UserModel( id:999,
+username: "Hoang")),
+          ReelModel(user: UserModel( id:999,
+username: "Tuan Anh")),
         ];
         emit(ProfileSuccess(reels: reels, posts: posts, user: user));
       }

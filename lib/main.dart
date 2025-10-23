@@ -1,4 +1,5 @@
 import 'package:camera/camera.dart';
+import 'package:chat_app/main/networks/api_end_point.dart';
 import 'package:chat_app/main/networks/api_util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -13,6 +14,7 @@ late List<CameraDescription> cameras;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   cameras = await availableCameras();
+  await ApiEndPoints.init();
   runApp(
     MultiBlocProvider(
       providers: [BlocProvider(create: (_) => LocaleCubit())],

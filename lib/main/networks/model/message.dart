@@ -18,7 +18,7 @@ class MessageResponse {
 }
 
 class MessageData {
-  final List<MessageModel> messages;
+  final List<MessageEntity> messages;
   final Pagination? pagination;
 
   MessageData({
@@ -29,7 +29,7 @@ class MessageData {
   factory MessageData.fromJson(Map<String, dynamic> json) {
     return MessageData(
       messages: (json['messages'] as List?)
-              ?.map((e) => MessageModel.fromJson(e))
+              ?.map((e) => MessageEntity.fromJson(e))
               .toList() ??
           [],
       pagination: json['pagination'] != null
@@ -44,31 +44,31 @@ class MessageData {
       };
 }
 
-class MessageModel {
+class MessageEntity {
   final int messageId;
   final int conversationId;
   final int senderId;
   final String content;
   final DateTime createdAt;
-  final bool isRead;
+  bool? isRead;
   final UserModel? sender;
   List<Attachment>? attachments;
   List<Status>? statuses;
 
-  MessageModel({
+  MessageEntity({
     required this.messageId,
     required this.conversationId,
     required this.senderId,
     required this.content,
     required this.createdAt,
-    required this.isRead,
+    this.isRead,
     this.sender,
     this.attachments,
     this.statuses,
   });
 
-  factory MessageModel.fromJson(Map<String, dynamic> json) {
-    return MessageModel(
+  factory MessageEntity.fromJson(Map<String, dynamic> json) {
+    return MessageEntity(
       messageId: json['message_id'] ?? 0,
       conversationId: json['conversation_id'] ?? 0,
       senderId: json['sender_id'] ?? 0,
@@ -176,43 +176,3 @@ class Receiver {
         'username': username,
       };
 }
-
-class ChatMessage {
-  final String id;
-  final String fromId;
-  final String fromName;
-  final String text;
-  final DateTime createdAt;
-  final bool mine;
-
-  ChatMessage({
-    required this.id,
-    required this.fromId,
-    required this.fromName,
-    required this.text,
-    required this.createdAt,
-    required this.mine,
-  });
-
-  factory ChatMessage.fromJson(Map<String, dynamic> json, String myId) {
-    return ChatMessage(
-      id: json['id'] ?? json['createdAt'] ?? '',
-      fromId: json['fromId'] ?? '',
-      fromName: json['fromName'] ?? '',
-      text: json['text'] ?? '',
-      createdAt: DateTime.parse(json['createdAt']),
-      mine: (json['fromId'] ?? '') == myId,
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'fromId': fromId,
-      'fromName': fromName,
-      'text': text,
-      'createdAt': createdAt.toIso8601String(),
-    };
-  }
-}
-

@@ -71,6 +71,7 @@ class SearchResultPage extends StatelessWidget {
       builder: (context, state) {
         return commonTextFieldV2(
           controller: _inputSearchController,
+          margin: const EdgeInsets.only(right: 16),
           hintText: 'Tìm kiếm...',
           onChanged:
               (value) =>
@@ -97,9 +98,25 @@ class SearchResultPage extends StatelessWidget {
       child: ListTile(
         contentPadding: EdgeInsets.zero,
         dense: true,
-        leading: Image.asset(AppImages.imgAvatarDefault),
-        title: Text(user.email ?? 'Unknown', style: AppStyles.title2Bold),
-        subtitle: Text(user.username ?? 'Unknown', style: AppStyles.bodyRegular),
+        leading: Container(
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: AppColors.gray30,
+            border: Border.all(color: Colors.white, width: 1.5),
+          ),
+          child: ClipOval(
+            child: SvgPicture.network(
+              user.avatar ??
+                  'https://api.dicebear.com/7.x/avataaars/svg?seed=Bob',
+              width: 48,
+              height: 48,
+              fit: BoxFit.cover,
+            ),
+          ),
+        ),
+
+        title: Text(user.username ?? 'Unknown', style: AppStyles.title2Bold),
+        subtitle: Text(user.email ?? '', style: AppStyles.bodyRegular),
         onTap: () {
           context.pushNamed(PathName.profilePage, extra: user);
         },

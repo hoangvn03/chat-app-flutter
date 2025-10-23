@@ -124,26 +124,31 @@ Widget commonTextFieldV2({
   TextEditingController? controller,
   bool? obscureText,
   bool? enabled,
+  bool hasHeight = true,
+  bool hasLeading = true,
   Color? color,
   TextInputType? keyboardType,
+  Border? border,
   Widget? suffixIcon,
   Widget? leadingIcon,
   Widget? onPressSuffixIcon,
   Widget? onPressPrefixIcon,
   VoidCallback? onTap,
+  ValueChanged<String>? onSubmitted,
   ValueChanged<String>? onChanged,
 }) {
   final effectiveController = controller ?? TextEditingController();
 
   return Container(
     alignment: Alignment.center,
-    margin: margin ?? const EdgeInsets.only(right: 16),
+    margin: margin,
     padding: padding ?? const EdgeInsets.symmetric(horizontal: 12),
     decoration: BoxDecoration(
       color: color ?? AppColors.gray20,
       borderRadius: BorderRadius.all(Radius.circular(radius ?? 8)),
+      border: border,
     ),
-    height: height ?? 38,
+    height: hasHeight ? height ?? 38 : null,
     child: ValueListenableBuilder<TextEditingValue>(
       valueListenable: effectiveController,
       builder: (context, value, child) {
@@ -153,6 +158,7 @@ Widget commonTextFieldV2({
           controller: effectiveController,
           style: inputStyle ?? AppStyles.title3Regular,
           onTap: onTap,
+          onSubmitted: onSubmitted,
           onChanged: onChanged,
           cursorColor: AppColors.gray40,
           cursorWidth: 1.5,
@@ -162,7 +168,7 @@ Widget commonTextFieldV2({
             hintText: hintText,
             hintStyle:
                 hintStyle ??
-                const TextStyle(fontSize: 14, color: AppColors.gray40),
+                AppStyles.title3Regular.copyWith(color: AppColors.gray40),
             isDense: true,
             labelText: labelText,
             labelStyle:
@@ -178,38 +184,46 @@ Widget commonTextFieldV2({
               horizontal: 12,
               vertical: 0,
             ),
-            prefixIcon: Padding(
-              padding: const EdgeInsets.only(right: 8),
-              child:
-                  value.text.isNotEmpty
-                      ? onPressPrefixIcon
-                      : leadingIcon ??
-                          SvgPicture.asset(
-                            iconLeading ?? AppImages.icSearch,
-                            color: AppColors.gray40,
-                            width: 16,
-                            height: 16,
-                          ),
-            ),
+            prefixIcon:
+                hasLeading
+                    ? Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child:
+                          value.text.isNotEmpty
+                              ? onPressPrefixIcon
+                              : leadingIcon ??
+                                  SvgPicture.asset(
+                                    iconLeading ?? AppImages.icSearch,
+                                    color: AppColors.gray40,
+                                    width: 16,
+                                    height: 16,
+                                  ),
+                    )
+                    : null,
             prefixIconConstraints: const BoxConstraints(
               minWidth: 16,
               minHeight: 16,
             ),
-            // 👇 chỉ hiện khi có text
+            suffixIconConstraints: const BoxConstraints(
+              minWidth: 16, // Kích thước tối thiểu
+              minHeight: 16, // Kích thước tối thiểu
+              maxHeight: 48,
+            ),
             suffixIcon:
                 value.text.isNotEmpty
                     ? onPressSuffixIcon ??
-                        IconButton(
-                          icon: const Icon(
-                            Icons.clear,
-                            size: 18,
+                        GestureDetector(
+                          onTap: () => effectiveController.clear(),
+                          child: SvgPicture.asset(
+                            AppImages.icClose,
+                            fit: BoxFit.contain,
+                            width: 16,
+                            height: 16,
                             color: Colors.grey,
                           ),
-                          onPressed: () {
-                            effectiveController.clear();
-                          },
                         )
                     : suffixIcon,
+
             fillColor: AppColors.gray20,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
@@ -300,12 +314,23 @@ Widget userNote({String? img, String? note, String? subTitle}) {
         children: [
           /// Avatar
           ClipOval(
-            child: Image.asset(
-              img ?? AppImages.imgAvatarDefault,
-              width: 68,
-              height: 68,
-              fit: BoxFit.cover,
-            ),
+            child:
+                img != null
+                    ? Container(
+                      color: AppColors.gray20,
+                      child: SvgPicture.network(
+                        img,
+                        width: 68,
+                        height: 68,
+                        fit: BoxFit.cover,
+                      ),
+                    )
+                    : Image.asset(
+                      img ?? AppImages.imgAvatarDefault,
+                      width: 68,
+                      height: 68,
+                      fit: BoxFit.cover,
+                    ),
           ),
 
           /// Note hiển thị phía trên avatar
@@ -464,6 +489,7 @@ Widget commonTileItemV2({
   TextStyle? titleStyle,
   TextStyle? subTitleStyle,
   EdgeInsets? margin,
+  EdgeInsets? contenMargin,
   Widget? titleWidget,
   Widget? trallingWidget,
   Widget? leadingWidget,
@@ -476,47 +502,86 @@ Widget commonTileItemV2({
   VoidCallback? onTapTralling,
   VoidCallback? onTap,
 }) {
-  return GestureDetector(
+  return InkWell(
     onTap: onTap,
     child: Padding(
       padding: margin ?? EdgeInsets.zero,
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           leadingWidget ??
               SvgPicture.asset(
-                imageLeading ?? AppImages.imgAvatarDefault, // ảnh PNG/JPG
+                imageLeading ?? AppImages.icCamera, // ảnh PNG/JPG
                 fit: BoxFit.cover,
               ),
           const SizedBox(width: 12),
           Expanded(
-            child:
-                titleWidget ??
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title ?? '',
-                      style: titleStyle ?? AppStyles.title2Regular,
-                    ),
-                    if (subtitle != null)
+            child: Padding(
+              padding: contenMargin ?? EdgeInsets.zero,
+              child:
+                  titleWidget ??
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
                       Text(
-                        subtitle,
-                        style:
-                            subTitleStyle ??
-                            AppStyles.title3Regular.copyWith(
-                              color: AppColors.gray40,
-                            ),
+                        title ?? '',
+                        style: titleStyle ?? AppStyles.title2Regular,
                       ),
-                  ],
-                ),
+                      if (subtitle != null)
+                        Text(
+                          subtitle,
+                          style:
+                              subTitleStyle ??
+                              AppStyles.title2Regular.copyWith(
+                                color: AppColors.gray60,
+                              ),
+                        ),
+                    ],
+                  ),
+            ),
           ),
           if (!istrallingWidget)
             GestureDetector(
               onTap: onTapTralling,
-              child: SvgPicture.asset(AppImages.icChevronRight),
+              child:
+                  trallingWidget ?? SvgPicture.asset(AppImages.icChevronRight),
             ),
         ],
       ),
+    ),
+  );
+}
+
+Widget groupUserAvatar({required List<String> images, double avatarSize = 48}) {
+  const double overlap = 32;
+  return SizedBox(
+    height: avatarSize + (images.length - 1) * (avatarSize - overlap),
+    width: avatarSize + (images.length - 1) * (avatarSize - overlap),
+    child: Stack(
+      clipBehavior: Clip.none,
+      children: List.generate(images.length, (index) {
+        return Positioned(
+          left: index * (avatarSize - overlap),
+          top: index * (avatarSize - overlap),
+          child: Container(
+            width: avatarSize,
+            height: avatarSize,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: AppColors.gray30,
+              border: Border.all(color: Colors.white, width: 1.5),
+            ),
+            child: ClipOval(
+              child: SvgPicture.network(
+                images[index],
+                fit: BoxFit.cover,
+                width: avatarSize,
+                height: avatarSize,
+              ),
+            ),
+          ),
+        );
+      }),
     ),
   );
 }

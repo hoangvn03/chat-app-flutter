@@ -6,11 +6,19 @@ abstract class ChatState {}
 class ChatLoading extends ChatState {}
 
 class ChatSuccess extends ChatState {
-  ConversationResponse? data;
-  MessageData? message;
-  MessageModel? messageModel;
-  ChatSuccess({this.data,this.message,this.messageModel});
+  final List<MessageEntity> messages;
+  final List<String>? userOnline;
+  ChatSuccess({this.messages = const [],this.userOnline});
+  ChatSuccess copyWith({
+    List<MessageEntity>? messages,
+  }) {
+    return ChatSuccess(
+      messages: messages ?? this.messages,
+      userOnline: userOnline ?? []
+    );
+  }
 }
+
 
 class ChatFailure extends ChatState {
   String errorMessage;

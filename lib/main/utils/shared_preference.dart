@@ -57,4 +57,16 @@ class AppStorage {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_keyUser);
   }
+
+    // Lưu IP tùy chỉnh (set khi người dùng nhập)
+  static Future<void> setCustomIp(String ip) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('custom_ip', ip);
+  }
+
+  // Lấy IP đã lưu
+  static Future<String?> getCustomIp() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('custom_ip');
+  }
 }

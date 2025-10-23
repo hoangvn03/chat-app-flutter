@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'package:bloc/bloc.dart';
+import 'package:chat_app/main/networks/api_end_point.dart';
+import 'package:chat_app/main/networks/api_util.dart';
 import 'package:chat_app/main/networks/model/post.dart';
 import 'package:chat_app/main/networks/model/reels.dart';
 import 'package:chat_app/main/networks/model/user.dart';
@@ -21,6 +23,8 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
         PostModel(
           id: "1",
           user: UserModel(
+            id: 999,
+
             username: 'hieu_pham',
             avatar: AppImages.imgAvatarDefault,
           ),
@@ -33,6 +37,8 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
         PostModel(
           id: "2",
           user: UserModel(
+            id: 999,
+
             username: 'linh_nguyen',
             avatar: AppImages.imgAvatarDefault,
           ),
@@ -43,7 +49,11 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
         ),
         PostModel(
           id: "3",
-          user: UserModel(username: 'lisa', avatar: AppImages.imgAvatarDefault),
+          user: UserModel(
+            id: 999,
+            username: 'lisa',
+            avatar: AppImages.imgAvatarDefault,
+          ),
           postImage: "https://picsum.photos/400/400?random=3",
           caption: "Coding all day 💻🔥",
           likes: 300,
@@ -52,6 +62,8 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
         PostModel(
           id: "4",
           user: UserModel(
+            id: 999,
+
             username: 'thanh_nguyen',
             avatar: AppImages.imgAvatarDefault,
           ),
@@ -62,7 +74,11 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
         ),
         PostModel(
           id: "5",
-          user: UserModel(username: 'tuan_anh', avatar: AppImages.imgAvatarDefault),
+          user: UserModel(
+            id: 999,
+            username: 'tuan_anh',
+            avatar: AppImages.imgAvatarDefault,
+          ),
           postImage: "https://picsum.photos/400/400?random=5",
           caption: "Du lịch biển 🌊",
           likes: 240,
@@ -72,6 +88,8 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
           id: "6",
           typePost: "reels",
           user: UserModel(
+            id: 999,
+
             username: 'minh_hieu',
             avatar: AppImages.imgAvatarDefault,
           ),
@@ -83,7 +101,11 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
         PostModel(
           id: "7",
           typePost: "reels",
-          user: UserModel(username: 'rosé', avatar: AppImages.imgAvatarDefault),
+          user: UserModel(
+            id: 999,
+            username: 'rosé',
+            avatar: AppImages.imgAvatarDefault,
+          ),
           postImage: "https://picsum.photos/400/400?random=7",
           caption: "Du lịch biển 🌊",
           likes: 240,
@@ -92,7 +114,11 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
         PostModel(
           id: "8",
           typePost: "video",
-          user: UserModel(username: 'david', avatar: AppImages.imgAvatarDefault),
+          user: UserModel(
+            id: 999,
+            username: 'david',
+            avatar: AppImages.imgAvatarDefault,
+          ),
           postImage: "https://picsum.photos/400/400?random=8",
           caption: "Du lịch biển 🌊",
           likes: 240,
@@ -100,7 +126,11 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
         ),
         PostModel(
           id: "9",
-          user: UserModel(username: 'yasuo', avatar: AppImages.imgAvatarDefault),
+          user: UserModel(
+            id: 999,
+            username: 'yasuo',
+            avatar: AppImages.imgAvatarDefault,
+          ),
           postImage: "https://picsum.photos/400/400?random=9",
           caption: "Du lịch biển 🌊",
           likes: 240,
@@ -108,7 +138,11 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
         ),
         PostModel(
           id: "10",
-          user: UserModel(username: 'hasagi', avatar: AppImages.imgAvatarDefault),
+          user: UserModel(
+            id: 999,
+            username: 'hasagi',
+            avatar: AppImages.imgAvatarDefault,
+          ),
           postImage: "https://picsum.photos/400/400?random=10",
           caption: "Du lịch biển 🌊",
           likes: 240,
@@ -116,7 +150,11 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
         ),
         PostModel(
           id: "11",
-          user: UserModel(username: 'anna', avatar: AppImages.imgAvatarDefault),
+          user: UserModel(
+            id: 999,
+            username: 'anna',
+            avatar: AppImages.imgAvatarDefault,
+          ),
           postImage: "https://picsum.photos/400/400?random=11",
           caption: "Du lịch biển 🌊",
           likes: 240,
@@ -125,6 +163,8 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
         PostModel(
           id: "12",
           user: UserModel(
+            id: 999,
+
             username: 'hieu_pham',
             avatar: AppImages.imgAvatarDefault,
           ),
@@ -136,6 +176,8 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
         PostModel(
           id: "13",
           user: UserModel(
+            id: 999,
+
             username: 'hieu_pham',
             avatar: AppImages.imgAvatarDefault,
           ),
@@ -147,6 +189,8 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
         PostModel(
           id: "14",
           user: UserModel(
+            id: 999,
+
             username: 'hieu_pham',
             avatar: AppImages.imgAvatarDefault,
           ),
@@ -158,6 +202,8 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
         PostModel(
           id: "15",
           user: UserModel(
+            id: 999,
+
             username: 'hieu_pham',
             avatar: AppImages.imgAvatarDefault,
           ),
@@ -169,12 +215,12 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
       ];
 
       final reels = [
-        ReelModel(user: UserModel(username: "Hoang")),
-        ReelModel(user: UserModel(username: "Tuan Anh")),
+        ReelModel(user: UserModel(id: 999, username: "Hoang")),
+        ReelModel(user: UserModel(id: 999, username: "Tuan Anh")),
       ];
       emit(SearchSuccess(reels: reels, posts: posts));
     } catch (e) {
-      emit(SearchFailure());
+      emit(SearchFailure(e.toString()));
     }
     return;
   }
@@ -185,16 +231,22 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
   ) async {
     emit(SearchLoading());
     try {
-      final List<UserModel> users = [
-        UserModel(username: 'hieu_pham', avatar: AppImages.imgAvatarDefault),
-        UserModel(username: 'tuan_anh', avatar: AppImages.imgAvatarDefault),
-        UserModel(username: 'nguyen_nguyen', avatar: AppImages.imgAvatarDefault),
-        UserModel(username: 'ngoc_hoang', avatar: AppImages.imgAvatarDefault),
-        UserModel(username: 'minh_hieu', avatar: AppImages.imgAvatarDefault),
-      ];
-      emit(SearchSuccess(users: users));
+      var url = ApiEndPoints.USERS;
+      var params = {'page': '1', 'limit': '10', 'search': event.input};
+      ApiResponse res = await ApiUtil.get(url, params: params);
+      if (res.statusCode == 200) {
+        final data = UserResponse.fromJson(res.body['data']);
+        if (state is SearchSuccess) {
+          final current = state as SearchSuccess;
+          emit(current.copyWith(users: data.users));
+        } else {
+          emit(SearchSuccess(users: data.users));
+        }
+      } else {
+        emit(SearchFailure('${res.statusCode} Fail to load api'));
+      }
     } catch (e) {
-      emit(SearchFailure());
+      emit(SearchFailure(e.toString()));
     }
   }
 }

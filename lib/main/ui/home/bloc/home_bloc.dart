@@ -21,10 +21,11 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     // on<DeletetUser>(_deleteUser);
     // on<UpdateUser>(_updateUser);
   }
-  UserModel user = UserModel();
+  UserModel user = UserModel( id:999,
+);
   Future<void> _loadListUser(LoadRequest event, Emitter<HomeState> emit) async {
     try {
-      var url = ApiEndPoints.USERINFO;
+      var url = ApiEndPoints.USERS;
       final response = await ApiUtil.post(url: url);
       if (response['code'] == 0) {
         user = UserModel.fromJson(response['user']);
@@ -40,10 +41,13 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
   Future<void> _loadRequest(LoadRequest event, Emitter<HomeState> emit) async {
     try {
+            final user = await AppStorage.getUser();
+
       final List<PostModel> posts = [
         PostModel(
           id: "1",
-          user: UserModel(username: 'david', avatar: AppImages.imgAvatarDefault),
+          user: UserModel( id:999,
+username: 'david', avatar: AppImages.imgAvatarDefault),
           postImage: "https://picsum.photos/400/400?random=1",
           caption: "Cuối tuần chill 😎",
           likes: 120,
@@ -51,7 +55,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         ),
         PostModel(
           id: "2",
-          user: UserModel(
+          user: UserModel( id:999,
+
             username: 'hieu_thu_2',
             avatar: AppImages.imgAvatarDefault,
           ),
@@ -62,7 +67,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         ),
         PostModel(
           id: "3",
-          user: UserModel(username: 'lisa', avatar: AppImages.imgAvatarDefault),
+          user: UserModel( id:999,
+username: 'lisa', avatar: AppImages.imgAvatarDefault),
           postImage: "https://picsum.photos/400/400?random=3",
           caption: "Coding all day 💻🔥",
           likes: 300,
@@ -70,7 +76,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         ),
         PostModel(
           id: "4",
-          user: UserModel(username: 'rose', avatar: AppImages.imgAvatarDefault),
+          user: UserModel( id:999,
+username: 'rose', avatar: AppImages.imgAvatarDefault),
           postImage: "https://picsum.photos/400/400?random=4",
           caption: "Du lịch biển 🌊",
           likes: 240,
@@ -79,10 +86,12 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       ];
 
       final reels = [
-        ReelModel(user: UserModel(username: "Hoang")),
-        ReelModel(user: UserModel(username: "Tuan Anh")),
+        ReelModel(user: UserModel( id:999,
+username: "Hoang")),
+        ReelModel(user: UserModel( id:999,
+username: "Tuan Anh")),
       ];
-      emit(HomeSuccess(reels: reels, posts: posts));
+      emit(HomeSuccess(reels: reels, posts: posts,user: user));
     } catch (e) {
       emit(HomeFailure());
     }

@@ -16,7 +16,8 @@ class SettingBloc extends Bloc<SettingEvent, SettingState> {
     on<LoadRequest>(_loadRequest);
     on<ClearStrogeUser>(_clearUser);
   }
-  UserModel user = UserModel();
+  UserModel user = UserModel( id:999,
+);
   bool isCurrientUser = true;
 
   Future<void> _clearUser(
@@ -43,14 +44,16 @@ class SettingBloc extends Bloc<SettingEvent, SettingState> {
     Emitter<SettingState> emit,
   ) async {
     try {
-      final user = UserModel(
+      final user = UserModel( id:999,
+
         username: 'ngoc_hoang',
         avatar: AppImages.imgAvatarDefault,
       );
       final List<PostModel> posts = [
         PostModel(
           id: "1",
-          user: UserModel(
+          user: UserModel( id:999,
+
             username: 'hieu_pham',
             avatar: AppImages.imgAvatarDefault,
           ),
@@ -62,7 +65,8 @@ class SettingBloc extends Bloc<SettingEvent, SettingState> {
         ),
         PostModel(
           id: "2",
-          user: UserModel(
+          user: UserModel( id:999,
+
             username: 'linh_nguyen',
             avatar: AppImages.imgAvatarDefault,
           ),
@@ -73,7 +77,8 @@ class SettingBloc extends Bloc<SettingEvent, SettingState> {
         ),
         PostModel(
           id: "3",
-          user: UserModel(username: 'lisa', avatar: AppImages.imgAvatarDefault),
+          user: UserModel( id:999,
+username: 'lisa', avatar: AppImages.imgAvatarDefault),
           postImage: "https://picsum.photos/400/400?random=3",
           caption: "Coding all day 💻🔥",
           likes: 300,
@@ -81,7 +86,8 @@ class SettingBloc extends Bloc<SettingEvent, SettingState> {
         ),
         PostModel(
           id: "4",
-          user: UserModel(
+          user: UserModel( id:999,
+
             username: 'thanh_nguyen',
             avatar: AppImages.imgAvatarDefault,
           ),
@@ -92,7 +98,8 @@ class SettingBloc extends Bloc<SettingEvent, SettingState> {
         ),
         PostModel(
           id: "5",
-          user: UserModel(
+          user: UserModel( id:999,
+
             username: 'tuan_anh',
             avatar: AppImages.imgAvatarDefault,
           ),
@@ -104,7 +111,8 @@ class SettingBloc extends Bloc<SettingEvent, SettingState> {
         PostModel(
           id: "6",
           typePost: "reels",
-          user: UserModel(
+          user: UserModel( id:999,
+
             username: 'minh_hieu',
             avatar: AppImages.imgAvatarDefault,
           ),
@@ -116,7 +124,8 @@ class SettingBloc extends Bloc<SettingEvent, SettingState> {
         PostModel(
           id: "7",
           typePost: "reels",
-          user: UserModel(username: 'rosé', avatar: AppImages.imgAvatarDefault),
+          user: UserModel( id:999,
+username: 'rosé', avatar: AppImages.imgAvatarDefault),
           postImage: "https://picsum.photos/400/400?random=7",
           caption: "Du lịch biển 🌊",
           likes: 240,
@@ -125,7 +134,8 @@ class SettingBloc extends Bloc<SettingEvent, SettingState> {
         PostModel(
           id: "8",
           typePost: "video",
-          user: UserModel(
+          user: UserModel( id:999,
+
             username: 'david',
             avatar: AppImages.imgAvatarDefault,
           ),
@@ -136,7 +146,8 @@ class SettingBloc extends Bloc<SettingEvent, SettingState> {
         ),
         PostModel(
           id: "9",
-          user: UserModel(
+          user: UserModel( id:999,
+
             username: 'yasuo',
             avatar: AppImages.imgAvatarDefault,
           ),
@@ -147,7 +158,8 @@ class SettingBloc extends Bloc<SettingEvent, SettingState> {
         ),
         PostModel(
           id: "10",
-          user: UserModel(
+          user: UserModel( id:999,
+
             username: 'hasagi',
             avatar: AppImages.imgAvatarDefault,
           ),
@@ -158,7 +170,8 @@ class SettingBloc extends Bloc<SettingEvent, SettingState> {
         ),
         PostModel(
           id: "11",
-          user: UserModel(username: 'anna', avatar: AppImages.imgAvatarDefault),
+          user: UserModel( id:999,
+username: 'anna', avatar: AppImages.imgAvatarDefault),
           postImage: "https://picsum.photos/400/400?random=11",
           caption: "Du lịch biển 🌊",
           likes: 240,
@@ -166,7 +179,8 @@ class SettingBloc extends Bloc<SettingEvent, SettingState> {
         ),
         PostModel(
           id: "12",
-          user: UserModel(
+          user: UserModel( id:999,
+
             username: 'hieu_pham',
             avatar: AppImages.imgAvatarDefault,
           ),
@@ -178,8 +192,10 @@ class SettingBloc extends Bloc<SettingEvent, SettingState> {
       ];
 
       final reels = [
-        ReelModel(user: UserModel(username: "Hoang")),
-        ReelModel(user: UserModel(username: "Tuan Anh")),
+        ReelModel(user: UserModel( id:999,
+username: "Hoang")),
+        ReelModel(user: UserModel( id:999,
+username: "Tuan Anh")),
       ];
       emit(SettingSuccess(reels: reels, posts: posts, user: user));
     } catch (e) {

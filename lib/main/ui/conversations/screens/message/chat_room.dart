@@ -1,12 +1,12 @@
-
 import 'package:chat_app/main/networks/api_end_point.dart';
 import 'package:chat_app/main/networks/model/converation.dart';
 import 'package:chat_app/main/networks/model/message.dart';
 import 'package:chat_app/main/networks/model/user.dart';
 import 'package:chat_app/main/router/router.dart';
-import 'package:chat_app/main/ui/chat/bloc/chat_bloc.dart';
-import 'package:chat_app/main/ui/chat/bloc/chat_event.dart';
-import 'package:chat_app/main/ui/chat/bloc/chat_state.dart';
+import 'package:chat_app/main/ui/conversations/screens/message/bloc/chat_bloc.dart';
+import 'package:chat_app/main/ui/conversations/screens/message/bloc/chat_event.dart';
+import 'package:chat_app/main/ui/conversations/screens/message/bloc/chat_state.dart';
+import 'package:chat_app/main/utils/common_function.dart';
 import 'package:chat_app/main/utils/common_widget.dart';
 import 'package:chat_app/main/utils/shared_preference.dart';
 import 'package:chat_app/res/app_colors.dart';
@@ -16,100 +16,29 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
-import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:logger/logger.dart';
 
 // ignore: must_be_immutable
 class ChatRoom extends StatefulWidget {
-  ChatRoom({super.key, required this.conversationId, required this.sender});
-  final int conversationId;
-  final LastMessage sender;
+  ChatRoom({super.key, required this.conversation});
+  final Conversation conversation;
   @override
   State<ChatRoom> createState() => _ChatRoomState();
 }
 
 class _ChatRoomState extends State<ChatRoom> {
   final TextEditingController _messageController = TextEditingController();
-  IO.Socket? socket;
-  List<LastMessage> chats = [];
-
-  @override
-  void initState() {
-    super.initState();
-    _initializeSocket();
-  }
-
-  void _initializeSocket() async {
-    final token = await AppStorage.getToken();
-    
-    socket = IO.io(
-      ApiEndPoints.DOMAININIT,
-      IO.OptionBuilder()
-          .setTransports(['websocket'])
-          .setExtraHeaders({
-            'Authorization': 'Bearer $token',
-          })
-          .build(),
-    );
-    
-    setUpListeners();
-    socket!.connect();
-  }
-
-  void setUpListeners() {
-    socket?.on('connect', (_) {
-      Logger().i('connected');
-      // Join conversation room
-      socket?.emit('join_conversation', {
-        'conversation_id': widget.conversationId,
-      });
-    });
-    
-    socket?.on('disconnect', (_) => Logger().e('disconnected'));
-    socket?.on('connect_error', (error) => Logger().e('Connect error: $error'));
-    
-    // Lắng nghe tin nhắn mới
-    socket?.on('new_message', (data) {
-      final messageData = data['message'];
-      setState(() {
-        chats = [LastMessage.fromJson(messageData), ...chats];
-      });
-    });
-    
-    socket?.on('joined_conversation', (data) {
-      Logger().i('Successfully joined conversation');
-    });
-    
-    socket?.on('error', (error) {
-      Logger().e('Socket error: $error');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Socket error: ${error['message']}')),
-      );
-    });
-  }
-
-  void sendChat() {
-    if (_messageController.text.isNotEmpty) {
-      // Gửi qua socket
-      socket?.emit('send_message', {
-        'conversation_id': widget.conversationId,
-        'content': _messageController.text.trim(),
-      });
-      _messageController.clear();
-    }
-  }
 
   @override
   void dispose() {
-    socket?.disconnect();
-    socket?.close();
+    _messageController.dispose();
     super.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create:
-          (_) => ChatBloc()..add(LoadDetailConveration(widget.conversationId)),
+      create: (_) => ChatBloc()..add(LoadMessage(widget.conversation)),
       child: Scaffold(
         backgroundColor: AppColors.white,
         resizeToAvoidBottomInset: true,
@@ -127,13 +56,10 @@ class _ChatRoomState extends State<ChatRoom> {
                 height: 28,
               ),
               title: Text(
-                widget.sender.sender.username ?? 'Unkonwn',
+                widget.conversation.conversationName ?? 'Unknown',
                 style: AppStyles.title2Bold,
               ),
-              subtitle: Text(
-                widget.sender.sender.status ?? 'Offline',
-                style: AppStyles.headlineRegular,
-              ),
+              subtitle: _buildListUserOnline(context),
             ),
           ),
           leading: IconButton(
@@ -159,7 +85,6 @@ class _ChatRoomState extends State<ChatRoom> {
                       child: SingleChildScrollView(
                         reverse: true,
                         child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             const SizedBox(height: 38),
                             _buildInfoUserContact(),
@@ -167,11 +92,12 @@ class _ChatRoomState extends State<ChatRoom> {
                             BlocSelector<
                               ChatBloc,
                               ChatState,
-                              List<MessageModel>
+                              List<MessageEntity>
                             >(
                               selector: (state) {
-                                if (state is ChatSuccess)
-                                  return state.message?.messages ?? [];
+                                if (state is ChatSuccess) {
+                                  return state.messages ?? [];
+                                }
                                 return [];
                               },
                               builder: (context, messages) {
@@ -213,7 +139,7 @@ class _ChatRoomState extends State<ChatRoom> {
         const SizedBox(height: 16),
 
         Text(
-          widget.sender.sender.username ?? 'Unkonwn',
+          widget.conversation.conversationName ?? 'Unkonwn',
           style: AppStyles.title2Bold,
         ),
         // Text(data.content, style: AppStyles.title3Regular),
@@ -242,6 +168,7 @@ class _ChatRoomState extends State<ChatRoom> {
               context.pushNamed(
                 PathName.profilePage,
                 extra: UserModel(
+                  id: 999,
                   username: 'hieu_pham',
                   avatar: AppImages.imgAvatarDefault,
                 ),
@@ -254,7 +181,7 @@ class _ChatRoomState extends State<ChatRoom> {
     );
   }
 
-  Widget _buildListMessage(List<MessageModel> messages) {
+  Widget _buildListMessage(List<MessageEntity> messages) {
     print('${messages.length}');
     return ListView.builder(
       shrinkWrap: true,
@@ -262,33 +189,44 @@ class _ChatRoomState extends State<ChatRoom> {
       itemCount: messages.length,
       itemBuilder: (context, index) {
         final msg = messages[index];
-        final isMe = msg.senderId == widget.sender.sender.id;
+        final isMe = msg.senderId == widget.conversation.participants[0].id;
 
-        return Align(
-          alignment: isMe ? Alignment.centerLeft : Alignment.centerRight,
-          child: Container(
-            margin: const EdgeInsets.symmetric(vertical: 4),
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            decoration: BoxDecoration(
-              color: isMe ? AppColors.gray20 : AppColors.gray10,
-              borderRadius: BorderRadius.circular(12),
+        return Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              child: Text(formatDateTime(msg.createdAt.toString())),
             ),
-            child: Column(
-              crossAxisAlignment:
-                  isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-              children: [
-                Text(
-                  msg.sender!.username ?? 'Unknown',
-                  style: AppStyles.bodyBold.copyWith(
-                    color: AppColors.gray70,
-                    fontSize: 12,
-                  ),
+            Align(
+              alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
+              child: Container(
+                margin: const EdgeInsets.symmetric(vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
                 ),
-                const SizedBox(height: 4),
-                Text(msg.content, style: AppStyles.bodyRegular),
-              ],
+                decoration: BoxDecoration(
+                  color: isMe ? AppColors.gray20 : AppColors.gray10,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Column(
+                  crossAxisAlignment:
+                      isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      msg.sender!.username ?? 'Unknown',
+                      style: AppStyles.bodyBold.copyWith(
+                        color: AppColors.gray70,
+                        fontSize: 12,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(msg.content, style: AppStyles.bodyRegular),
+                  ],
+                ),
+              ),
             ),
-          ),
+          ],
         );
       },
     );
@@ -303,7 +241,7 @@ class _ChatRoomState extends State<ChatRoom> {
       padding: EdgeInsets.symmetric(vertical: 8, horizontal: 8),
       leadingIcon: IconButton.filledTonal(
         onPressed: () {},
-        icon: SvgPicture.asset(AppImages.icCamera, color: AppColors.white),
+        icon: SvgPicture.asset(AppImages.icCameraDark, color: AppColors.white),
         style: IconButton.styleFrom(
           backgroundColor: AppColors.blue60.withOpacity(0.6),
         ),
@@ -326,7 +264,7 @@ class _ChatRoomState extends State<ChatRoom> {
           final text = _messageController.text.trim();
           if (text.isEmpty) return;
           context.read<ChatBloc>().add(
-            SendMessage(widget.conversationId, text),
+            SendMessage(widget.conversation.conversationId, text),
           );
           _messageController.clear();
           // sendChat();
@@ -344,6 +282,28 @@ class _ChatRoomState extends State<ChatRoom> {
           backgroundColor: AppColors.white.withOpacity(0.6),
         ),
       ),
+    );
+  }
+
+  Widget _buildListUserOnline(BuildContext context) {
+    return BlocBuilder<ChatBloc, ChatState>(
+      builder: (context, state) {
+        if (state is ChatSuccess) {
+          final names = state.userOnline?.join(", ") ?? "";
+          return Text(
+            names,
+            overflow: TextOverflow.ellipsis,
+            maxLines: 1, // chỉ 1 dòng
+            style: AppStyles.headlineRegular,
+          );
+        }
+        return Text(
+          '...',
+          overflow: TextOverflow.ellipsis,
+          maxLines: 1, // chỉ 1 dòng
+          style: AppStyles.headlineRegular,
+        );
+      },
     );
   }
 }

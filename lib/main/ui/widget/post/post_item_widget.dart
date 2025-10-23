@@ -80,14 +80,14 @@ class PostWidget extends StatelessWidget {
         //User Like
         _buildListUserLikePost(
           users: [
-            UserModel(username: 'hieu_pham', avatar: AppImages.imgAvatarDefault),
-            UserModel(username: 'tuan_anh', avatar: AppImages.imgAvatarDefault),
-            UserModel(
-              username: 'nguyen_nguyen',
-              avatar: AppImages.imgAvatarDefault,
-            ),
-            UserModel(username: 'ngoc_hoang', avatar: AppImages.imgAvatarDefault),
-            UserModel(username: 'minh_hieu', avatar: AppImages.imgAvatarDefault),
+            UserModel(                            id:999,
+username: 'hieu_pham', avatar: AppImages.imgAvatarDefault),
+            UserModel(                            id:999,
+username: 'tuan_anh', avatar: AppImages.imgAvatarDefault),
+         UserModel(                            id:999,
+username: 'ngoc_hoang', avatar: AppImages.imgAvatarDefault),
+            UserModel(                            id:999,
+username: 'minh_hieu', avatar: AppImages.imgAvatarDefault),
           ],
         ),
         // Caption

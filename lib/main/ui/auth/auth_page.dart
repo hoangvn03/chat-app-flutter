@@ -27,6 +27,7 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController ipController = TextEditingController();
   final PageController _pageController = PageController();
 
   @override
@@ -257,7 +258,7 @@ class _LoginPageState extends State<LoginPage> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text("Tiếng Việt", style: AppStyles.title3Regular),
+              Text("Tiếng Việt/Ip", style: AppStyles.title3Regular),
               const SizedBox(width: 4),
               Transform.flip(
                 flipY: true,
@@ -660,6 +661,14 @@ class _LoginPageState extends State<LoginPage> {
       child: SingleChildScrollView(
         child: Column(
           children: [
+            commonTextFieldV2(
+              padding: EdgeInsets.all(12),
+              controller: ipController,
+              hintText: 'Nhập ip',
+              onSubmitted: (value) async {
+                await AppStorage.setCustomIp(value);
+              },
+            ),
             Container(
               margin: const EdgeInsets.symmetric(vertical: 16),
               alignment: Alignment.centerRight,

@@ -1,11 +1,13 @@
 import 'package:chat_app/main/main_page.dart';
+import 'package:chat_app/main/networks/model/converation.dart';
 import 'package:chat_app/main/networks/model/message.dart';
 import 'package:chat_app/main/networks/model/reels.dart';
 import 'package:chat_app/main/networks/model/user.dart';
 import 'package:chat_app/main/router/router.dart';
 import 'package:chat_app/main/ui/auth/auth_page.dart';
-import 'package:chat_app/main/ui/chat/chat_page.dart';
-import 'package:chat_app/main/ui/chat/chat_room.dart';
+import 'package:chat_app/main/ui/conversations/conversations_page.dart';
+import 'package:chat_app/main/ui/conversations/screens/createGroupChat/create_chat_page.dart';
+import 'package:chat_app/main/ui/conversations/screens/message/chat_room.dart';
 import 'package:chat_app/main/ui/home/home_page.dart';
 import 'package:chat_app/main/ui/notification/notification_page.dart';
 import 'package:chat_app/main/ui/personal/personal_page.dart';
@@ -78,20 +80,29 @@ class AppGoRouter {
       GoRoute(
         name: PathName.chatPage,
         path: AppPath.chatPage,
+        routes: [
+          GoRoute(
+            name: PathName.chatRoomPage,
+            path: AppPath.chatRoomPage,
+            pageBuilder: (context, state) {
+              final data = state.extra as Conversation;
+              return slidePage(ChatRoom(conversation: data));
+            },
+          ),
+          GoRoute(
+            name: PathName.createChatGroupPage,
+            path: AppPath.createChatGroupPage,
+            pageBuilder: (context, state) {
+              return slidePage(CreateChatPage());
+            },
+          ),
+        ],
         builder: (context, state) {
-          return ChatPage();
+          final currentUser = state.extra as UserModel;
+          return ChatPage(currentUser:currentUser);
         },
       ),
-      GoRoute(
-        name: PathName.chatRoomPage,
-        path: AppPath.chatRoomPage,
-        builder: (context, state) {
-          final data = state.extra as List; // 👈 Nhận dạng List
-          final int conversationId = data[0];
-          final sender = data[1];
-          return ChatRoom(conversationId: conversationId, sender: sender);
-        },
-      ),
+
       // GoRoute(
       //   name: PathName.chatScreen,
       //   path: AppPath.chatScreen,
@@ -236,5 +247,17 @@ class AppGoRouter {
         ],
       ),
     ],
+  );
+  static CustomTransitionPage slidePage(Widget child) => CustomTransitionPage(
+    key: ValueKey(child.hashCode),
+    child: child,
+    transitionDuration: const Duration(milliseconds: 500),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      final tween = Tween(
+        begin: const Offset(1, 0),
+        end: Offset.zero,
+      ).chain(CurveTween(curve: Curves.easeOut));
+      return SlideTransition(position: animation.drive(tween), child: child);
+    },
   );
 }

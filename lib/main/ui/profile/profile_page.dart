@@ -660,32 +660,40 @@ class _ProfilePageState extends State<ProfilePage>
               _buttonActionProfile(isCurrientUser),
               if (user.reels != null)
                 _buildGalleryProfile([
-                  ReelModel(user: UserModel(username: "Hoang")),
-                  ReelModel(user: UserModel(username: "Hoang")),
-                  ReelModel(user: UserModel(username: "Hoang")),
+                  ReelModel(user: UserModel( id:999,
+username: "Hoang")),
+                  ReelModel(user: UserModel( id:999,
+username: "Hoang")),
+                  ReelModel(user: UserModel( id:999,
+username: "Hoang")),
                 ]),
               const SizedBox(height: 8),
               AccountSuggestWidget(
                 isHorirontal: true,
                 title: 'Khám phá mọi người',
                 users: [
-                  UserModel(
+                  UserModel( id:999,
+
                     username: 'hieu_pham',
                     avatar: AppImages.imgAvatarDefault,
                   ),
-                  UserModel(
+                  UserModel( id:999,
+
                     username: 'tuan_anh',
                     avatar: AppImages.imgAvatarDefault,
                   ),
-                  UserModel(
+                  UserModel( id:999,
+
                     username: 'nguyen_nguyen',
                     avatar: AppImages.imgAvatarDefault,
                   ),
-                  UserModel(
+                  UserModel( id:999,
+
                     username: 'ngoc_hoang',
                     avatar: AppImages.imgAvatarDefault,
                   ),
-                  UserModel(
+                  UserModel( id:999,
+
                     username: 'minh_hieu',
                     avatar: AppImages.imgAvatarDefault,
                   ),

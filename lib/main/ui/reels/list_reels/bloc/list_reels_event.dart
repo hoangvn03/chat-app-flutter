@@ -4,9 +4,9 @@ import 'package:photo_manager/photo_manager.dart';
 abstract class ListReelsEvent {}
 
 class LoadReelsMedia extends ListReelsEvent {
-
-
   LoadReelsMedia();
+}
+class LoadListReels extends ListReelsEvent {
 }
 
 class ChooseMedia extends ListReelsEvent {

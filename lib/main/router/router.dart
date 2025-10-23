@@ -20,6 +20,7 @@ class AppPath {
   static const String cameraPage = "/cameraPage";
   static const String settingpage = "/settingpage";
   static const String notificationPage = "/notificationPage";
+  static const String createChatGroupPage = "/createChatGroupPage";
 
   ///context.gp(AppPath.homePage)
 }
@@ -46,6 +47,7 @@ class PathName {
   static const String cameraPage = "cameraPage";
   static const String settingpage = "settingpage";
   static const String notificationPage = "notificationPage";
+  static const String createChatGroupPage = "createChatGroupPage";
 
   ///context.goNamed(PathName.homePage)
 }
