@@ -7,35 +7,40 @@ abstract class CreateChatState {}
 class CreateChatLoading extends CreateChatState {}
 
 class CreateChatSuccess extends CreateChatState {
-  final List<MessageEntity>? messages;
   final List<UserModel>? users;
   final List<UserModel>? members;
-  final int? conversationId;
+  final bool isCreateSuccess;
+  final bool isLoading;
+  final Conversation? conversation;
 
   CreateChatSuccess({
-    this.messages,
-    this.conversationId,
     this.users,
     this.members,
+    this.isCreateSuccess = false,
+    this.isLoading = false,
+    this.conversation,
   });
 
   CreateChatSuccess copyWith({
-    List<MessageEntity>? messages,
     List<UserModel>? users,
     List<UserModel>? members,
-    int? conversationId,
+    bool? isCreateSuccess,
+    bool? isLoading,
+    Conversation? conversation,
   }) {
     return CreateChatSuccess(
-      messages: messages ?? this.messages,
       users: users ?? this.users,
       members: members ?? this.members,
-      conversationId: conversationId ?? this.conversationId,
+      isCreateSuccess: isCreateSuccess ?? this.isCreateSuccess,
+      isLoading: isLoading ?? this.isLoading,
+      conversation: conversation ?? this.conversation,
     );
   }
 }
 
 class CreateChatFailure extends CreateChatState {
   final String errorMessage;
+  int? erorCode;
 
-  CreateChatFailure(this.errorMessage);
+  CreateChatFailure(this.errorMessage,{this.erorCode});
 }

@@ -13,11 +13,11 @@ import '../../../networks/api_util.dart';
 
 class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
   ProfileBloc() : super(ProfileLoading()) {
-    on<LoadRequest>(_loadRequest);
+    on<LoadProfile>(_loadRequest);
+    on<LoadProfileUserContact>(_loadProfileUserContact);
     on<ClearStrogeUser>(_clearUser);
   }
-  UserModel user = UserModel( id:999,
-);
+  UserModel user = UserModel(id: 999);
   bool isCurrientUser = true;
 
   Future<void> _clearUser(
@@ -40,7 +40,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
   }
 
   Future<void> _loadRequest(
-    LoadRequest event,
+    LoadProfile event,
     Emitter<ProfileState> emit,
   ) async {
     try {
@@ -52,7 +52,8 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
         final List<PostModel> posts = [
           PostModel(
             id: "1",
-            user: UserModel( id:999,
+            user: UserModel(
+              id: 999,
 
               username: 'hieu_pham',
               avatar: AppImages.imgAvatarDefault,
@@ -65,7 +66,8 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
           ),
           PostModel(
             id: "2",
-            user: UserModel( id:999,
+            user: UserModel(
+              id: 999,
 
               username: 'linh_nguyen',
               avatar: AppImages.imgAvatarDefault,
@@ -77,7 +79,8 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
           ),
           PostModel(
             id: "3",
-            user: UserModel( id:999,
+            user: UserModel(
+              id: 999,
 
               username: 'lisa',
               avatar: AppImages.imgAvatarDefault,
@@ -89,7 +92,8 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
           ),
           PostModel(
             id: "4",
-            user: UserModel( id:999,
+            user: UserModel(
+              id: 999,
 
               username: 'thanh_nguyen',
               avatar: AppImages.imgAvatarDefault,
@@ -101,7 +105,8 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
           ),
           PostModel(
             id: "5",
-            user: UserModel( id:999,
+            user: UserModel(
+              id: 999,
 
               username: 'tuan_anh',
               avatar: AppImages.imgAvatarDefault,
@@ -114,7 +119,8 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
           PostModel(
             id: "6",
             typePost: "reels",
-            user: UserModel( id:999,
+            user: UserModel(
+              id: 999,
 
               username: 'minh_hieu',
               avatar: AppImages.imgAvatarDefault,
@@ -127,7 +133,8 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
           PostModel(
             id: "7",
             typePost: "reels",
-            user: UserModel( id:999,
+            user: UserModel(
+              id: 999,
 
               username: 'rosé',
               avatar: AppImages.imgAvatarDefault,
@@ -140,7 +147,8 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
           PostModel(
             id: "8",
             typePost: "video",
-            user: UserModel( id:999,
+            user: UserModel(
+              id: 999,
 
               username: 'david',
               avatar: AppImages.imgAvatarDefault,
@@ -152,7 +160,8 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
           ),
           PostModel(
             id: "9",
-            user: UserModel( id:999,
+            user: UserModel(
+              id: 999,
 
               username: 'yasuo',
               avatar: AppImages.imgAvatarDefault,
@@ -164,7 +173,8 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
           ),
           PostModel(
             id: "10",
-            user: UserModel( id:999,
+            user: UserModel(
+              id: 999,
 
               username: 'hasagi',
               avatar: AppImages.imgAvatarDefault,
@@ -176,7 +186,8 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
           ),
           PostModel(
             id: "11",
-            user: UserModel( id:999,
+            user: UserModel(
+              id: 999,
 
               username: 'anna',
               avatar: AppImages.imgAvatarDefault,
@@ -188,7 +199,8 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
           ),
           PostModel(
             id: "12",
-            user: UserModel( id:999,
+            user: UserModel(
+              id: 999,
 
               username: 'hieu_pham',
               avatar: AppImages.imgAvatarDefault,
@@ -200,12 +212,27 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
           ),
         ];
         final reels = [
-          ReelModel(user: UserModel( id:999,
-username: "Hoang")),
-          ReelModel(user: UserModel( id:999,
-username: "Tuan Anh")),
+          ReelModel(user: UserModel(id: 999, username: "Hoang")),
+          ReelModel(user: UserModel(id: 999, username: "Tuan Anh")),
         ];
         emit(ProfileSuccess(reels: reels, posts: posts, user: user));
+      }
+    } catch (e) {
+      emit(ProfileFailure());
+    }
+    return;
+  }
+
+  Future<void> _loadProfileUserContact(
+    LoadProfileUserContact event,
+    Emitter<ProfileState> emit,
+  ) async {
+    try {
+      var url = '${ApiEndPoints.USERS}/${event.id}';
+      ApiResponse res = await ApiUtil.get(url);
+      if (res.statusCode == 200) {
+        final user = UserModel.fromJson(res.body['data']['user']);
+        emit(ProfileSuccess(user: user));
       }
     } catch (e) {
       emit(ProfileFailure());

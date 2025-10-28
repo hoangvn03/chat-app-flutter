@@ -23,6 +23,7 @@ class CreateChatBloc extends Bloc<CreateChatEvent, CreateChatState> {
     on<LoadListUser>(_loadUser);
     on<AddUserToGroup>(_addUserToGroup);
     on<RemoveUserToGroup>(_removeUserToGroup);
+    on<ClearCreateChat>(_clearData);
   }
 
   final List<UserModel> memberGroup = [];
@@ -30,7 +31,6 @@ class CreateChatBloc extends Bloc<CreateChatEvent, CreateChatState> {
     CreateNewChat event,
     Emitter<CreateChatState> emit,
   ) async {
-    emit(CreateChatLoading());
     try {
       var url = ApiEndPoints.CONVERATIONS;
       print(url);
@@ -40,18 +40,31 @@ class CreateChatBloc extends Bloc<CreateChatEvent, CreateChatState> {
         "participant_ids": event.participantIds,
       };
       ApiResponse res = await ApiUtil.post(url: url, data: body);
-      if (res.statusCode == 200) {
-        final data = Conversation.fromJson(res.body['data']);
+      if (res.statusCode == 201) {
+        memberGroup.clear();
+        final data = Conversation.fromJson(res.body['data']['conversation']);
         if (state is CreateChatSuccess) {
           final current = state as CreateChatSuccess;
-          emit(current.copyWith(conversationId: data.conversationId));
+          emit(current.copyWith(conversation: data, isCreateSuccess: true));
+        } else if (res.statusCode == 409) {
+          CreateChatFailure(
+            erorCode: res.statusCode,
+            '${res.statusCode} ${res.body['error']['message']}',
+          );
         } else {
-          emit(CreateChatSuccess(conversationId: data.conversationId));
+          CreateChatFailure(
+            '${res.statusCode} ${res.body['error']['message']}',
+          );
         }
       } else {
-        emit(CreateChatFailure('${res.statusCode} Fail to load api'));
+        emit(
+          CreateChatFailure(
+            '${res.statusCode} ${res.body['error']['message']}',
+          ),
+        );
       }
     } catch (e) {
+      print(e.toString());
       emit(CreateChatFailure(e.toString()));
     }
     return;
@@ -61,18 +74,23 @@ class CreateChatBloc extends Bloc<CreateChatEvent, CreateChatState> {
     LoadListUser event,
     Emitter<CreateChatState> emit,
   ) async {
-    emit(CreateChatLoading());
+    if (state is CreateChatSuccess) {
+      emit((state as CreateChatSuccess).copyWith(isLoading: true));
+    }
+
     try {
       var url = ApiEndPoints.USERS;
-      var params = {'page': '1', 'limit': '10', 'CreateChat': event.input};
+      var params = {'page': '1', 'limit': '10', 'search': event.input};
       ApiResponse res = await ApiUtil.get(url, params: params);
+
       if (res.statusCode == 200) {
         final data = UserResponse.fromJson(res.body['data']);
+
         if (state is CreateChatSuccess) {
           final current = state as CreateChatSuccess;
-          emit(current.copyWith(users: data.users));
+          emit(current.copyWith(users: data.users, isLoading: false));
         } else {
-          emit(CreateChatSuccess(users: data.users));
+          emit(CreateChatSuccess(users: data.users, isLoading: false));
         }
       } else {
         emit(CreateChatFailure('${res.statusCode} Fail to load api'));
@@ -102,5 +120,13 @@ class CreateChatBloc extends Bloc<CreateChatEvent, CreateChatState> {
       final current = state as CreateChatSuccess;
       emit(current.copyWith(members: memberGroup));
     }
+  }
+
+  Future<void> _clearData(
+    ClearCreateChat event,
+    Emitter<CreateChatState> emit,
+  ) async {
+    memberGroup.clear();
+    emit(CreateChatLoading()); // hoặc CreateChatSuccess(members: [], users: [])
   }
 }

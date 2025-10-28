@@ -80,28 +80,33 @@ class _ChatPageState extends State<ChatPage> {
               onPressed: () {},
               icon: SvgPicture.asset(AppImages.icSearch),
             ),
-            IconButton(
-              onPressed: () {
-                context.pushNamed(PathName.createChatGroupPage);
+            BlocBuilder<ConversationsBloc, ConversationsState>(
+              builder: (context, state) {
+                return IconButton(
+                  onPressed: () {
+                    context.pushNamed(
+                      PathName.createChatGroupPage,
+                      extra: BlocProvider.of<CreateChatBloc>(context),
+                    );
+                  },
+                  icon: SvgPicture.asset(
+                    AppImages.icNoteCreate,
+                    width: 24,
+                    height: 24,
+                  ),
+                );
               },
-              icon: SvgPicture.asset(
-                AppImages.icNoteCreate,
-                width: 24,
-                height: 24,
-              ),
             ),
           ],
         ),
         body: BlocListener<CreateChatBloc, CreateChatState>(
-          listener: (con, state) {
-            if (state is CreateChatSuccess) {
-              con.pushNamed(
-                PathName.chatRoomPage,
-                extra: [state.conversationId, null], // 👈 truyền ID sang
-              );
+          listener: (context, state) {
+            if (state is CreateChatSuccess && state.isCreateSuccess) {
+              print('Create Success');
+              context.read<ConversationsBloc>().add(LoadRequest());
             } else if (state is CreateChatFailure) {
               ScaffoldMessenger.of(
-                con,
+                context,
               ).showSnackBar(SnackBar(content: Text(state.errorMessage)));
             }
           },
@@ -221,31 +226,30 @@ class _ChatPageState extends State<ChatPage> {
     );
   }
 
-  Widget _itemMessage(Conversation con, BuildContext context) {
+  Widget _itemMessage(Conversation conversation, BuildContext con) {
     var listImage = [
-      con.participants[0].avatar ?? AppImages.icStickers,
-      con.participants[1].avatar ?? AppImages.icStickers,
+      conversation.participants[0].avatar ?? AppImages.icStickers,
+      conversation.participants[1].avatar ?? AppImages.icStickers,
     ];
-    if (!con.isGroup) {
-      listImage = [con.participants[1].avatar ?? AppImages.icStickers];
+    if (!conversation.isGroup) {
+      listImage = [conversation.participants[1].avatar ?? AppImages.icStickers];
     }
     return commonTileItemV2(
       onTap: () {
-        context.pushNamed(
-          PathName.chatRoomPage,
-          extra: con, // 👈 truyền ID sang
-        );
+        con.pushNamed(PathName.chatRoomPage, extra: conversation);
       },
       leadingWidget: groupUserAvatar(
         images: listImage,
-        avatarSize: con.isGroup ? 48 : 64,
+        avatarSize: conversation.isGroup ? 48 : 64,
       ),
       trallingWidget: SvgPicture.asset(AppImages.icCamera),
-      title: con.conversationName ?? 'Unknown',
+      title: conversation.conversationName ?? 'Unknown',
       subtitle:
-          con.isGroup
-              ? con.lastMessage?.content ?? 'Hãy gửi tin nhắn đầu tiên!'
-              : con.lastMessage?.content ?? con.participants[1].status,
+          conversation.isGroup
+              ? conversation.lastMessage?.content ??
+                  'Hãy gửi tin nhắn đầu tiên!'
+              : conversation.lastMessage?.content ??
+                  conversation.participants[1].status,
       margin: EdgeInsets.symmetric(vertical: 12),
     );
   }

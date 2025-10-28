@@ -104,13 +104,59 @@ class MessageEntity {
 }
 
 class Attachment {
-  Attachment();
+  final int attachmentId;
+  final int messageId;
+  final String fileUrl;
+  final String fileType;
+  final int fileSize;
+  final DateTime uploadedAt;
+
+  Attachment({
+    required this.attachmentId,
+    required this.messageId,
+    required this.fileUrl,
+    required this.fileType,
+    required this.fileSize,
+    required this.uploadedAt,
+  });
 
   factory Attachment.fromJson(Map<String, dynamic> json) {
-    return Attachment();
+    return Attachment(
+      attachmentId: json['attachment_id'] as int,
+      messageId: json['message_id'] as int,
+      fileUrl: json['file_url'] as String,
+      fileType: json['file_type'] as String,
+      fileSize: json['file_size'] as int,
+      uploadedAt: DateTime.parse(json['uploaded_at'] as String),
+    );
   }
 
-  Map<String, dynamic> toJson() => {};
+  Map<String, dynamic> toJson() {
+    return {
+      'attachment_id': attachmentId,
+      'message_id': messageId,
+      'file_url': fileUrl,
+      'file_type': fileType,
+      'file_size': fileSize,
+      'uploaded_at': uploadedAt.toIso8601String(),
+    };
+  }
+
+  @override
+  String toString() {
+    return 'Attachment(attachmentId: $attachmentId, messageId: $messageId, fileUrl: $fileUrl, fileType: $fileType, fileSize: $fileSize, uploadedAt: $uploadedAt)';
+  }
+
+  // Optional: Override equality operators for better comparison
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Attachment &&
+          runtimeType == other.runtimeType &&
+          attachmentId == other.attachmentId;
+
+  @override
+  int get hashCode => attachmentId.hashCode;
 }
 
 class Status {

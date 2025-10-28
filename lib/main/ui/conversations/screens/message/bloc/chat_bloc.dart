@@ -22,9 +22,12 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     on<LoadMessage>(_loadListMessage);
     on<ReceiveMessage>(_receiveMessage);
     on<SendMessage>(_sendMessage);
+    on<UserTypingOrStopTypingEvent>(_onUserTypingOrStopTyping);
+    on<UpdateTypingEvent>(_updateStateTyping);
   }
-  SocketService _socketService = SocketService();
+  final SocketService _socketService = SocketService();
   final List<MessageEntity> _messages = [];
+  final List<UserModel> _userOnline = [];
   Future<void> _loadListMessage(
     LoadMessage event,
     Emitter<ChatState> emit,
@@ -32,19 +35,31 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     try {
       var url =
           '${ApiEndPoints.GETMESSAGE}/${event.conversation.conversationId}';
-      final userOnline = getOnlineUserIds(event.conversation.participants);
       ApiResponse res = await ApiUtil.get(url);
       if (res.statusCode == 200) {
         final data = MessageData.fromJson(res.body['data']);
         _messages.clear();
         _messages.addAll(data.messages);
-        emit(
-          ChatSuccess(messages: List.from(_messages), userOnline: userOnline),
-        );
-        _socketService.socket.emit(
-          'join_conversation',
-          event.conversation.conversationId,
-        );
+        emit(ChatSuccess(messages: List.from(_messages)));
+        _socketService.socket.on('user_typing', (data) {
+          final userid = data['user_id'];
+          final username = data['username'];
+          final convId = data['conversation_id'];
+          final user = UserModel(id: userid, username: username);
+          print('Step Typing 2 :$username + $convId');
+          add(UpdateTypingEvent(user, false));
+        });
+
+        _socketService.socket.on('user_stopped_typing', (data) {
+          final username = data['username'];
+          final userid = data['user_id'];
+          final convId = data['conversation_id'];
+          final user = UserModel(id: userid, username: username);
+          print('Step Typing 3 :$username + $convId');
+          add(UpdateTypingEvent(user, true));
+        });
+
+        _socketService.joinConversation(event.conversation.conversationId);
         _socketService.socket.on('new_message', (data) {
           print("B1 Gui :$data");
           add(ReceiveMessage(data));
@@ -61,11 +76,11 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   Future<void> _sendMessage(SendMessage event, Emitter<ChatState> emit) async {
     if (state is! ChatSuccess) return;
     try {
-      var param = {
+      var params = {
         'conversation_id': event.conversationId,
         'content': event.message,
       };
-      _socketService.socket.emit('send_message', param);
+      _socketService.sendMessage(params);
     } catch (e) {
       emit(ChatFailure(e.toString()));
     }
@@ -115,21 +130,66 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     }
   }
 
+  Future<void> _updateStateTyping(
+    UpdateTypingEvent event,
+    Emitter<ChatState> emit,
+  ) async {
+    if (state is! ChatSuccess) return;
+    final currentState = state as ChatSuccess;
+    try {
+      final user = event.user;
+      if (!event.isStop) {
+        // chỉ thêm nếu chưa có id này
+        if (!_userOnline.any((u) => u.id == user.id)) {
+          _userOnline.add(user);
+          emit(currentState.copyWith(typingUsers: List.from(_userOnline)));
+        }
+      } else {
+        // xóa theo id
+        _userOnline.removeWhere((u) => u.id == user.id);
+        emit(currentState.copyWith(typingUsers: List.from(_userOnline)));
+      }
+    } catch (e) {
+      emit(ChatFailure(e.toString()));
+    }
+  }
+
+  Future<void> _onUserTypingOrStopTyping(
+    UserTypingOrStopTypingEvent event,
+    Emitter<ChatState> emit,
+  ) async {
+    final current = state;
+    if (!event.isStop) {
+      print('Step Typing 1 : ${event.conversationId}');
+      if (current is ChatSuccess) {
+        _socketService.startTyping(event.conversationId);
+      }
+    } else {
+      print('Step Typing 4 : ${event.conversationId}');
+      if (current is ChatSuccess) {
+        _socketService.stopTyping(event.conversationId);
+      }
+    }
+  }
+
+  
+
   List<String> getOnlineUserIds(List<UserModel> participants) {
     final name = <String>{};
-      for (final user in participants) {
-        if (user.status == 'online' && user.username != null) {
-          name.add(user.username!);
-        }
+    for (final user in participants) {
+      if (user.status == 'online' && user.username != null) {
+        name.add(user.username!);
+      }
     }
     return name.toList();
   }
 
   @override
   Future<void> close() {
-    // Ngắt lắng nghe event khi rời màn
     _socketService.socket.off('new_message');
     _socketService.socket.off('send_message');
+    _socketService.socket.off('user_typing');
+    _socketService.socket.off('user_stopped_typing');
     return super.close();
   }
 }

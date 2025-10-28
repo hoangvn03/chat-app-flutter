@@ -5,8 +5,8 @@ import 'package:chat_app/main/networks/api_util.dart';
 import 'package:chat_app/main/networks/model/post.dart';
 import 'package:chat_app/main/networks/model/reels.dart';
 import 'package:chat_app/main/networks/model/user.dart';
-import 'package:chat_app/main/ui/profile/settings/bloc/settings_event.dart';
-import 'package:chat_app/main/ui/profile/settings/bloc/settings_state.dart';
+import 'package:chat_app/main/ui/profile/widgets/settings/bloc/settings_event.dart';
+import 'package:chat_app/main/ui/profile/widgets/settings/bloc/settings_state.dart';
 
 import 'package:chat_app/main/utils/shared_preference.dart';
 import 'package:chat_app/res/app_images.dart';

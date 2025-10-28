@@ -1,4 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:chat_app/main/networks/model/converation.dart';
+import 'package:chat_app/main/ui/conversations/screens/createGroupChat/bloc/create_chat_bloc.dart';
+import 'package:chat_app/main/ui/conversations/screens/createGroupChat/bloc/create_chat_event.dart';
+import 'package:chat_app/main/ui/conversations/screens/createGroupChat/bloc/create_chat_state.dart';
 import 'package:chat_app/main/ui/widget/account_suggest/account_suggest_widget.dart';
 import 'package:chat_app/main/ui/widget/interaction_button/bloc/interaction_cubit.dart';
 import 'package:chat_app/main/ui/widget/interaction_button/interaction_button.dart';
@@ -41,501 +45,527 @@ class _ProfilePageState extends State<ProfilePage>
   @override
   Widget build(BuildContext context) {
     final isCurrientUser = (widget.user != null) ? true : false;
-    return BlocProvider<ProfileBloc>(
-      create: (_) => ProfileBloc()..add(LoadRequest()),
-      child: Scaffold(
-        backgroundColor: AppColors.white,
-        body: BlocBuilder<ProfileBloc, ProfileState>(
-          builder: (context, state) {
-            if (state is ProfileLoading) {
-              return const Center(child: CircularProgressIndicator());
-            } else if (state is ProfileSuccess) {
-              return NestedScrollView(
-                headerSliverBuilder:
-                    (context, innerBoxIsScrolled) => [
-                      // AppBar phía trên
-                      SliverAppBar(
-                        backgroundColor: AppColors.white,
-                        surfaceTintColor: AppColors.white,
-                        floating: true,
-                        snap: true,
-                        pinned: true,
-                        title:
-                            !isCurrientUser
-                                ? Row(
-                                  children: [
-                                    SvgPicture.asset(AppImages.icLock),
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 8,
+    return MultiBlocProvider(
+      providers: [
+        !isCurrientUser
+            ? BlocProvider<ProfileBloc>(
+              create: (_) => ProfileBloc()..add(LoadProfile()),
+            )
+            : BlocProvider<ProfileBloc>(
+              create:
+                  (_) =>
+                      ProfileBloc()
+                        ..add(LoadProfileUserContact(widget.user!.id)),
+            ),
+        BlocProvider(create: (_) => CreateChatBloc()),
+      ],
+      child: BlocListener<CreateChatBloc, CreateChatState>(
+        listener: (context, state) {
+          if (state is CreateChatSuccess && state.isCreateSuccess) {
+            context.pushNamed(PathName.chatRoomPage, extra: state.conversation);
+          } else if (state is CreateChatFailure) {
+            if (state.erorCode == 409) {
+            } else {
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(SnackBar(content: Text(state.errorMessage)));
+            }
+          }
+        },
+        child: Scaffold(
+          backgroundColor: AppColors.white,
+          body: BlocBuilder<ProfileBloc, ProfileState>(
+            builder: (context, state) {
+              if (state is ProfileLoading) {
+                return const Center(child: CircularProgressIndicator());
+              } else if (state is ProfileSuccess) {
+                return NestedScrollView(
+                  headerSliverBuilder:
+                      (context, innerBoxIsScrolled) => [
+                        // AppBar phía trên
+                        SliverAppBar(
+                          backgroundColor: AppColors.white,
+                          surfaceTintColor: AppColors.white,
+                          floating: true,
+                          snap: true,
+                          pinned: true,
+                          title:
+                              !isCurrientUser
+                                  ? Row(
+                                    children: [
+                                      SvgPicture.asset(AppImages.icLock),
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 8,
+                                        ),
+                                        child: Text(
+                                          state.user!.username ?? 'Unkonwn',
+                                          style: AppStyles.title1Bold,
+                                        ),
                                       ),
-                                      child: Text(
-                                        state.user!.username ?? 'Unkonwn',
-                                        style: AppStyles.title1Bold,
+                                      Transform.flip(
+                                        flipY: true,
+                                        child: SvgPicture.asset(
+                                          AppImages.icChevronUp,
+                                          width: 16,
+                                          height: 16,
+                                        ),
                                       ),
-                                    ),
-                                    Transform.flip(
-                                      flipY: true,
+                                    ],
+                                  )
+                                  : Text(
+                                    widget.user!.username ?? 'Unkonwn',
+                                    style: AppStyles.title1Bold,
+                                  ),
+                          leading:
+                              isCurrientUser
+                                  ? IconButton(
+                                    onPressed: () {
+                                      context.pop();
+                                    },
+                                    icon: Transform.flip(
+                                      flipX: true,
                                       child: SvgPicture.asset(
-                                        AppImages.icChevronUp,
-                                        width: 16,
-                                        height: 16,
+                                        AppImages.icNextRight,
                                       ),
                                     ),
-                                  ],
-                                )
-                                : Text(
-                                  widget.user!.username ?? 'Unkonwn',
-                                  style: AppStyles.title1Bold,
+                                  )
+                                  : null,
+                          actions: [
+                            if (isCurrientUser) ...[
+                              PopupMenuButton(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 12,
                                 ),
-                        leading:
-                            isCurrientUser
-                                ? IconButton(
-                                  onPressed: () {
-                                    context.pop();
-                                  },
-                                  icon: Transform.flip(
-                                    flipX: true,
-                                    child: SvgPicture.asset(
-                                      AppImages.icNextRight,
-                                    ),
-                                  ),
-                                )
-                                : null,
-                        actions: [
-                          if (isCurrientUser) ...[
-                            PopupMenuButton(
-                              padding: EdgeInsets.symmetric(
-                                horizontal: 16,
-                                vertical: 12,
-                              ),
-                              constraints: const BoxConstraints(),
-                              color: Colors.white.withOpacity(0.95),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              offset: const Offset(40, 40),
-                              itemBuilder:
-                                  (context) => [
-                                    PopupMenuItem(
-                                      padding: EdgeInsets.only(left: 24),
-                                      enabled: false, // tắt click
-                                      child: Text(
-                                        "Thông báo từ ${(isCurrientUser) ? widget.user!.username ?? 'Unkonwn' : state.user!.username ?? 'Unkonwn'}",
-                                        style: AppStyles.bodyRegular,
-                                      ),
-                                    ),
-                                    PopupMenuItem(
-                                      onTap: () {},
-                                      child: ListTile(
-                                        dense: true,
-                                        leading: SvgPicture.asset(
-                                          AppImages.icPictureGallery,
-                                        ),
-                                        title: Text(
-                                          "Bài biết",
-                                          style: AppStyles.title2Regular,
-                                        ),
-                                        subtitle: Text(
-                                          "Phù hợp nhất",
-                                          style: AppStyles.bodyRegular,
-                                        ),
-                                        trailing: SvgPicture.asset(
-                                          AppImages.icChevronRight,
-                                        ),
-                                      ),
-                                    ),
-                                    PopupMenuItem(
-                                      onTap: () {},
-                                      child: ListTile(
-                                        dense: true,
-                                        leading: SvgPicture.asset(
-                                          AppImages.icAddHighlight,
-                                        ),
-                                        title: Text(
-                                          "Tin",
-                                          style: AppStyles.title2Regular,
-                                        ),
-                                        subtitle: Text(
-                                          "Phù hợp nhất",
-                                          style: AppStyles.bodyRegular,
-                                        ),
-                                        trailing: SvgPicture.asset(
-                                          AppImages.icChevronRight,
-                                        ),
-                                      ),
-                                    ),
-                                    PopupMenuItem(
-                                      onTap: () {},
-                                      child: ListTile(
-                                        dense: true,
-
-                                        leading: SvgPicture.asset(
-                                          AppImages.icReels,
-                                        ),
-                                        title: Text(
-                                          "Reels",
-                                          style: AppStyles.title2Regular,
-                                        ),
-                                        subtitle: Text(
-                                          "Phù hợp nhất",
-                                          style: AppStyles.bodyRegular,
-                                        ),
-                                        trailing: SvgPicture.asset(
-                                          AppImages.icChevronRight,
-                                        ),
-                                      ),
-                                    ),
-                                    PopupMenuItem(
-                                      onTap: () {},
-                                      child: ListTile(
-                                        dense: true,
-
-                                        leading: SvgPicture.asset(
-                                          AppImages.icLive,
-                                        ),
-                                        title: Text(
-                                          "Video trực tiếp",
-                                          style: AppStyles.title2Regular,
-                                        ),
-                                        subtitle: Text(
-                                          "Phù hợp nhất",
-                                          style: AppStyles.bodyRegular,
-                                        ),
-                                        trailing: SvgPicture.asset(
-                                          AppImages.icChevronRight,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                              child: Transform.flip(
-                                flipX: true,
-                                child: SvgPicture.asset(
-                                  AppImages.icNotificationsOff,
+                                constraints: const BoxConstraints(),
+                                color: Colors.white.withOpacity(0.95),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
                                 ),
-                              ),
-                            ),
-                            IconButton(
-                              onPressed: () {
-                                showModalBottomSheet(
-                                  context: context,
-                                  useSafeArea: true,
-                                  useRootNavigator: true,
-                                  backgroundColor: AppColors.white,
-                                  isScrollControlled: true,
-                                  shape: const RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.vertical(
-                                      top: Radius.circular(16),
-                                    ),
-                                  ),
-                                  builder:
-                                      (context) =>
-                                          _buildBottomSheetProfileOption(
-                                            context,
+                                offset: const Offset(40, 40),
+                                itemBuilder:
+                                    (context) => [
+                                      PopupMenuItem(
+                                        padding: EdgeInsets.only(left: 24),
+                                        enabled: false, // tắt click
+                                        child: Text(
+                                          "Thông báo từ ${(isCurrientUser) ? widget.user!.username ?? 'Unkonwn' : state.user!.username ?? 'Unkonwn'}",
+                                          style: AppStyles.bodyRegular,
+                                        ),
+                                      ),
+                                      PopupMenuItem(
+                                        onTap: () {},
+                                        child: ListTile(
+                                          dense: true,
+                                          leading: SvgPicture.asset(
+                                            AppImages.icPictureGallery,
                                           ),
-                                );
-                              },
-                              icon: Transform.rotate(
-                                angle:
-                                    90 *
-                                    3.1415926535 /
-                                    180, // xoay 90 độ (radian)
-                                child: SvgPicture.asset(AppImages.icOption),
-                              ),
-                            ),
-                          ] else ...[
-                            IconButton(
-                              onPressed: () {},
-                              icon: SvgPicture.asset(AppImages.icThreads),
-                            ),
-                            IconButton(
-                              onPressed: () {},
-                              icon: SvgPicture.asset(AppImages.icCreate),
-                            ),
-                            IconButton(
-                              onPressed: () {
-                                context.pushNamed(PathName.settingpage);
-                              },
-                              icon: SvgPicture.asset(AppImages.icMenu),
-                            ),
-                          ],
-                        ],
-                      ),
+                                          title: Text(
+                                            "Bài biết",
+                                            style: AppStyles.title2Regular,
+                                          ),
+                                          subtitle: Text(
+                                            "Phù hợp nhất",
+                                            style: AppStyles.bodyRegular,
+                                          ),
+                                          trailing: SvgPicture.asset(
+                                            AppImages.icChevronRight,
+                                          ),
+                                        ),
+                                      ),
+                                      PopupMenuItem(
+                                        onTap: () {},
+                                        child: ListTile(
+                                          dense: true,
+                                          leading: SvgPicture.asset(
+                                            AppImages.icAddHighlight,
+                                          ),
+                                          title: Text(
+                                            "Tin",
+                                            style: AppStyles.title2Regular,
+                                          ),
+                                          subtitle: Text(
+                                            "Phù hợp nhất",
+                                            style: AppStyles.bodyRegular,
+                                          ),
+                                          trailing: SvgPicture.asset(
+                                            AppImages.icChevronRight,
+                                          ),
+                                        ),
+                                      ),
+                                      PopupMenuItem(
+                                        onTap: () {},
+                                        child: ListTile(
+                                          dense: true,
 
-                      // Profile info nằm giữa
-                      SliverToBoxAdapter(
-                        child: _buildProfileInfo(state.user, isCurrientUser),
-                      ),
+                                          leading: SvgPicture.asset(
+                                            AppImages.icReels,
+                                          ),
+                                          title: Text(
+                                            "Reels",
+                                            style: AppStyles.title2Regular,
+                                          ),
+                                          subtitle: Text(
+                                            "Phù hợp nhất",
+                                            style: AppStyles.bodyRegular,
+                                          ),
+                                          trailing: SvgPicture.asset(
+                                            AppImages.icChevronRight,
+                                          ),
+                                        ),
+                                      ),
+                                      PopupMenuItem(
+                                        onTap: () {},
+                                        child: ListTile(
+                                          dense: true,
 
-                      // TabBar dính ngay dưới info
-                      SliverPersistentHeader(
-                        pinned: true,
-                        delegate: SliverAppBarDelegate(
-                          TabBar(
-                            controller: _tabController,
-                            labelColor: Colors.black,
-                            indicatorColor: Colors.black,
-                            dividerColor: AppColors.white,
-                            indicator: UnderlineTabIndicator(
-                              borderSide: BorderSide(
-                                width: 2,
-                                color: Colors.black,
-                              ),
-                              insets: EdgeInsets.symmetric(
-                                horizontal: 48,
-                              ), // chỉnh để dài hơn/ngắn lại
-                            ),
-                            indicatorWeight: 1,
-                            tabs: [
-                              Tab(
-                                icon: SvgPicture.asset(
-                                  AppImages.icGridDark,
-                                  // color: AppColors.gray60,
+                                          leading: SvgPicture.asset(
+                                            AppImages.icLive,
+                                          ),
+                                          title: Text(
+                                            "Video trực tiếp",
+                                            style: AppStyles.title2Regular,
+                                          ),
+                                          subtitle: Text(
+                                            "Phù hợp nhất",
+                                            style: AppStyles.bodyRegular,
+                                          ),
+                                          trailing: SvgPicture.asset(
+                                            AppImages.icChevronRight,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                child: Transform.flip(
+                                  flipX: true,
+                                  child: SvgPicture.asset(
+                                    AppImages.icNotificationsOff,
+                                  ),
                                 ),
                               ),
-                              Tab(
-                                icon: SvgPicture.asset(
-                                  AppImages.icReels,
-                                  color: AppColors.gray60,
+                              IconButton(
+                                onPressed: () {
+                                  showModalBottomSheet(
+                                    context: context,
+                                    useSafeArea: true,
+                                    useRootNavigator: true,
+                                    backgroundColor: AppColors.white,
+                                    isScrollControlled: true,
+                                    shape: const RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.vertical(
+                                        top: Radius.circular(16),
+                                      ),
+                                    ),
+                                    builder:
+                                        (context) =>
+                                            _buildBottomSheetProfileOption(
+                                              context,
+                                            ),
+                                  );
+                                },
+                                icon: Transform.rotate(
+                                  angle:
+                                      90 *
+                                      3.1415926535 /
+                                      180, // xoay 90 độ (radian)
+                                  child: SvgPicture.asset(AppImages.icOption),
                                 ),
                               ),
-                              Tab(
-                                icon: SvgPicture.asset(
-                                  AppImages.icTag,
-                                  color: AppColors.gray60,
-                                ),
+                            ] else ...[
+                              IconButton(
+                                onPressed: () {},
+                                icon: SvgPicture.asset(AppImages.icThreads),
+                              ),
+                              IconButton(
+                                onPressed: () {},
+                                icon: SvgPicture.asset(AppImages.icCreate),
+                              ),
+                              IconButton(
+                                onPressed: () {
+                                  context.pushNamed(PathName.settingpage);
+                                },
+                                icon: SvgPicture.asset(AppImages.icMenu),
                               ),
                             ],
+                          ],
+                        ),
+
+                        // Profile info nằm giữa
+                        SliverToBoxAdapter(
+                          child: _buildProfileInfo(state.user, isCurrientUser),
+                        ),
+
+                        // TabBar dính ngay dưới info
+                        SliverPersistentHeader(
+                          pinned: true,
+                          delegate: SliverAppBarDelegate(
+                            TabBar(
+                              controller: _tabController,
+                              labelColor: Colors.black,
+                              indicatorColor: Colors.black,
+                              dividerColor: AppColors.white,
+                              indicator: UnderlineTabIndicator(
+                                borderSide: BorderSide(
+                                  width: 2,
+                                  color: Colors.black,
+                                ),
+                                insets: EdgeInsets.symmetric(
+                                  horizontal: 48,
+                                ), // chỉnh để dài hơn/ngắn lại
+                              ),
+                              indicatorWeight: 1,
+                              tabs: [
+                                Tab(
+                                  icon: SvgPicture.asset(
+                                    AppImages.icGridDark,
+                                    // color: AppColors.gray60,
+                                  ),
+                                ),
+                                Tab(
+                                  icon: SvgPicture.asset(
+                                    AppImages.icReels,
+                                    color: AppColors.gray60,
+                                  ),
+                                ),
+                                Tab(
+                                  icon: SvgPicture.asset(
+                                    AppImages.icTag,
+                                    color: AppColors.gray60,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
-                      ),
+                      ],
+                  body: TabBarView(
+                    controller: _tabController,
+                    children: [
+                      _buildListPost(state.posts ?? [], 0),
+                      _buildListPost(state.posts ?? [], 1),
+                      _buildListPost(state.posts ?? [], 2),
                     ],
-                body: TabBarView(
-                  controller: _tabController,
-                  children: [
-                    _buildListPost(state.posts ?? [], 0),
-                    _buildListPost(state.posts ?? [], 1),
-                    _buildListPost(state.posts ?? [], 2),
-                  ],
-                ),
-              );
-            } else if (state is ProfileFailure) {
-              return NestedScrollView(
-                headerSliverBuilder:
-                    (context, innerBoxIsScrolled) => [
-                      SliverAppBar(
-                        backgroundColor: AppColors.white,
-                        surfaceTintColor: AppColors.white,
-                        floating: true,
-                        snap: true,
-                        pinned: true,
-                        title:
-                            !isCurrientUser
-                                ? Row(
-                                  children: [
-                                    SvgPicture.asset(AppImages.icLock),
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 8,
+                  ),
+                );
+              } else if (state is ProfileFailure) {
+                return NestedScrollView(
+                  headerSliverBuilder:
+                      (context, innerBoxIsScrolled) => [
+                        SliverAppBar(
+                          backgroundColor: AppColors.white,
+                          surfaceTintColor: AppColors.white,
+                          floating: true,
+                          snap: true,
+                          pinned: true,
+                          title:
+                              !isCurrientUser
+                                  ? Row(
+                                    children: [
+                                      SvgPicture.asset(AppImages.icLock),
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 8,
+                                        ),
+                                        child: Text(
+                                          'Unkonwn',
+                                          style: AppStyles.title1Bold,
+                                        ),
                                       ),
-                                      child: Text(
-                                        'Unkonwn',
-                                        style: AppStyles.title1Bold,
+                                      Transform.flip(
+                                        flipY: true,
+                                        child: SvgPicture.asset(
+                                          AppImages.icChevronUp,
+                                          width: 16,
+                                          height: 16,
+                                        ),
                                       ),
-                                    ),
-                                    Transform.flip(
-                                      flipY: true,
+                                    ],
+                                  )
+                                  : Text(
+                                    widget.user!.username ?? 'Unkonwn',
+                                    style: AppStyles.title1Bold,
+                                  ),
+                          leading:
+                              isCurrientUser
+                                  ? IconButton(
+                                    onPressed: () {
+                                      context.pop();
+                                    },
+                                    icon: Transform.flip(
+                                      flipX: true,
                                       child: SvgPicture.asset(
-                                        AppImages.icChevronUp,
-                                        width: 16,
-                                        height: 16,
+                                        AppImages.icNextRight,
                                       ),
                                     ),
-                                  ],
-                                )
-                                : Text(
-                                  widget.user!.username ?? 'Unkonwn',
-                                  style: AppStyles.title1Bold,
+                                  )
+                                  : null,
+                          actions: [
+                            if (isCurrientUser) ...[
+                              PopupMenuButton(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 12,
                                 ),
-                        leading:
-                            isCurrientUser
-                                ? IconButton(
-                                  onPressed: () {
-                                    context.pop();
-                                  },
-                                  icon: Transform.flip(
-                                    flipX: true,
-                                    child: SvgPicture.asset(
-                                      AppImages.icNextRight,
-                                    ),
-                                  ),
-                                )
-                                : null,
-                        actions: [
-                          if (isCurrientUser) ...[
-                            PopupMenuButton(
-                              padding: EdgeInsets.symmetric(
-                                horizontal: 16,
-                                vertical: 12,
-                              ),
-                              constraints: const BoxConstraints(),
-                              color: Colors.white.withOpacity(0.95),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              offset: const Offset(40, 40),
-                              itemBuilder:
-                                  (context) => [
-                                    PopupMenuItem(
-                                      padding: EdgeInsets.only(left: 24),
-                                      enabled: false, // tắt click
-                                      child: Text(
-                                        "Thông báo từ ${(isCurrientUser) ? widget.user!.username ?? 'Unkonwn' : 'Unkonwn'}",
-                                        style: AppStyles.bodyRegular,
-                                      ),
-                                    ),
-                                    PopupMenuItem(
-                                      onTap: () {},
-                                      child: ListTile(
-                                        dense: true,
-                                        leading: SvgPicture.asset(
-                                          AppImages.icPictureGallery,
-                                        ),
-                                        title: Text(
-                                          "Bài biết",
-                                          style: AppStyles.title2Regular,
-                                        ),
-                                        subtitle: Text(
-                                          "Phù hợp nhất",
-                                          style: AppStyles.bodyRegular,
-                                        ),
-                                        trailing: SvgPicture.asset(
-                                          AppImages.icChevronRight,
-                                        ),
-                                      ),
-                                    ),
-                                    PopupMenuItem(
-                                      onTap: () {},
-                                      child: ListTile(
-                                        dense: true,
-                                        leading: SvgPicture.asset(
-                                          AppImages.icAddHighlight,
-                                        ),
-                                        title: Text(
-                                          "Tin",
-                                          style: AppStyles.title2Regular,
-                                        ),
-                                        subtitle: Text(
-                                          "Phù hợp nhất",
-                                          style: AppStyles.bodyRegular,
-                                        ),
-                                        trailing: SvgPicture.asset(
-                                          AppImages.icChevronRight,
-                                        ),
-                                      ),
-                                    ),
-                                    PopupMenuItem(
-                                      onTap: () {},
-                                      child: ListTile(
-                                        dense: true,
-
-                                        leading: SvgPicture.asset(
-                                          AppImages.icReels,
-                                        ),
-                                        title: Text(
-                                          "Reels",
-                                          style: AppStyles.title2Regular,
-                                        ),
-                                        subtitle: Text(
-                                          "Phù hợp nhất",
-                                          style: AppStyles.bodyRegular,
-                                        ),
-                                        trailing: SvgPicture.asset(
-                                          AppImages.icChevronRight,
-                                        ),
-                                      ),
-                                    ),
-                                    PopupMenuItem(
-                                      onTap: () {},
-                                      child: ListTile(
-                                        dense: true,
-
-                                        leading: SvgPicture.asset(
-                                          AppImages.icLive,
-                                        ),
-                                        title: Text(
-                                          "Video trực tiếp",
-                                          style: AppStyles.title2Regular,
-                                        ),
-                                        subtitle: Text(
-                                          "Phù hợp nhất",
-                                          style: AppStyles.bodyRegular,
-                                        ),
-                                        trailing: SvgPicture.asset(
-                                          AppImages.icChevronRight,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                              child: Transform.flip(
-                                flipX: true,
-                                child: SvgPicture.asset(
-                                  AppImages.icNotificationsOff,
+                                constraints: const BoxConstraints(),
+                                color: Colors.white.withOpacity(0.95),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
                                 ),
-                              ),
-                            ),
-                            IconButton(
-                              onPressed: () {
-                                showModalBottomSheet(
-                                  context: context,
-                                  useSafeArea: true,
-                                  useRootNavigator: true,
-                                  backgroundColor: AppColors.white,
-                                  isScrollControlled: true,
-                                  shape: const RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.vertical(
-                                      top: Radius.circular(16),
-                                    ),
-                                  ),
-                                  builder:
-                                      (context) =>
-                                          _buildBottomSheetProfileOption(
-                                            context,
+                                offset: const Offset(40, 40),
+                                itemBuilder:
+                                    (context) => [
+                                      PopupMenuItem(
+                                        padding: EdgeInsets.only(left: 24),
+                                        enabled: false, // tắt click
+                                        child: Text(
+                                          "Thông báo từ ${(isCurrientUser) ? widget.user!.username ?? 'Unkonwn' : 'Unkonwn'}",
+                                          style: AppStyles.bodyRegular,
+                                        ),
+                                      ),
+                                      PopupMenuItem(
+                                        onTap: () {},
+                                        child: ListTile(
+                                          dense: true,
+                                          leading: SvgPicture.asset(
+                                            AppImages.icPictureGallery,
                                           ),
-                                );
-                              },
-                              icon: Transform.rotate(
-                                angle:
-                                    90 *
-                                    3.1415926535 /
-                                    180, // xoay 90 độ (radian)
-                                child: SvgPicture.asset(AppImages.icOption),
+                                          title: Text(
+                                            "Bài biết",
+                                            style: AppStyles.title2Regular,
+                                          ),
+                                          subtitle: Text(
+                                            "Phù hợp nhất",
+                                            style: AppStyles.bodyRegular,
+                                          ),
+                                          trailing: SvgPicture.asset(
+                                            AppImages.icChevronRight,
+                                          ),
+                                        ),
+                                      ),
+                                      PopupMenuItem(
+                                        onTap: () {},
+                                        child: ListTile(
+                                          dense: true,
+                                          leading: SvgPicture.asset(
+                                            AppImages.icAddHighlight,
+                                          ),
+                                          title: Text(
+                                            "Tin",
+                                            style: AppStyles.title2Regular,
+                                          ),
+                                          subtitle: Text(
+                                            "Phù hợp nhất",
+                                            style: AppStyles.bodyRegular,
+                                          ),
+                                          trailing: SvgPicture.asset(
+                                            AppImages.icChevronRight,
+                                          ),
+                                        ),
+                                      ),
+                                      PopupMenuItem(
+                                        onTap: () {},
+                                        child: ListTile(
+                                          dense: true,
+
+                                          leading: SvgPicture.asset(
+                                            AppImages.icReels,
+                                          ),
+                                          title: Text(
+                                            "Reels",
+                                            style: AppStyles.title2Regular,
+                                          ),
+                                          subtitle: Text(
+                                            "Phù hợp nhất",
+                                            style: AppStyles.bodyRegular,
+                                          ),
+                                          trailing: SvgPicture.asset(
+                                            AppImages.icChevronRight,
+                                          ),
+                                        ),
+                                      ),
+                                      PopupMenuItem(
+                                        onTap: () {},
+                                        child: ListTile(
+                                          dense: true,
+
+                                          leading: SvgPicture.asset(
+                                            AppImages.icLive,
+                                          ),
+                                          title: Text(
+                                            "Video trực tiếp",
+                                            style: AppStyles.title2Regular,
+                                          ),
+                                          subtitle: Text(
+                                            "Phù hợp nhất",
+                                            style: AppStyles.bodyRegular,
+                                          ),
+                                          trailing: SvgPicture.asset(
+                                            AppImages.icChevronRight,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                child: Transform.flip(
+                                  flipX: true,
+                                  child: SvgPicture.asset(
+                                    AppImages.icNotificationsOff,
+                                  ),
+                                ),
                               ),
-                            ),
-                          ] else ...[
-                            IconButton(
-                              onPressed: () {},
-                              icon: SvgPicture.asset(AppImages.icThreads),
-                            ),
-                            IconButton(
-                              onPressed: () {},
-                              icon: SvgPicture.asset(AppImages.icCreate),
-                            ),
-                            IconButton(
-                              onPressed: () {
-                                context.pushNamed(PathName.settingpage);
-                              },
-                              icon: SvgPicture.asset(AppImages.icMenu),
-                            ),
+                              IconButton(
+                                onPressed: () {
+                                  showModalBottomSheet(
+                                    context: context,
+                                    useSafeArea: true,
+                                    useRootNavigator: true,
+                                    backgroundColor: AppColors.white,
+                                    isScrollControlled: true,
+                                    shape: const RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.vertical(
+                                        top: Radius.circular(16),
+                                      ),
+                                    ),
+                                    builder:
+                                        (context) =>
+                                            _buildBottomSheetProfileOption(
+                                              context,
+                                            ),
+                                  );
+                                },
+                                icon: Transform.rotate(
+                                  angle:
+                                      90 *
+                                      3.1415926535 /
+                                      180, // xoay 90 độ (radian)
+                                  child: SvgPicture.asset(AppImages.icOption),
+                                ),
+                              ),
+                            ] else ...[
+                              IconButton(
+                                onPressed: () {},
+                                icon: SvgPicture.asset(AppImages.icThreads),
+                              ),
+                              IconButton(
+                                onPressed: () {},
+                                icon: SvgPicture.asset(AppImages.icCreate),
+                              ),
+                              IconButton(
+                                onPressed: () {
+                                  context.pushNamed(PathName.settingpage);
+                                },
+                                icon: SvgPicture.asset(AppImages.icMenu),
+                              ),
+                            ],
                           ],
-                        ],
-                      ),
-                    ],
-                body: const Center(child: Text('Failed to load users')),
-              );
-            }
-            return const Center(child: Text('Welcome to the Profile Page!'));
-          },
+                        ),
+                      ],
+                  body: const Center(child: Text('Failed to load users')),
+                );
+              }
+              return const Center(child: Text('Welcome to the Profile Page!'));
+            },
+          ),
         ),
       ),
     );
@@ -660,39 +690,41 @@ class _ProfilePageState extends State<ProfilePage>
               _buttonActionProfile(isCurrientUser),
               if (user.reels != null)
                 _buildGalleryProfile([
-                  ReelModel(user: UserModel( id:999,
-username: "Hoang")),
-                  ReelModel(user: UserModel( id:999,
-username: "Hoang")),
-                  ReelModel(user: UserModel( id:999,
-username: "Hoang")),
+                  ReelModel(user: UserModel(id: 999, username: "Hoang")),
+                  ReelModel(user: UserModel(id: 999, username: "Hoang")),
+                  ReelModel(user: UserModel(id: 999, username: "Hoang")),
                 ]),
               const SizedBox(height: 8),
               AccountSuggestWidget(
                 isHorirontal: true,
                 title: 'Khám phá mọi người',
                 users: [
-                  UserModel( id:999,
+                  UserModel(
+                    id: 999,
 
                     username: 'hieu_pham',
                     avatar: AppImages.imgAvatarDefault,
                   ),
-                  UserModel( id:999,
+                  UserModel(
+                    id: 999,
 
                     username: 'tuan_anh',
                     avatar: AppImages.imgAvatarDefault,
                   ),
-                  UserModel( id:999,
+                  UserModel(
+                    id: 999,
 
                     username: 'nguyen_nguyen',
                     avatar: AppImages.imgAvatarDefault,
                   ),
-                  UserModel( id:999,
+                  UserModel(
+                    id: 999,
 
                     username: 'ngoc_hoang',
                     avatar: AppImages.imgAvatarDefault,
                   ),
-                  UserModel( id:999,
+                  UserModel(
+                    id: 999,
 
                     username: 'minh_hieu',
                     avatar: AppImages.imgAvatarDefault,
@@ -908,28 +940,32 @@ username: "Hoang")),
                 colorBorder: AppColors.blue40,
                 textStyle: AppStyles.bodyBold.copyWith(color: AppColors.white),
               ),
-              // child: commonButton(
-              //   margin: EdgeInsets.only(right: 6),
-              //   hasHeight: true,
-              //   padding: EdgeInsets.symmetric(vertical: 6),
-              //   text: 'Theo dõi',
-              //   textStyle: AppStyles.bodyBold.copyWith(color: AppColors.white),
-              //   onTap: () {},
-              //   radius: 6,
-              // ),
             ),
-            Expanded(
-              child: commonButton(
-                hasHeight: true,
-                padding: EdgeInsets.symmetric(vertical: 6),
-                margin: EdgeInsets.only(left: 6),
-                isBoxBorder: Border.all(color: AppColors.gray20, width: 0),
-                text: 'Nhắn tin',
-                textStyle: AppStyles.bodyBold,
-                onTap: () {},
-                radius: 6,
-                color: AppColors.gray20,
-              ),
+            BlocBuilder<CreateChatBloc, CreateChatState>(
+              builder: (context, state) {
+                final createChatBloc = context.read<CreateChatBloc>();
+                return Expanded(
+                  child: commonButton(
+                    hasHeight: true,
+                    padding: EdgeInsets.symmetric(vertical: 6),
+                    margin: EdgeInsets.only(left: 6),
+                    isBoxBorder: Border.all(color: AppColors.gray20, width: 0),
+                    text: 'Nhắn tin',
+                    textStyle: AppStyles.bodyBold,
+                    onTap: () {
+                      createChatBloc.add(
+                        CreateNewChat(
+                          participantIds: [widget.user!.id],
+                          converationName: widget.user!.username,
+                          isGroup: false,
+                        ),
+                      );
+                    },
+                    radius: 6,
+                    color: AppColors.gray20,
+                  ),
+                );
+              },
             ),
           ] else ...[
             Expanded(

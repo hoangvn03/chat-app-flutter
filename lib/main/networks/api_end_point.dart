@@ -17,7 +17,8 @@ class ApiEndPoints {
           _customDomain = "http://10.0.2.2:3000";
           break;
         case ENV.preprod:
-          _customDomain = "http://192.168.51.168:3000";
+          // _customDomain = "http://192.168.51.168:3000";
+          _customDomain = "http://192.168.1.77:3000";
           break;
         case ENV.prod:
           _customDomain = "http://192.168.1.77:3000";
@@ -55,10 +56,12 @@ class ApiEndPoints {
   static String get CONVERATIONS => "$DOMAIN/api/conversations";
   static String get GETMESSAGE => "$DOMAIN/api/messages/conversation";
   static String get SENDMESSAGE => "$DOMAIN/api/messages";
+  static String get SENDFILE => "$DOMAIN/api/upload/messages";
 
   static String get USERS => "$DOMAIN/api/users";
-  static String get DELETEUSER => "$DOMAIN/api/delete_user";
-  static String get UPDATEUSER => "$DOMAIN/api/update_user";
+
+  static String get NOTIFICATION => "$DOMAIN/api/notifications";
+  static String get UNREAD => "$DOMAIN/api/notifications/unread/count";
 
   static String get LISTSTORY => "$DOMAISTORYS/list";
   static String get UPLOADSTORY => "$DOMAISTORYS/uploadStoryFile";

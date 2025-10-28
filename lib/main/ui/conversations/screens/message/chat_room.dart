@@ -3,6 +3,7 @@ import 'package:chat_app/main/networks/model/converation.dart';
 import 'package:chat_app/main/networks/model/message.dart';
 import 'package:chat_app/main/networks/model/user.dart';
 import 'package:chat_app/main/router/router.dart';
+import 'package:chat_app/main/ui/conversations/screens/message/audio_chat/bloc/audio_bloc.dart';
 import 'package:chat_app/main/ui/conversations/screens/message/bloc/chat_bloc.dart';
 import 'package:chat_app/main/ui/conversations/screens/message/bloc/chat_event.dart';
 import 'package:chat_app/main/ui/conversations/screens/message/bloc/chat_state.dart';
@@ -37,8 +38,13 @@ class _ChatRoomState extends State<ChatRoom> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => ChatBloc()..add(LoadMessage(widget.conversation)),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (_) => ChatBloc()..add(LoadMessage(widget.conversation)),
+        ),
+        BlocProvider(create: (_) => AudioBloc()),
+      ],
       child: Scaffold(
         backgroundColor: AppColors.white,
         resizeToAvoidBottomInset: true,
@@ -56,7 +62,9 @@ class _ChatRoomState extends State<ChatRoom> {
                 height: 28,
               ),
               title: Text(
-                widget.conversation.conversationName ?? 'Unknown',
+                widget.conversation.isGroup
+                    ? widget.conversation.conversationName ?? 'Unknown'
+                    : widget.conversation.participants[1].username ?? 'Unknown',
                 style: AppStyles.title2Bold,
               ),
               subtitle: _buildListUserOnline(context),
@@ -104,6 +112,17 @@ class _ChatRoomState extends State<ChatRoom> {
                                 return _buildListMessage(messages);
                               },
                             ),
+                            BlocSelector<ChatBloc, ChatState, List<UserModel>>(
+                              selector: (state) {
+                                if (state is ChatSuccess) {
+                                  return state.typingUsers ?? [];
+                                }
+                                return [];
+                              },
+                              builder: (context, data) {
+                                return _buildTypingIndicator(data);
+                              },
+                            ),
                           ],
                         ),
                       ),
@@ -139,10 +158,11 @@ class _ChatRoomState extends State<ChatRoom> {
         const SizedBox(height: 16),
 
         Text(
-          widget.conversation.conversationName ?? 'Unkonwn',
+          widget.conversation.isGroup
+              ? widget.conversation.conversationName ?? 'Unknown'
+              : widget.conversation.participants[1].username ?? 'Unknown',
           style: AppStyles.title2Bold,
         ),
-        // Text(data.content, style: AppStyles.title3Regular),
         RichText(
           text: TextSpan(
             text: '106 triệu người theo dõi . ',
@@ -167,11 +187,10 @@ class _ChatRoomState extends State<ChatRoom> {
             onTap: () {
               context.pushNamed(
                 PathName.profilePage,
-                extra: UserModel(
-                  id: 999,
-                  username: 'hieu_pham',
-                  avatar: AppImages.imgAvatarDefault,
-                ),
+                extra:
+                    widget.conversation.isGroup
+                        ? widget.conversation.participants[1]
+                        : widget.conversation.participants[1],
               );
             },
             radius: 6,
@@ -181,7 +200,7 @@ class _ChatRoomState extends State<ChatRoom> {
     );
   }
 
-  Widget _buildListMessage(List<MessageEntity> messages) {
+  Widget _buildListMessage(List<dynamic> messages) {
     print('${messages.length}');
     return ListView.builder(
       shrinkWrap: true,
@@ -232,6 +251,43 @@ class _ChatRoomState extends State<ChatRoom> {
     );
   }
 
+  Widget _buildTypingIndicator(List<UserModel> users) {
+    if (users.isEmpty) {
+      return Container();
+    }
+
+    String text;
+    if (users.length == 1) {
+      text = '${users.first.username} đang nhập...';
+    } else if (users.length == 2) {
+      text = '${users[0].username} và ${users[1].username} đang nhập...';
+    } else {
+      text =
+          '${users.sublist(0, users.length - 1).join(", ")} và ${users.last.username} đang nhập...';
+    }
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          const Icon(Icons.edit, size: 14, color: Colors.grey),
+          const SizedBox(width: 6),
+          Flexible(
+            child: Text(
+              text,
+              style: const TextStyle(
+                fontStyle: FontStyle.italic,
+                color: Colors.grey,
+              ),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildTextFieldMessage(BuildContext context) {
     return commonTextFieldV2(
       radius: 32,
@@ -239,9 +295,31 @@ class _ChatRoomState extends State<ChatRoom> {
       margin: EdgeInsets.zero,
       controller: _messageController,
       padding: EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+      onChanged: (value) {
+        if (value.isNotEmpty) {
+          context.read<ChatBloc>().add(
+            UserTypingOrStopTypingEvent(
+              conversationId: widget.conversation.conversationId,
+              isStop: false,
+            ),
+          );
+        } else {
+          context.read<ChatBloc>().add(
+            UserTypingOrStopTypingEvent(
+              conversationId: widget.conversation.conversationId,
+              isStop: true,
+            ),
+          );
+        }
+      },
       leadingIcon: IconButton.filledTonal(
         onPressed: () {},
-        icon: SvgPicture.asset(AppImages.icCameraDark, color: AppColors.white),
+        icon: SvgPicture.asset(
+          AppImages.icCameraDark,
+          color: AppColors.white,
+          width: 24,
+          height: 24,
+        ),
         style: IconButton.styleFrom(
           backgroundColor: AppColors.blue60.withOpacity(0.6),
         ),
@@ -249,6 +327,26 @@ class _ChatRoomState extends State<ChatRoom> {
       suffixIcon: Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
+          BlocBuilder<AudioBloc, AudioState>(
+            builder: (context, audioState) {
+              final isRecording = audioState is AudioRecording; // lấy từ state
+
+              return IconButton(
+                onPressed: () async {
+                  if (!isRecording) {
+                    context.read<AudioBloc>().add(StartRecordEvent());
+                  } else {
+                    context.read<AudioBloc>().add(StopRecordEvent());
+                  }
+                },
+                icon: Icon(
+                  isRecording ? Icons.stop : Icons.mic,
+                  color: isRecording ? Colors.red : Colors.black,
+                ),
+              );
+            },
+          ),
+
           IconButton(
             onPressed: () {},
             icon: SvgPicture.asset(AppImages.icPictureGallery),
@@ -289,7 +387,7 @@ class _ChatRoomState extends State<ChatRoom> {
     return BlocBuilder<ChatBloc, ChatState>(
       builder: (context, state) {
         if (state is ChatSuccess) {
-          final names = state.userOnline?.join(", ") ?? "";
+          final names = "test";
           return Text(
             names,
             overflow: TextOverflow.ellipsis,

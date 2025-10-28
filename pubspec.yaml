@@ -57,6 +57,8 @@ dependencies:
   camera:
   socket_io_client: ^3.1.2
   logger: ^2.6.2
+  audioplayers: ^6.5.1
+  record: ^6.1.2
   # photo_view: ^0.15.0
   # video_player: ^2.6.1
   # chewie: ^1.5.0

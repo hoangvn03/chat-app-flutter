@@ -6,15 +6,16 @@ import 'package:chat_app/main/networks/model/user.dart';
 import 'package:chat_app/main/router/router.dart';
 import 'package:chat_app/main/ui/auth/auth_page.dart';
 import 'package:chat_app/main/ui/conversations/conversations_page.dart';
+import 'package:chat_app/main/ui/conversations/screens/createGroupChat/bloc/create_chat_bloc.dart';
 import 'package:chat_app/main/ui/conversations/screens/createGroupChat/create_chat_page.dart';
 import 'package:chat_app/main/ui/conversations/screens/message/chat_room.dart';
 import 'package:chat_app/main/ui/home/home_page.dart';
 import 'package:chat_app/main/ui/notification/notification_page.dart';
 import 'package:chat_app/main/ui/personal/personal_page.dart';
 import 'package:chat_app/main/ui/post/post_page.dart';
-import 'package:chat_app/main/ui/profile/profile_list_follower.dart';
+import 'package:chat_app/main/ui/profile/widgets/profile_list_follower.dart';
 import 'package:chat_app/main/ui/profile/profile_page.dart';
-import 'package:chat_app/main/ui/profile/settings/setting_page.dart';
+import 'package:chat_app/main/ui/profile/widgets/settings/setting_page.dart';
 import 'package:chat_app/main/ui/reels/camera/camera_page.dart';
 import 'package:chat_app/main/ui/reels/create_reels/create_reels_page.dart';
 import 'package:chat_app/main/ui/reels/list_reels/list_reels_page.dart';
@@ -82,36 +83,33 @@ class AppGoRouter {
         path: AppPath.chatPage,
         routes: [
           GoRoute(
+            name: PathName.createChatGroupPage,
+            path: AppPath.createChatGroupPage,
+            pageBuilder: (context, state) {
+              final createChatBloc = state.extra as CreateChatBloc;
+              return slidePage(
+                BlocProvider.value(
+                  value: createChatBloc,
+                  child: CreateChatPage(),
+                ),
+              );
+            },
+          ),
+          GoRoute(
             name: PathName.chatRoomPage,
             path: AppPath.chatRoomPage,
             pageBuilder: (context, state) {
               final data = state.extra as Conversation;
               return slidePage(ChatRoom(conversation: data));
             },
-          ),
-          GoRoute(
-            name: PathName.createChatGroupPage,
-            path: AppPath.createChatGroupPage,
-            pageBuilder: (context, state) {
-              return slidePage(CreateChatPage());
-            },
-          ),
+          )
         ],
         builder: (context, state) {
           final currentUser = state.extra as UserModel;
-          return ChatPage(currentUser:currentUser);
+          return ChatPage(currentUser: currentUser);
         },
       ),
 
-      // GoRoute(
-      //   name: PathName.chatScreen,
-      //   path: AppPath.chatScreen,
-      //   builder: (context, state) {
-      //     return ChatScreen(
-
-      //     );
-      //   },
-      // ),
       GoRoute(
         name: PathName.profileListFollowerPage,
         path: AppPath.profileListFollowerPage,

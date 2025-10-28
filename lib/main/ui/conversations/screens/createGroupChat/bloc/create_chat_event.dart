@@ -21,6 +21,7 @@ class RemoveUserToGroup extends CreateChatEvent {
   final UserModel user;
   RemoveUserToGroup(this.user);
 }
+class ClearCreateChat extends CreateChatEvent {}
 
 class LoadListUser extends CreateChatEvent {
   String input;
