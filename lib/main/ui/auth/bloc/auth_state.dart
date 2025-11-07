@@ -5,10 +5,30 @@ abstract class AuthState {}
 class AuthLoading extends AuthState {}
 
 class AuthSuccess extends AuthState {
-  UserModel? user;
-  String? message;
-  bool hasLocalUser;
-  AuthSuccess({this.user, this.message, this.hasLocalUser = false});
+  final UserModel? user;
+  final String? message;
+  final bool hasLocalUser;
+  final String? statusUser;
+  AuthSuccess({
+    this.user,
+    this.message,
+    this.hasLocalUser = false,
+    this.statusUser,
+  });
+
+  AuthSuccess copyWith({
+    UserModel? user,
+    String? message,
+    bool? hasLocalUser,
+    String? statusUser,
+  }) {
+    return AuthSuccess(
+      user: user ?? this.user,
+      message: message ?? this.message,
+      hasLocalUser: hasLocalUser ?? this.hasLocalUser,
+      statusUser: statusUser ?? this.statusUser,
+    );
+  }
 }
 
 class AuthFailure extends AuthState {

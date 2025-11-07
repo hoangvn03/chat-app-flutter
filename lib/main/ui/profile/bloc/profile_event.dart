@@ -8,6 +8,10 @@ class LoadProfileUserContact extends ProfileEvent {
   int id;
   LoadProfileUserContact(this.id);
 }
+class LoadConveration extends ProfileEvent {
+    int id;
+  LoadConveration(this.id);
+}
 
 class ClearStrogeUser extends ProfileEvent {
 }

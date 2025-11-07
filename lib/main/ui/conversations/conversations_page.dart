@@ -243,13 +243,16 @@ class _ChatPageState extends State<ChatPage> {
         avatarSize: conversation.isGroup ? 48 : 64,
       ),
       trallingWidget: SvgPicture.asset(AppImages.icCamera),
-      title: conversation.conversationName ?? 'Unknown',
+      title:
+          conversation.isGroup
+              ? conversation.conversationName ?? 'Unknown'
+              : conversation.participants[1].username,
       subtitle:
           conversation.isGroup
               ? conversation.lastMessage?.content ??
                   'Hãy gửi tin nhắn đầu tiên!'
               : conversation.lastMessage?.content ??
-                  conversation.participants[1].status,
+                  'Hãy gửi tin nhắn đầu tiên!',
       margin: EdgeInsets.symmetric(vertical: 12),
     );
   }

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:chat_app/main/helper/socket/socket_service.dart';
 import 'package:chat_app/main/networks/api_end_point.dart';
+import 'package:chat_app/main/networks/enum.dart';
 import 'package:chat_app/main/networks/model/converation.dart';
 import 'package:chat_app/main/networks/model/message.dart';
 import 'package:chat_app/main/networks/model/post.dart';
@@ -9,25 +10,35 @@ import 'package:chat_app/main/networks/model/reels.dart';
 import 'package:chat_app/main/networks/model/user.dart';
 import 'package:chat_app/main/ui/conversations/screens/message/bloc/chat_event.dart';
 import 'package:chat_app/main/ui/conversations/screens/message/bloc/chat_state.dart';
+import 'package:chat_app/main/utils/common_function.dart';
 import 'package:chat_app/main/utils/shared_preference.dart';
 import 'package:chat_app/res/app_images.dart';
 
 import 'package:http/http.dart' as http;
+import 'package:photo_manager/photo_manager.dart';
 import 'dart:convert';
 
 import '../../../../../networks/api_util.dart';
 
 class ChatBloc extends Bloc<ChatEvent, ChatState> {
-  ChatBloc() : super(ChatLoading()) {
+  final SocketService socketService;
+  ChatBloc(this.socketService) : super(ChatLoading()) {
     on<LoadMessage>(_loadListMessage);
     on<ReceiveMessage>(_receiveMessage);
     on<SendMessage>(_sendMessage);
     on<UserTypingOrStopTypingEvent>(_onUserTypingOrStopTyping);
     on<UpdateTypingEvent>(_updateStateTyping);
+    on<UpdateOnlineUsers>(_updateOnlineUser);
+    on<UpdateStatusUsers>(_updateStatusUser);
+    on<UploadFileMessage>(_uploadFileMessage);
+    on<UpdateStatusMessage>(_updateStatusMessage);
   }
-  final SocketService _socketService = SocketService();
+  // final SocketService socketService = SocketService();
   final List<MessageEntity> _messages = [];
+  final List<UserModel> _userTyping = [];
   final List<UserModel> _userOnline = [];
+  final List<Attachment> _listFile = [];
+  final List<AssetEntity> _listFilesSend = [];
   Future<void> _loadListMessage(
     LoadMessage event,
     Emitter<ChatState> emit,
@@ -41,7 +52,9 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
         _messages.clear();
         _messages.addAll(data.messages);
         emit(ChatSuccess(messages: List.from(_messages)));
-        _socketService.socket.on('user_typing', (data) {
+        socketService.joinConversation(event.conversation.conversationId);
+        socketService.getUsersOnine(event.conversation.conversationId);
+        socketService.socket.on('user_typing', (data) {
           final userid = data['user_id'];
           final username = data['username'];
           final convId = data['conversation_id'];
@@ -50,7 +63,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
           add(UpdateTypingEvent(user, false));
         });
 
-        _socketService.socket.on('user_stopped_typing', (data) {
+        socketService.socket.on('user_stopped_typing', (data) {
           final username = data['username'];
           final userid = data['user_id'];
           final convId = data['conversation_id'];
@@ -58,11 +71,22 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
           print('Step Typing 3 :$username + $convId');
           add(UpdateTypingEvent(user, true));
         });
-
-        _socketService.joinConversation(event.conversation.conversationId);
-        _socketService.socket.on('new_message', (data) {
+        socketService.socket.on('new_message', (data) {
           print("B1 Gui :$data");
           add(ReceiveMessage(data));
+        });
+        socketService.socket.on('message_status_updated', (data) {
+          add(
+            UpdateStatusMessage(
+              messageId: data['message_id'],
+              receiverId: data['reader_id'],
+            ),
+          );
+        });
+        socketService.socket.on('online_users', (data) {
+          final onlineList = data['online_users'] as List<dynamic>? ?? [];
+          final users = onlineList.map((u) => UserModel.fromJson(u)).toList();
+          add(UpdateOnlineUsers(onlineUsers: users));
         });
       } else {
         emit(ChatFailure('${res.statusCode} Fail to load api'));
@@ -80,7 +104,10 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
         'conversation_id': event.conversationId,
         'content': event.message,
       };
-      _socketService.sendMessage(params);
+      if (event.files != null) {
+        _listFilesSend.addAll(event.files!);
+      }
+      socketService.sendMessage(params);
     } catch (e) {
       emit(ChatFailure(e.toString()));
     }
@@ -96,7 +123,21 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
       print('B2 Receive Message');
       print(event.message);
       final msg = event.message['message'] ?? event.message;
-
+      if (_listFilesSend.isNotEmpty) {
+        add(
+          UploadFileMessage(
+            file: _listFilesSend,
+            conversationId:
+                msg['conversation_id'] is String
+                    ? int.tryParse(msg['conversation_id']) ?? 0
+                    : (msg['conversation_id'] ?? 0),
+            messageId:
+                msg['message_id'] is String
+                    ? int.tryParse(msg['message_id']) ?? 0
+                    : (msg['message_id'] ?? 0),
+          ),
+        );
+      }
       final message = MessageEntity(
         messageId:
             msg['message_id'] is String
@@ -121,10 +162,10 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
                     .map((e) => Status.fromJson(e))
                     .toList()
                 : [],
+        attachments: _listFile,
       );
       _messages.add(message);
       emit(currentState.copyWith(messages: List.from(_messages)));
-      // emit(ChatSuccess(messages: List.from(_messages)));
     } catch (e) {
       emit(ChatFailure(e.toString()));
     }
@@ -140,14 +181,16 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
       final user = event.user;
       if (!event.isStop) {
         // chỉ thêm nếu chưa có id này
-        if (!_userOnline.any((u) => u.id == user.id)) {
-          _userOnline.add(user);
-          emit(currentState.copyWith(typingUsers: List.from(_userOnline)));
+        if (!_userTyping.any((u) => u.id == user.id)) {
+          print('Step Typing 3 :${user.id}');
+
+          _userTyping.add(user);
+          emit(currentState.copyWith(typingUsers: List.from(_userTyping)));
         }
       } else {
         // xóa theo id
-        _userOnline.removeWhere((u) => u.id == user.id);
-        emit(currentState.copyWith(typingUsers: List.from(_userOnline)));
+        _userTyping.removeWhere((u) => u.id == user.id);
+        emit(currentState.copyWith(typingUsers: List.from(_userTyping)));
       }
     } catch (e) {
       emit(ChatFailure(e.toString()));
@@ -162,34 +205,107 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     if (!event.isStop) {
       print('Step Typing 1 : ${event.conversationId}');
       if (current is ChatSuccess) {
-        _socketService.startTyping(event.conversationId);
+        socketService.startTyping(event.conversationId);
       }
     } else {
       print('Step Typing 4 : ${event.conversationId}');
       if (current is ChatSuccess) {
-        _socketService.stopTyping(event.conversationId);
+        socketService.stopTyping(event.conversationId);
       }
     }
   }
 
-  
+  Future<void> _updateOnlineUser(
+    UpdateOnlineUsers event,
+    Emitter<ChatState> emit,
+  ) async {
+    if (state is! ChatSuccess) return;
+    final currentState = state as ChatSuccess;
 
-  List<String> getOnlineUserIds(List<UserModel> participants) {
-    final name = <String>{};
-    for (final user in participants) {
-      if (user.status == 'online' && user.username != null) {
-        name.add(user.username!);
-      }
+    try {
+      _userOnline.clear();
+      _userOnline.addAll(event.onlineUsers);
+      emit(currentState.copyWith(onlineUsers: _userOnline));
+    } catch (e) {
+      emit(ChatFailure(e.toString()));
     }
-    return name.toList();
+  }
+
+  Future<void> _updateStatusUser(
+    UpdateStatusUsers event,
+    Emitter<ChatState> emit,
+  ) async {
+    if (state is! ChatSuccess) return;
+    final currentState = state as ChatSuccess;
+    try {
+      if (event.isInit) {
+        socketService.updateUserStatus(StatusUser.online.name);
+      } else {
+        emit(currentState.copyWith(onlineUsers: _userOnline));
+      }
+    } catch (e) {
+      emit(ChatFailure(e.toString()));
+    }
+  }
+
+  Future<void> _updateStatusMessage(
+    UpdateStatusMessage event,
+    Emitter<ChatState> emit,
+  ) async {
+    if (state is! ChatSuccess) return;
+    final currentState = state as ChatSuccess;
+    try {
+      socketService.markMessageAsRead(event.messageId, event.receiverId);
+      // Cập nhật trong local state
+      final updatedMessages =
+          currentState.messages.map((msg) {
+            if (msg.messageId == event.messageId) {
+              return msg.copyWith(isRead: true);
+            }
+            return msg;
+          }).toList();
+
+      emit(currentState.copyWith(messages: updatedMessages));
+    } catch (e) {
+      emit(ChatFailure(e.toString()));
+    }
+  }
+
+  Future<void> _uploadFileMessage(
+    UploadFileMessage event,
+    Emitter<ChatState> emit,
+  ) async {
+    if (state is! ChatSuccess) return;
+    final currentState = state as ChatSuccess;
+    try {
+      _listFile.clear();
+      final files = await convertAssetEntitiesToFiles(event.file);
+      final url = '${ApiEndPoints.SENDFILE}/${event.messageId}';
+      print('Upload FIle Step 2: ${files.length}');
+      ApiResponse res = await ApiUtil.postFiles(url: url, files: files);
+      if (res.statusCode == 201) {
+        final data =
+            (res.body['data'] as List)
+                .map((e) => Attachment.fromJson(e))
+                .toList();
+        _listFile.addAll(data);
+        print('Upload FIle Step 3: ${_listFile.length}');
+        emit(currentState.copyWith(file: data));
+      } else {
+        print('Upload FIle Step 3: Error');
+      }
+    } catch (e) {
+      emit(ChatFailure(e.toString()));
+    }
   }
 
   @override
   Future<void> close() {
-    _socketService.socket.off('new_message');
-    _socketService.socket.off('send_message');
-    _socketService.socket.off('user_typing');
-    _socketService.socket.off('user_stopped_typing');
+    socketService.socket.off('new_message');
+    socketService.socket.off('user_typing');
+    socketService.socket.off('user_stopped_typing');
+    socketService.socket.off('message_status_updated');
+    socketService.socket.off('online_users');
     return super.close();
   }
 }

@@ -7,9 +7,12 @@ class Login extends AuthEvent {
 
   Login( this.username, this.password);
 }
+class UpdateStatusUsers extends AuthEvent {
+  final String status;
+  final bool isInit;
+  UpdateStatusUsers({required this.status,required this.isInit});
+}
 class Logout extends AuthEvent {
-
-
 }
 class CheckUser extends AuthEvent {
 }

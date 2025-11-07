@@ -1,3 +1,4 @@
+import 'package:chat_app/main/helper/socket/socket_service.dart';
 import 'package:chat_app/main/networks/api_end_point.dart';
 import 'package:chat_app/main/networks/api_util.dart';
 import 'package:chat_app/main/networks/model/user.dart';
@@ -34,7 +35,7 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
     return BlocProvider(
-      create: (_) => AuthBloc()..add(CheckUser()),
+      create: (_) => AuthBloc(context.read<SocketService>())..add(CheckUser()),
       child: BlocListener<AuthBloc, AuthState>(
         listener: (context, state) {
           if (state is AuthSuccess && state.hasLocalUser == false) {
@@ -661,14 +662,6 @@ class _LoginPageState extends State<LoginPage> {
       child: SingleChildScrollView(
         child: Column(
           children: [
-            commonTextFieldV2(
-              padding: EdgeInsets.all(12),
-              controller: ipController,
-              hintText: 'Nhập ip',
-              onSubmitted: (value) async {
-                await AppStorage.setCustomIp(value);
-              },
-            ),
             Container(
               margin: const EdgeInsets.symmetric(vertical: 16),
               alignment: Alignment.centerRight,
@@ -715,6 +708,23 @@ class _LoginPageState extends State<LoginPage> {
                   );
                 },
               ),
+            ),
+            Row(
+              children: [
+                Expanded(
+                  child: commonTextFieldV2(
+                    controller: ipController,
+                    hintText: 'Nhập ip',
+                  ),
+                ),
+                commonButton(
+                  text: 'Lưu',
+                  padding: EdgeInsets.symmetric(horizontal: 8),
+                  onTap: () async {
+                    await ApiEndPoints.updateIp(ipController.text);
+                  },
+                ),
+              ],
             ),
           ],
         ),

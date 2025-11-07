@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:bloc/bloc.dart';
-import 'package:chat_app/main/helper/image/media_helper.dart';
+import 'package:chat_app/main/helper/media/media_helper.dart';
 import 'package:chat_app/main/ui/reels/media_picked/bloc/media_picked_event.dart';
 import 'package:chat_app/main/ui/reels/media_picked/bloc/media_picked_state.dart';
 
@@ -50,7 +50,14 @@ class MediaPickedBloc extends Bloc<MediaPickedEvent, MediaPickedState> {
     Emitter<MediaPickedState> emit,
   ) async {
     try {
+      if (state is! MediaPickedSuccess) return;
+      final currentState = state as MediaPickedSuccess;
+
       String? errorMessage;
+      final selectedAssetList = List<AssetEntity>.from(
+        currentState.selectedAsset ?? [],
+      );
+
       if (event.asset != null) {
         if (selectedAssetList.contains(event.asset)) {
           selectedAssetList.remove(event.asset);
@@ -64,12 +71,10 @@ class MediaPickedBloc extends Bloc<MediaPickedEvent, MediaPickedState> {
       }
 
       emit(
-        MediaPickedSuccess(
-          album: albumList,
-          asset: assetList,
+        currentState.copyWith(
           selectedAsset: selectedAssetList,
           errorMessage: errorMessage,
-          isSelecting: event.isSelecting, // giữ trạng thái chọn
+          isSelecting: event.isSelecting ?? currentState.isSelecting,
         ),
       );
     } catch (e) {
@@ -82,17 +87,19 @@ class MediaPickedBloc extends Bloc<MediaPickedEvent, MediaPickedState> {
     Emitter<MediaPickedState> emit,
   ) async {
     try {
-      final data = selectedAssetList;
-      // if (selectedAssetList.isNotEmpty) {
-      //   data.clear();
-      // }
+      if (state is! MediaPickedSuccess) return;
+      final currentState = state as MediaPickedSuccess;
+
+      final updatedSelected =
+          event.isSelecting == false
+              ? <AssetEntity>[] // Nếu tắt chế độ chọn thì xóa danh sách
+              : currentState.selectedAsset ?? [];
+
       emit(
-        MediaPickedSuccess(
-          album: albumList,
-          asset: assetList,
-          selectedAsset: data,
-          errorMessage: null,
+        currentState.copyWith(
           isSelecting: event.isSelecting,
+          selectedAsset: updatedSelected,
+          errorMessage: null,
         ),
       );
     } catch (e) {

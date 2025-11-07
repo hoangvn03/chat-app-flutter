@@ -1,3 +1,4 @@
+import 'package:chat_app/main/helper/socket/socket_service.dart';
 import 'package:chat_app/main/router/router.dart';
 import 'package:chat_app/main/ui/auth/bloc/auth_bloc.dart';
 import 'package:chat_app/main/ui/auth/bloc/auth_event.dart';
@@ -26,7 +27,7 @@ class SettingPage extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (_) => SettingBloc()..add(LoadRequest())),
-        BlocProvider(create: (_) => AuthBloc()),
+        BlocProvider(create: (_) => AuthBloc(context.read<SocketService>())),
       ],
       child: Scaffold(
         backgroundColor: AppColors.white,

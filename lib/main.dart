@@ -1,4 +1,5 @@
 import 'package:camera/camera.dart';
+import 'package:chat_app/main/helper/socket/socket_service.dart';
 import 'package:chat_app/main/networks/api_end_point.dart';
 import 'package:chat_app/main/networks/api_util.dart';
 import 'package:flutter/material.dart';
@@ -15,10 +16,19 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   cameras = await availableCameras();
   await ApiEndPoints.init();
+  final socketService = SocketService();
+  await socketService.initSocket();
   runApp(
-    MultiBlocProvider(
-      providers: [BlocProvider(create: (_) => LocaleCubit())],
-      child: const MyApp(),
+    MultiRepositoryProvider(
+      providers: [
+        RepositoryProvider<SocketService>.value(
+          value: socketService, // 👈 inject SocketService toàn cục
+        ),
+      ],
+      child: MultiBlocProvider(
+        providers: [BlocProvider(create: (_) => LocaleCubit())],
+        child: const MyApp(),
+      ),
     ),
   );
 }

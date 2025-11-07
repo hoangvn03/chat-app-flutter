@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:developer';
 import 'package:chat_app/main/networks/api_end_point.dart';
+import 'package:chat_app/main/networks/enum.dart';
+import 'package:chat_app/main/ui/home/bloc/home_event.dart';
 import 'package:chat_app/main/utils/shared_preference.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 
@@ -13,34 +15,13 @@ class SocketService {
   factory SocketService() => _instance;
   late IO.Socket _socket;
 
-  // Stream controllers cho các sự kiện realtime
-  final _messageController = StreamController<Map<String, dynamic>>.broadcast();
-  final _typingController = StreamController<Map<String, dynamic>>.broadcast();
-  final _userStatusController =
-      StreamController<Map<String, dynamic>>.broadcast();
-  final _messageReadController =
-      StreamController<Map<String, dynamic>>.broadcast();
-  final _notificationController =
-      StreamController<Map<String, dynamic>>.broadcast();
-  final _connectionController = StreamController<bool>.broadcast();
+
 
   SocketService._internal() {
     initSocket();
   }
 
   bool get isConnected => _socket.connected;
-
-  // Các stream để lắng nghe từ UI
-  Stream<Map<String, dynamic>> get onMessageReceived =>
-      _messageController.stream;
-  Stream<Map<String, dynamic>> get onTypingEvent => _typingController.stream;
-  Stream<Map<String, dynamic>> get onUserStatusChanged =>
-      _userStatusController.stream;
-  Stream<Map<String, dynamic>> get onMessageRead =>
-      _messageReadController.stream;
-  Stream<Map<String, dynamic>> get onNotification =>
-      _notificationController.stream;
-  Stream<bool> get onConnectionStatusChanged => _connectionController.stream;
 
   Future<void> initSocket() async {
     final token = await AppStorage.getToken();
@@ -54,75 +35,65 @@ class SocketService {
           .build(),
     );
 
-    _setupSocketListeners();
+    // _setupSocketListeners();
     _socket.connect();
   }
 
   IO.Socket get socket => _socket;
 
-  void _setupSocketListeners() {
-    _socket.onConnect((_) {
-      log('✅ Connected to Socket.IO server : ${_socket.id}');
-      _connectionController.add(true);
-    });
-
-    _socket.onDisconnect((reason) {
-      log('❌ Socket Disconnected: $reason');
-      _connectionController.add(false);
-    });
-
-    _socket.onError((error) {
-      log('⚠️ Socket error: $error');
-    });
-
-    _socket.onConnectError((error) {
-      log('⚠️ Connection error: $error');
-    });
-
-    // Tin nhắn mới
-    _socket.on('new_message', (data) {
-      log('💬 New message: $data');
-      _messageController.add(Map<String, dynamic>.from(data));
-    });
-
-    // User typing
-    _socket.on('user_typing', (data) {
-      log('⌨️ User typing: $data');
-      _typingController.add(Map<String, dynamic>.from(data));
-    });
-
-    _socket.on('user_stop_typing', (data) {
-      log('⏹️ User stop typing: $data');
-      _typingController.add({
-        ...Map<String, dynamic>.from(data),
-        'is_typing': false,
-      });
-    });
-
-    // User status changed
-    _socket.on('user_status_changed', (data) {
-      log('👤 User status changed: $data');
-      _userStatusController.add(Map<String, dynamic>.from(data));
-    });
-
-    // Message read
-    _socket.on('message_read', (data) {
-      log('📖 Message read: $data');
-      _messageReadController.add(Map<String, dynamic>.from(data));
-    });
-
-    // Notifications
-    _socket.on('unread_notifications_count', (data) {
-      log('🔔 Unread notifications: $data');
-      _notificationController.add(Map<String, dynamic>.from(data));
-    });
-
-    // New notification
-    _socket.on('new_notification', (data) {
-      log('🔔 New notification: $data');
-      _notificationController.add(Map<String, dynamic>.from(data));
-    });
-  }
+  // void _setupSocketListeners() {
+  //   _socket.onConnect((_) {
+  //     log('✅ Connected to Socket.IO server : ${_socket.id}');
+  //     _connectionController.add(true);
+  //   });
+  //   _socket.onDisconnect((reason) {
+  //     log('❌ Socket Disconnected: $reason');
+  //     _connectionController.add(false);
+  //   });
+  //   _socket.onError((error) {
+  //     log('⚠️ Socket error: $error');
+  //   });
+  //   _socket.onConnectError((error) {
+  //     log('⚠️ Connection error: $error');
+  //   });
+  //   // Tin nhắn mới
+  //   _socket.on('new_message', (data) {
+  //     log('💬 New message: $data');
+  //     _messageController.add(Map<String, dynamic>.from(data));
+  //   });
+  //   // User typing
+  //   _socket.on('user_typing', (data) {
+  //     log('⌨️ User typing: $data');
+  //     _typingController.add(Map<String, dynamic>.from(data));
+  //   });
+  //   _socket.on('user_stop_typing', (data) {
+  //     log('⏹️ User stop typing: $data');
+  //     _typingController.add({
+  //       ...Map<String, dynamic>.from(data),
+  //       'is_typing': false,
+  //     });
+  //   });
+  //   // User status changed
+  //   _socket.on('user_status_changed', (data) {
+  //     log('👤 User status changed: $data');
+  //     _userStatusController.add(Map<String, dynamic>.from(data));
+  //   });
+  //   // Message read
+  //   _socket.on('message_read', (data) {
+  //     log('📖 Message read: $data');
+  //     _messageReadController.add(Map<String, dynamic>.from(data));
+  //   });
+  //   // Notifications
+  //   _socket.on('unread_notifications_count', (data) {
+  //     log('🔔 Unread notifications: $data');
+  //     _notificationController.add(Map<String, dynamic>.from(data));
+  //   });
+  //   // New notification
+  //   _socket.on('new_notification', (data) {
+  //     log('🔔 New notification: $data');
+  //     _notificationController.add(Map<String, dynamic>.from(data));
+  //   });
+  // }
 
   /// Gửi tin nhắn
   void sendMessage(dynamic params) {
@@ -130,7 +101,6 @@ class SocketService {
       log('⚠️ Socket not connected');
       return;
     }
-
     _socket.emit('send_message', params);
   }
 
@@ -187,31 +157,31 @@ class SocketService {
     _socket.emit('leave_conversation', {'conversation_id': conversationId});
   }
 
-  // /// Tin nhắn mới
-  // void newMessages(int conversationId) {
-  //   _socket.emit('new_message', {'conversation_id': conversationId});
-  // }
-
   /// Lấy trạng thái online của users
-  void getUserStatuses(List<int> userIds) {
-    _socket.emit('status_updated', {'user_ids': userIds});
+  void updateUserStatus(String status) {
+    _socket.emit('update_status', {'status': status});
+  }
+  /// Lấy trạng thái online của users
+  void getUsersOnine(int conversationId) {
+    log('⚠️ get_online_users : ');
+    _socket.emit('get_online_users', {'conversation_id': conversationId});
   }
   
 
   /// Ngắt kết nối
   void disconnect() {
     _socket.disconnect();
-    _connectionController.add(false);
+    // _connectionController.add(false);
     log('🔌 Socket disconnected manually');
   }
 
   // Cleanup
   void dispose() {
-    _messageController.close();
-    _typingController.close();
-    _userStatusController.close();
-    _messageReadController.close();
-    _notificationController.close();
-    _connectionController.close();
+    // _messageController.close();
+    // _typingController.close();
+    // _userStatusController.close();
+    // _messageReadController.close();
+    // _notificationController.close();
+    // _connectionController.close();
   }
 }

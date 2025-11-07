@@ -12,28 +12,28 @@ import 'package:photo_manager/photo_manager.dart';
 import 'package:photo_manager_image_provider/photo_manager_image_provider.dart';
 import 'package:video_player/video_player.dart';
 
-// ignore: must_be_immutable
-class ListReelsPage extends StatefulWidget {
-  ListReelsPage({this.assetList, super.key});
-  List<AssetEntity>? assetList;
-  @override
-  State<ListReelsPage> createState() => _ListReelsPageState();
-}
+// // ignore: must_be_immutable
+// class ListReelsPage extends StatefulWidget {
+//   ListReelsPage({this.assetList, super.key});
+//   List<AssetEntity>? assetList;
+//   @override
+//   State<ListReelsPage> createState() => _ListReelsPageState();
+// }
 
-class _ListReelsPageState extends State<ListReelsPage> {
-  @override
-  Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => ListReelsBloc()..add(LoadReelsMedia()),
-      child: Scaffold(body: Container()),
-    );
-  }
-}
+// class _ListReelsPageState extends State<ListReelsPage> {
+//   @override
+//   Widget build(BuildContext context) {
+//     return BlocProvider(
+//       create: (_) => ListReelsBloc()..add(LoadReelsMedia()),
+//       child: Scaffold(body: Container()),
+//     );
+//   }
+// }
 
 class StoryScreen extends StatefulWidget {
   final List<ReelModel> stories;
 
-  const StoryScreen({required this.stories});
+  const StoryScreen({super.key, required this.stories});
 
   @override
   _StoryScreenState createState() => _StoryScreenState();
@@ -99,7 +99,7 @@ class _StoryScreenState extends State<StoryScreen>
               itemBuilder: (context, i) {
                 final ReelModel story = widget.stories[i];
                 final listAsset = widget.stories[i].assetList;
-                return (listAsset?.first is String)
+                return (listAsset?.first is File)
                     ? Image.file(
                       File(listAsset?[0]),
                       fit: BoxFit.cover,

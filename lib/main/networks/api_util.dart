@@ -1,7 +1,10 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:chat_app/main/utils/shared_preference.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:mime/mime.dart';
+import 'package:http_parser/http_parser.dart';
 
 class ApiResponse {
   final int statusCode;
@@ -81,6 +84,91 @@ class ApiUtil {
       return await _handleResponse(response);
     } catch (e) {
       debugPrint('❌ POST error: $e');
+      rethrow;
+    }
+  }
+
+  static Future<dynamic> postFileV2({
+    required String url,
+    Map<String, dynamic>? data,
+  }) async {
+    try {
+      final uri = Uri.parse(url);
+
+      debugPrint('====================================');
+      debugPrint('📤 POST REQUEST (FormData)');
+      debugPrint('URL: $url');
+      debugPrint('Body: $data');
+      debugPrint('====================================');
+
+      var request = http.MultipartRequest('POST', uri);
+
+      // 🟢 Thêm các trường text
+      data?.forEach((key, value) async {
+        if (value == null) return;
+        if (value is String || value is num) {
+          request.fields[key] = value.toString();
+        } else if (value is List<int>) {
+          // Nếu bạn gửi file dạng bytes
+          request.files.add(http.MultipartFile.fromBytes(key, value));
+        } else if (value is String && value.startsWith("/")) {
+          // Nếu value là đường dẫn tới file trong local
+          request.files.add(await http.MultipartFile.fromPath(key, value));
+        }
+      });
+
+      // ❌ Không cần Authorization hoặc Content-Type JSON
+      // request.headers["Authorization"] = "Bearer $token"; // bỏ
+
+      final streamedResponse = await request.send();
+      final response = await http.Response.fromStream(streamedResponse);
+
+      debugPrint('📥 RESPONSE');
+      debugPrint('Status Code: ${response.statusCode}');
+      debugPrint('Response Body: ${response.body}');
+      debugPrint('====================================');
+
+      return await _handleResponse(response);
+    } catch (e) {
+      debugPrint('❌ POST error: $e');
+      rethrow;
+    }
+  }
+
+  static Future<ApiResponse> postFiles({
+    required String url,
+    required List<File> files,
+  }) async {
+    try {
+      final token = await AppStorage.getToken();
+      var request = http.MultipartRequest('POST', Uri.parse(url));
+      request.headers['Authorization'] = 'Bearer $token';
+      debugPrint('🔹 [GET] Request URL: $url');
+      debugPrint('🔹 [GET] Token: $token');
+      for (var file in files) {
+        final mimeType = lookupMimeType(file.path) ?? 'image/jpeg'; // fallback
+        final mimeSplit = mimeType.split('/');
+        print('Uploading ${file.path} with MIME type $mimeType');
+        request.files.add(
+          await http.MultipartFile.fromPath(
+            'files',
+            file.path,
+            contentType: MediaType(mimeSplit[0], mimeSplit[1]),
+          ),
+        );
+      }
+
+      var streamedResponse = await request.send();
+      var response = await http.Response.fromStream(streamedResponse);
+
+      debugPrint('📥 RESPONSE');
+      debugPrint('Status Code: ${response.statusCode}');
+      debugPrint('Response Body: ${response.body}');
+      debugPrint('====================================');
+
+      return await _handleResponse(response); // Trả về ApiResponse
+    } catch (e) {
+      debugPrint('❌ Upload error: $e');
       rethrow;
     }
   }

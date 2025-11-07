@@ -8,28 +8,33 @@ class ApiEndPoints {
 
   static Future<void> init() async {
     final ip = await AppStorage.getCustomIp();
+    _updateDomain(ip);
+  }
+
+  static void _updateDomain(String? ip) {
     if (ip != null && ip.isNotEmpty) {
-      print('Save $ip');
-      _customDomain = "http://$ip:3000";
+      _customDomain = "http://$ip:8080";
     } else {
       switch (env) {
         case ENV.test:
-          _customDomain = "http://10.0.2.2:3000";
+          _customDomain = "http://10.0.2.2:8080";
           break;
         case ENV.preprod:
-          // _customDomain = "http://192.168.51.168:3000";
-          _customDomain = "http://192.168.1.77:3000";
+          _customDomain = "http://192.168.1.77:8080";
           break;
         case ENV.prod:
-          _customDomain = "http://192.168.1.77:3000";
+          _customDomain = "http://192.168.1.77:8080";
           break;
-        default:
-          _customDomain = "http://192.168.1.77:3000";
       }
     }
   }
 
-  static String get DOMAIN => _customDomain ?? "http://192.168.51.168:3000";
+  static Future<void> updateIp(String ip) async {
+    await AppStorage.setCustomIp(ip);
+    _updateDomain(ip); // 👈 cập nhật trực tiếp mà không cần init lại
+  }
+
+  static String get DOMAIN => _customDomain ?? "http://192.168.51.168:8080";
 
   static String get DOMAISTORYS {
     switch (env) {
@@ -56,7 +61,7 @@ class ApiEndPoints {
   static String get CONVERATIONS => "$DOMAIN/api/conversations";
   static String get GETMESSAGE => "$DOMAIN/api/messages/conversation";
   static String get SENDMESSAGE => "$DOMAIN/api/messages";
-  static String get SENDFILE => "$DOMAIN/api/upload/messages";
+  static String get SENDFILE => "$DOMAIN/api/upload/message";
 
   static String get USERS => "$DOMAIN/api/users";
 

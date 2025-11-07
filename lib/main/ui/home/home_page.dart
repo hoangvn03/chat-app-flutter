@@ -1,3 +1,5 @@
+import 'package:chat_app/main/helper/socket/socket_service.dart';
+import 'package:chat_app/main/networks/api_end_point.dart';
 import 'package:chat_app/main/ui/widget/interaction_button/bloc/interaction_cubit.dart';
 import 'package:chat_app/main/ui/widget/post/post_item_widget.dart';
 import 'package:chat_app/main/networks/model/post.dart';
@@ -32,7 +34,11 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider<HomeBloc>(create: (_) => HomeBloc()..add(LoadRequest())),
+        BlocProvider<HomeBloc>(
+          create:
+              (_) =>
+                  HomeBloc(context.read<SocketService>())..add(LoadRequest()),
+        ),
       ],
       child: Scaffold(
         backgroundColor: AppColors.white,
@@ -79,6 +85,30 @@ class _HomePageState extends State<HomePage> {
                                 ],
                               ),
                             ),
+                            PopupMenuItem(
+                              onTap: () {},
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: commonTextFieldV2(
+                                      controller: ipController,
+                                      hintText: 'Nhập ip',
+                                    ),
+                                  ),
+                                  commonButton(
+                                    text: 'Lưu',
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: 8,
+                                    ),
+                                    onTap: () async {
+                                      await ApiEndPoints.updateIp(
+                                        ipController.text,
+                                      );
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
                           ],
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
@@ -101,7 +131,12 @@ class _HomePageState extends State<HomePage> {
                         onPressed: () {
                           context.pushNamed(PathName.notificationPage);
                         },
-                        icon: iconLikeNotification(isHasNotification: true),
+                        icon: iconLikeNotification(
+                          isHasNotification:
+                              (state.numNoti != null && state.numNoti! > 0)
+                                  ? true
+                                  : false,
+                        ),
                       ),
                       IconButton(
                         onPressed: () {
@@ -111,8 +146,11 @@ class _HomePageState extends State<HomePage> {
                           );
                         },
                         icon: iconShareNotification(
-                          num: 5,
-                          isHasNotification: true,
+                          num: state.numNoti,
+                          isHasNotification:
+                              (state.numNoti != null && state.numNoti! > 0)
+                                  ? true
+                                  : false,
                         ),
                       ),
                       const SizedBox(width: 16),

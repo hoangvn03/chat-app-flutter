@@ -1,8 +1,11 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:chat_app/main/helper/socket/socket_service.dart';
 import 'package:chat_app/main/networks/model/converation.dart';
 import 'package:chat_app/main/ui/conversations/screens/createGroupChat/bloc/create_chat_bloc.dart';
 import 'package:chat_app/main/ui/conversations/screens/createGroupChat/bloc/create_chat_event.dart';
 import 'package:chat_app/main/ui/conversations/screens/createGroupChat/bloc/create_chat_state.dart';
+import 'package:chat_app/main/ui/conversations/screens/message/bloc/chat_bloc.dart';
+import 'package:chat_app/main/ui/conversations/screens/message/bloc/chat_state.dart';
 import 'package:chat_app/main/ui/widget/account_suggest/account_suggest_widget.dart';
 import 'package:chat_app/main/ui/widget/interaction_button/bloc/interaction_cubit.dart';
 import 'package:chat_app/main/ui/widget/interaction_button/interaction_button.dart';
@@ -58,20 +61,44 @@ class _ProfilePageState extends State<ProfilePage>
                         ..add(LoadProfileUserContact(widget.user!.id)),
             ),
         BlocProvider(create: (_) => CreateChatBloc()),
+        BlocProvider(create: (_) => ChatBloc(context.read<SocketService>())),
       ],
-      child: BlocListener<CreateChatBloc, CreateChatState>(
-        listener: (context, state) {
-          if (state is CreateChatSuccess && state.isCreateSuccess) {
-            context.pushNamed(PathName.chatRoomPage, extra: state.conversation);
-          } else if (state is CreateChatFailure) {
-            if (state.erorCode == 409) {
-            } else {
-              ScaffoldMessenger.of(
-                context,
-              ).showSnackBar(SnackBar(content: Text(state.errorMessage)));
-            }
-          }
-        },
+      child: MultiBlocListener(
+        listeners: [
+          BlocListener<ProfileBloc, ProfileState>(
+            listener: (context, state) {
+              if (state is ProfileFailure) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(state.erroMessage ?? '')),
+                );
+              } else if (state is ProfileSuccess &&
+                  state.conversation != null) {
+                print("Step XX: ${state.conversationId}");
+                context.pushNamed(
+                  PathName.chatRoomPage,
+                  extra: state.conversation,
+                );
+              }
+            },
+          ),
+          BlocListener<CreateChatBloc, CreateChatState>(
+            listener: (context, state) {
+              if (state is CreateChatSuccess && state.isCreateSuccess) {
+                context.pushNamed(
+                  PathName.chatRoomPage,
+                  extra: state.conversation,
+                );
+              } else if (state is CreateChatFailure) {
+                if (state.erorCode == 409) {
+                } else {
+                  ScaffoldMessenger.of(
+                    context,
+                  ).showSnackBar(SnackBar(content: Text(state.errorMessage)));
+                }
+              }
+            },
+          ),
+        ],
         child: Scaffold(
           backgroundColor: AppColors.white,
           body: BlocBuilder<ProfileBloc, ProfileState>(
@@ -293,7 +320,11 @@ class _ProfilePageState extends State<ProfilePage>
 
                         // Profile info nằm giữa
                         SliverToBoxAdapter(
-                          child: _buildProfileInfo(state.user, isCurrientUser),
+                          child: _buildProfileInfo(
+                            state.user,
+                            isCurrientUser,
+                            state.conversationId,
+                          ),
                         ),
 
                         // TabBar dính ngay dưới info
@@ -571,7 +602,11 @@ class _ProfilePageState extends State<ProfilePage>
     );
   }
 
-  Widget _buildProfileInfo(UserModel user, bool isCurrientUser) {
+  Widget _buildProfileInfo(
+    UserModel user,
+    bool isCurrientUser,
+    int? converationId,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -687,7 +722,7 @@ class _ProfilePageState extends State<ProfilePage>
               const SizedBox(height: 8),
               _totalUserFollow(),
               const SizedBox(height: 8),
-              _buttonActionProfile(isCurrientUser),
+              _buttonActionProfile(isCurrientUser, converationId),
               if (user.reels != null)
                 _buildGalleryProfile([
                   ReelModel(user: UserModel(id: 999, username: "Hoang")),
@@ -926,7 +961,7 @@ class _ProfilePageState extends State<ProfilePage>
     // );
   }
 
-  Widget _buttonActionProfile(bool isCurrientUser) {
+  Widget _buttonActionProfile(bool isCurrientUser, int? converationId) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 12),
       child: Row(
@@ -941,32 +976,59 @@ class _ProfilePageState extends State<ProfilePage>
                 textStyle: AppStyles.bodyBold.copyWith(color: AppColors.white),
               ),
             ),
-            BlocBuilder<CreateChatBloc, CreateChatState>(
-              builder: (context, state) {
-                final createChatBloc = context.read<CreateChatBloc>();
-                return Expanded(
-                  child: commonButton(
-                    hasHeight: true,
-                    padding: EdgeInsets.symmetric(vertical: 6),
-                    margin: EdgeInsets.only(left: 6),
-                    isBoxBorder: Border.all(color: AppColors.gray20, width: 0),
-                    text: 'Nhắn tin',
-                    textStyle: AppStyles.bodyBold,
-                    onTap: () {
-                      createChatBloc.add(
-                        CreateNewChat(
-                          participantIds: [widget.user!.id],
-                          converationName: widget.user!.username,
-                          isGroup: false,
+            (converationId != null)
+                ? BlocBuilder<ProfileBloc, ProfileState>(
+                  builder: (context, state) {
+                    final chatBloc = context.read<ProfileBloc>();
+                    return Expanded(
+                      child: commonButton(
+                        hasHeight: true,
+                        padding: EdgeInsets.symmetric(vertical: 6),
+                        margin: EdgeInsets.only(left: 6),
+                        isBoxBorder: Border.all(
+                          color: AppColors.gray20,
+                          width: 0,
                         ),
-                      );
-                    },
-                    radius: 6,
-                    color: AppColors.gray20,
-                  ),
-                );
-              },
-            ),
+                        text: 'Nhắn tin',
+                        textStyle: AppStyles.bodyBold,
+                        onTap: () {
+                          chatBloc.add(LoadConveration(converationId));
+                        },
+                        radius: 6,
+                        color: AppColors.gray20,
+                      ),
+                    );
+                  },
+                )
+                : BlocBuilder<CreateChatBloc, CreateChatState>(
+                  builder: (context, state) {
+                    final createChatBloc = context.read<CreateChatBloc>();
+                    return Expanded(
+                      child: commonButton(
+                        hasHeight: true,
+                        padding: EdgeInsets.symmetric(vertical: 6),
+                        margin: EdgeInsets.only(left: 6),
+                        isBoxBorder: Border.all(
+                          color: AppColors.gray20,
+                          width: 0,
+                        ),
+                        text: 'Nhắn tin',
+                        textStyle: AppStyles.bodyBold,
+                        onTap: () {
+                          createChatBloc.add(
+                            CreateNewChat(
+                              participantIds: [widget.user!.id],
+                              converationName: widget.user!.username,
+                              isGroup: false,
+                            ),
+                          );
+                        },
+                        radius: 6,
+                        color: AppColors.gray20,
+                      ),
+                    );
+                  },
+                ),
           ] else ...[
             Expanded(
               child: commonButton(

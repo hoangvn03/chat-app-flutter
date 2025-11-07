@@ -7,41 +7,36 @@ class MessageResponse {
   MessageResponse({required this.data});
 
   factory MessageResponse.fromJson(Map<String, dynamic> json) {
-    return MessageResponse(
-      data: MessageData.fromJson(json['data'] ?? {}),
-    );
+    return MessageResponse(data: MessageData.fromJson(json['data'] ?? {}));
   }
 
-  Map<String, dynamic> toJson() => {
-        'data': data.toJson(),
-      };
+  Map<String, dynamic> toJson() => {'data': data.toJson()};
 }
 
 class MessageData {
   final List<MessageEntity> messages;
   final Pagination? pagination;
 
-  MessageData({
-    required this.messages,
-    this.pagination,
-  });
+  MessageData({required this.messages, this.pagination});
 
   factory MessageData.fromJson(Map<String, dynamic> json) {
     return MessageData(
-      messages: (json['messages'] as List?)
+      messages:
+          (json['messages'] as List?)
               ?.map((e) => MessageEntity.fromJson(e))
               .toList() ??
           [],
-      pagination: json['pagination'] != null
-          ? Pagination.fromJson(json['pagination'])
-          : null,
+      pagination:
+          json['pagination'] != null
+              ? Pagination.fromJson(json['pagination'])
+              : null,
     );
   }
 
   Map<String, dynamic> toJson() => {
-        'messages': messages.map((e) => e.toJson()).toList(),
-        if (pagination != null) 'pagination': pagination!.toJson(),
-      };
+    'messages': messages.map((e) => e.toJson()).toList(),
+    if (pagination != null) 'pagination': pagination!.toJson(),
+  };
 }
 
 class MessageEntity {
@@ -54,6 +49,7 @@ class MessageEntity {
   final UserModel? sender;
   List<Attachment>? attachments;
   List<Status>? statuses;
+  final UserModel? receiver;
 
   MessageEntity({
     required this.messageId,
@@ -63,9 +59,24 @@ class MessageEntity {
     required this.createdAt,
     this.isRead,
     this.sender,
+    this.receiver,
     this.attachments,
     this.statuses,
   });
+  MessageEntity copyWith({bool? isRead, List<Status>? statuses}) {
+    return MessageEntity(
+      messageId: messageId,
+      conversationId: conversationId,
+      senderId: senderId,
+      content: content,
+      createdAt: createdAt,
+      isRead: isRead ?? this.isRead,
+      sender: sender,
+      receiver: receiver,
+      attachments: attachments,
+      statuses: statuses ?? this.statuses,
+    );
+  }
 
   factory MessageEntity.fromJson(Map<String, dynamic> json) {
     return MessageEntity(
@@ -73,17 +84,24 @@ class MessageEntity {
       conversationId: json['conversation_id'] ?? 0,
       senderId: json['sender_id'] ?? 0,
       content: json['content'] ?? '',
-      createdAt: json['created_at'] != null
-          ? DateTime.parse(json['created_at'])
-          : DateTime.now(),
+      createdAt:
+          json['created_at'] != null
+              ? DateTime.parse(json['created_at'])
+              : DateTime.now(),
       isRead: json['is_read'] ?? false,
       sender:
           json['sender'] != null ? UserModel.fromJson(json['sender']) : null,
-      attachments: (json['attachments'] as List?)
+      receiver:
+          json['receiver'] != null
+              ? UserModel.fromJson(json['receiver'])
+              : null,
+      attachments:
+          (json['attachments'] as List?)
               ?.map((e) => Attachment.fromJson(e))
               .toList() ??
           [],
-      statuses: (json['statuses'] as List?)
+      statuses:
+          (json['statuses'] as List?)
               ?.map((e) => Status.fromJson(e))
               .toList() ??
           [],
@@ -91,21 +109,21 @@ class MessageEntity {
   }
 
   Map<String, dynamic> toJson() => {
-        'message_id': messageId,
-        'conversation_id': conversationId,
-        'sender_id': senderId,
-        'content': content,
-        'created_at': createdAt.toIso8601String(),
-        'is_read': isRead,
-        'sender': sender?.toJson(),
-        'attachments': attachments!.map((e) => e.toJson()).toList(),
-        'statuses': statuses!.map((e) => e.toJson()).toList(),
-      };
+    'message_id': messageId,
+    'conversation_id': conversationId,
+    'sender_id': senderId,
+    'content': content,
+    'created_at': createdAt.toIso8601String(),
+    'is_read': isRead,
+    'sender': sender?.toJson(),
+    'attachments': attachments!.map((e) => e.toJson()).toList(),
+    'statuses': statuses!.map((e) => e.toJson()).toList(),
+  };
 }
 
 class Attachment {
   final int attachmentId;
-  final int messageId;
+  // final int messageId;
   final String fileUrl;
   final String fileType;
   final int fileSize;
@@ -113,7 +131,7 @@ class Attachment {
 
   Attachment({
     required this.attachmentId,
-    required this.messageId,
+    // required this.messageId,
     required this.fileUrl,
     required this.fileType,
     required this.fileSize,
@@ -123,7 +141,7 @@ class Attachment {
   factory Attachment.fromJson(Map<String, dynamic> json) {
     return Attachment(
       attachmentId: json['attachment_id'] as int,
-      messageId: json['message_id'] as int,
+      // messageId: json['message_id'] as int,
       fileUrl: json['file_url'] as String,
       fileType: json['file_type'] as String,
       fileSize: json['file_size'] as int,
@@ -134,7 +152,7 @@ class Attachment {
   Map<String, dynamic> toJson() {
     return {
       'attachment_id': attachmentId,
-      'message_id': messageId,
+      // 'message_id': messageId,
       'file_url': fileUrl,
       'file_type': fileType,
       'file_size': fileSize,
@@ -144,7 +162,7 @@ class Attachment {
 
   @override
   String toString() {
-    return 'Attachment(attachmentId: $attachmentId, messageId: $messageId, fileUrl: $fileUrl, fileType: $fileType, fileSize: $fileSize, uploadedAt: $uploadedAt)';
+    return 'Attachment(attachmentId: $attachmentId, fileUrl: $fileUrl, fileType: $fileType, fileSize: $fileSize, uploadedAt: $uploadedAt)';
   }
 
   // Optional: Override equality operators for better comparison
@@ -182,33 +200,30 @@ class Status {
       messageId: json['message_id'] ?? 0,
       receiverId: json['receiver_id'] ?? 0,
       status: json['status'] ?? '',
-      updatedAt: json['updated_at'] != null
-          ? DateTime.parse(json['updated_at'])
-          : DateTime.now(),
-      receiver: json['receiver'] != null
-          ? Receiver.fromJson(json['receiver'])
-          : null,
+      updatedAt:
+          json['updated_at'] != null
+              ? DateTime.parse(json['updated_at'])
+              : DateTime.now(),
+      receiver:
+          json['receiver'] != null ? Receiver.fromJson(json['receiver']) : null,
     );
   }
 
   Map<String, dynamic> toJson() => {
-        'status_id': statusId,
-        'message_id': messageId,
-        'receiver_id': receiverId,
-        'status': status,
-        'updated_at': updatedAt.toIso8601String(),
-        if (receiver != null) 'receiver': receiver!.toJson(),
-      };
+    'status_id': statusId,
+    'message_id': messageId,
+    'receiver_id': receiverId,
+    'status': status,
+    'updated_at': updatedAt.toIso8601String(),
+    if (receiver != null) 'receiver': receiver!.toJson(),
+  };
 }
 
 class Receiver {
   final int userId;
   final String username;
 
-  Receiver({
-    required this.userId,
-    required this.username,
-  });
+  Receiver({required this.userId, required this.username});
 
   factory Receiver.fromJson(Map<String, dynamic> json) {
     return Receiver(
@@ -217,8 +232,5 @@ class Receiver {
     );
   }
 
-  Map<String, dynamic> toJson() => {
-        'user_id': userId,
-        'username': username,
-      };
+  Map<String, dynamic> toJson() => {'user_id': userId, 'username': username};
 }

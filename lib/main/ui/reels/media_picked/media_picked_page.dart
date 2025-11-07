@@ -2,7 +2,9 @@ import 'package:chat_app/main/router/router.dart';
 import 'package:chat_app/main/ui/reels/media_picked/bloc/media_picked_bloc.dart';
 import 'package:chat_app/main/ui/reels/media_picked/bloc/media_picked_event.dart';
 import 'package:chat_app/main/ui/reels/media_picked/bloc/media_picked_state.dart';
-import 'package:chat_app/main/ui/reels/media_picked/media_picked.dart';
+import 'package:chat_app/main/ui/reels/media_picked/widget/all_album_media.dart';
+import 'package:chat_app/main/ui/reels/media_picked/widget/media_option_header.dart';
+import 'package:chat_app/main/ui/reels/media_picked/widget/media_picked.dart';
 import 'package:chat_app/main/utils/common_widget.dart';
 import 'package:chat_app/res/app_colors.dart';
 import 'package:chat_app/res/app_images.dart';
@@ -11,7 +13,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
-import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:photo_manager_image_provider/photo_manager_image_provider.dart';
 
@@ -81,22 +82,12 @@ class _CreateReelPageState extends State<MediaPickedPage> {
                   delegate: SliverAppBarDelegate1(
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 12),
-                      child: _buildOptionHeadeMediaV2(),
+                      child: MediaHeaderOption(pageController: _pageController),
                     ),
                   ),
                 ),
               ],
-          body: Stack(
-            children: [
-              _buildListImage(context),
-              Positioned(
-                bottom: 0,
-                left: 0,
-                right: 0,
-                child: _buildListAssetSelected(context),
-              ),
-            ],
-          ),
+          body: MediaGridView(),
         ),
       ),
     );
@@ -270,9 +261,9 @@ class _CreateReelPageState extends State<MediaPickedPage> {
                             builder: (_) {
                               return BlocProvider.value(
                                 value: context.read<MediaPickedBloc>(),
-                                child: _buildBottomSheetAllAlbum(
-                                  context,
-                                  state.album,
+                                child: AlbumBottomSheet(
+                                  pageController: _pageController,
+                                  album: state.album,
                                 ),
                               );
                             },

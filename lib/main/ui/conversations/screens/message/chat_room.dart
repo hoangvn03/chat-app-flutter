@@ -1,3 +1,5 @@
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:chat_app/main/helper/socket/socket_service.dart';
 import 'package:chat_app/main/networks/api_end_point.dart';
 import 'package:chat_app/main/networks/model/converation.dart';
 import 'package:chat_app/main/networks/model/message.dart';
@@ -7,6 +9,12 @@ import 'package:chat_app/main/ui/conversations/screens/message/audio_chat/bloc/a
 import 'package:chat_app/main/ui/conversations/screens/message/bloc/chat_bloc.dart';
 import 'package:chat_app/main/ui/conversations/screens/message/bloc/chat_event.dart';
 import 'package:chat_app/main/ui/conversations/screens/message/bloc/chat_state.dart';
+import 'package:chat_app/main/ui/reels/media_picked/bloc/media_picked_bloc.dart';
+import 'package:chat_app/main/ui/reels/media_picked/bloc/media_picked_event.dart';
+import 'package:chat_app/main/ui/reels/media_picked/bloc/media_picked_state.dart';
+import 'package:chat_app/main/ui/reels/media_picked/widget/media_option_header.dart';
+import 'package:chat_app/main/ui/reels/media_picked/widget/media_picked.dart';
+import 'package:chat_app/main/ui/reels/media_picked/widget/all_album_media.dart';
 import 'package:chat_app/main/utils/common_function.dart';
 import 'package:chat_app/main/utils/common_widget.dart';
 import 'package:chat_app/main/utils/shared_preference.dart';
@@ -18,6 +26,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:logger/logger.dart';
+import 'package:photo_manager/photo_manager.dart';
 
 // ignore: must_be_immutable
 class ChatRoom extends StatefulWidget {
@@ -29,6 +38,7 @@ class ChatRoom extends StatefulWidget {
 
 class _ChatRoomState extends State<ChatRoom> {
   final TextEditingController _messageController = TextEditingController();
+  final PageController _pageController = PageController();
 
   @override
   void dispose() {
@@ -41,9 +51,19 @@ class _ChatRoomState extends State<ChatRoom> {
     return MultiBlocProvider(
       providers: [
         BlocProvider(
-          create: (_) => ChatBloc()..add(LoadMessage(widget.conversation)),
+          create:
+              (_) =>
+                  ChatBloc(context.read<SocketService>())
+                    ..add(LoadMessage(widget.conversation)),
         ),
         BlocProvider(create: (_) => AudioBloc()),
+        BlocProvider(
+          create:
+              (_) =>
+                  MediaPickedBloc()..add(
+                    LoadRequest(requestType: RequestType.common, maxCount: 5),
+                  ),
+        ),
       ],
       child: Scaffold(
         backgroundColor: AppColors.white,
@@ -67,7 +87,10 @@ class _ChatRoomState extends State<ChatRoom> {
                     : widget.conversation.participants[1].username ?? 'Unknown',
                 style: AppStyles.title2Bold,
               ),
-              subtitle: _buildListUserOnline(context),
+              subtitle:
+                  widget.conversation.isGroup
+                      ? _buildListUserOnline()
+                      : _buildStatusUserContact(),
             ),
           ),
           leading: IconButton(
@@ -114,7 +137,9 @@ class _ChatRoomState extends State<ChatRoom> {
                             ),
                             BlocSelector<ChatBloc, ChatState, List<UserModel>>(
                               selector: (state) {
-                                if (state is ChatSuccess) {
+                                if (state is ChatSuccess &&
+                                    state.typingUsers != null) {
+                                  print(state.typingUsers!.length);
                                   return state.typingUsers ?? [];
                                 }
                                 return [];
@@ -130,7 +155,7 @@ class _ChatRoomState extends State<ChatRoom> {
                   ),
 
                   Padding(
-                    padding: const EdgeInsets.fromLTRB(8, 4, 8, 12),
+                    padding: EdgeInsets.only(left: 8, right: 8, bottom: 8),
                     child: _buildTextFieldMessage(context),
                   ),
                 ],
@@ -200,7 +225,7 @@ class _ChatRoomState extends State<ChatRoom> {
     );
   }
 
-  Widget _buildListMessage(List<dynamic> messages) {
+  Widget _buildListMessage(List<MessageEntity> messages) {
     print('${messages.length}');
     return ListView.builder(
       shrinkWrap: true,
@@ -208,52 +233,14 @@ class _ChatRoomState extends State<ChatRoom> {
       itemCount: messages.length,
       itemBuilder: (context, index) {
         final msg = messages[index];
-        final isMe = msg.senderId == widget.conversation.participants[0].id;
-
-        return Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              child: Text(formatDateTime(msg.createdAt.toString())),
-            ),
-            Align(
-              alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
-              child: Container(
-                margin: const EdgeInsets.symmetric(vertical: 4),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 8,
-                ),
-                decoration: BoxDecoration(
-                  color: isMe ? AppColors.gray20 : AppColors.gray10,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Column(
-                  crossAxisAlignment:
-                      isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      msg.sender!.username ?? 'Unknown',
-                      style: AppStyles.bodyBold.copyWith(
-                        color: AppColors.gray70,
-                        fontSize: 12,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(msg.content, style: AppStyles.bodyRegular),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        );
+        return _itemMessage(msg);
       },
     );
   }
 
   Widget _buildTypingIndicator(List<UserModel> users) {
     if (users.isEmpty) {
-      return Container();
+      return const SizedBox();
     }
 
     String text;
@@ -330,30 +317,102 @@ class _ChatRoomState extends State<ChatRoom> {
           BlocBuilder<AudioBloc, AudioState>(
             builder: (context, audioState) {
               final isRecording = audioState is AudioRecording; // lấy từ state
-
-              return IconButton(
-                onPressed: () async {
+              return GestureDetector(
+                onTap: () async {
                   if (!isRecording) {
                     context.read<AudioBloc>().add(StartRecordEvent());
                   } else {
                     context.read<AudioBloc>().add(StopRecordEvent());
                   }
                 },
-                icon: Icon(
+                child: Icon(
+                  size: 24,
                   isRecording ? Icons.stop : Icons.mic,
                   color: isRecording ? Colors.red : Colors.black,
                 ),
               );
             },
           ),
-
-          IconButton(
-            onPressed: () {},
-            icon: SvgPicture.asset(AppImages.icPictureGallery),
+          const SizedBox(width: 12),
+          BlocBuilder<MediaPickedBloc, MediaPickedState>(
+            builder: (context, state) {
+              return GestureDetector(
+                onTap: () {
+                  showModalBottomSheet(
+                    backgroundColor: Colors.black,
+                    context: context,
+                    useSafeArea: true,
+                    isScrollControlled: true,
+                    shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.vertical(
+                        top: Radius.circular(16),
+                      ),
+                    ),
+                    builder: (_) {
+                      final height = MediaQuery.of(context).size.height;
+                      return BlocProvider.value(
+                        value: context.read<MediaPickedBloc>(),
+                        child: SizedBox(
+                          height: height * 0.75,
+                          child: Column(
+                            children: [
+                              const SizedBox(height: 12),
+                              iconCloseBottomSheet(context),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12.0,
+                                  vertical: 12,
+                                ),
+                                child: MediaHeaderOption(
+                                  pageController: _pageController,
+                                ),
+                              ),
+                              Expanded(
+                                child: MediaGridView(
+                                  onTap: () {
+                                    if (state is MediaPickedSuccess &&
+                                        state.selectedAsset != null) {
+                                      print("Uplaod FIle Step 1");
+                                      // context.read<ChatBloc>().add(
+                                      //   UploadFileMessage(
+                                      //     state.selectedAsset!,
+                                      //     widget.conversation.conversationId,
+                                      //   ),
+                                      // );
+                                      context.read<ChatBloc>().add(
+                                        SendMessage(
+                                          widget.conversation.conversationId,
+                                          'Đã gửi 1 ảnh',
+                                          files: state.selectedAsset,
+                                        ),
+                                      );
+                                    }
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                },
+                child: SvgPicture.asset(
+                  AppImages.icPictureGallery,
+                  width: 24,
+                  height: 24,
+                ),
+              );
+            },
           ),
-          IconButton(
-            onPressed: () {},
-            icon: SvgPicture.asset(AppImages.icStickers),
+          const SizedBox(width: 12),
+          GestureDetector(
+            onTap: () {},
+            child: SvgPicture.asset(
+              AppImages.icStickers,
+              width: 24,
+              height: 24,
+            ),
           ),
         ],
       ),
@@ -363,6 +422,12 @@ class _ChatRoomState extends State<ChatRoom> {
           if (text.isEmpty) return;
           context.read<ChatBloc>().add(
             SendMessage(widget.conversation.conversationId, text),
+          );
+          context.read<ChatBloc>().add(
+            UserTypingOrStopTypingEvent(
+              conversationId: widget.conversation.conversationId,
+              isStop: true,
+            ),
           );
           _messageController.clear();
           // sendChat();
@@ -383,11 +448,11 @@ class _ChatRoomState extends State<ChatRoom> {
     );
   }
 
-  Widget _buildListUserOnline(BuildContext context) {
+  Widget _buildListUserOnline() {
     return BlocBuilder<ChatBloc, ChatState>(
       builder: (context, state) {
-        if (state is ChatSuccess) {
-          final names = "test";
+        if (state is ChatSuccess && state.onlineUsers != null) {
+          final names = state.onlineUsers!.map((u) => u.username).join(", ");
           return Text(
             names,
             overflow: TextOverflow.ellipsis,
@@ -403,5 +468,146 @@ class _ChatRoomState extends State<ChatRoom> {
         );
       },
     );
+  }
+
+  Widget _buildStatusUserContact() {
+    return BlocBuilder<ChatBloc, ChatState>(
+      builder: (context, state) {
+        if (state is ChatSuccess) {
+          return Text(
+            state.statusUserContact.name,
+            overflow: TextOverflow.ellipsis,
+            maxLines: 1, // chỉ 1 dòng
+            style: AppStyles.headlineRegular,
+          );
+        }
+        return Text(
+          '...',
+          overflow: TextOverflow.ellipsis,
+          maxLines: 1, // chỉ 1 dòng
+          style: AppStyles.headlineRegular,
+        );
+      },
+    );
+  }
+
+  Widget _itemMessage(MessageEntity msg) {
+    final isMe = msg.senderId == widget.conversation.participants[0].id;
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          child: Text(formatDateTime(msg.createdAt.toString())),
+        ),
+        Row(
+          mainAxisAlignment:
+              isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
+          children: [
+            isMe
+                ? const SizedBox()
+                : groupUserAvatar(
+                  avatarSize: 42,
+                  images: [
+                    msg.sender!.avatar ??
+                        'https://api.dicebear.com/7.x/avataaars/svg?seed=Alice',
+                  ],
+                ),
+            const SizedBox(width: 8),
+            (msg.attachments != null &&
+                    msg.attachments!.isNotEmpty &&
+                    msg.content == 'Đã gửi 1 ảnh')
+                ? _itemFile(msg.attachments![0])
+                : Column(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Container(
+                      margin: const EdgeInsets.symmetric(vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(32),
+                        gradient: LinearGradient(
+                          colors:
+                              isMe
+                                  ? [
+                                    AppColors.purple100,
+                                    AppColors.purple80,
+                                    AppColors.purple60,
+                                  ]
+                                  : [AppColors.gray30, AppColors.gray40],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                      ),
+                      child: Text(
+                        msg.content,
+                        style: AppStyles.bodyRegular.copyWith(
+                          color: isMe ? AppColors.white : AppColors.black,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+          ],
+        ),
+        Align(
+          alignment: Alignment.centerRight,
+          child: Padding(
+            padding: const EdgeInsets.only(right: 8, top: 2),
+            child: Text(
+              msg.isRead! ? 'Đã xem' : 'Đã gửi',
+              style: AppStyles.footnoteRegular.copyWith(
+                color: AppColors.gray70,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _itemFile(Attachment attachment) {
+    switch (attachment.fileType) {
+      case 'image':
+        return ClipRRect(
+          borderRadius: BorderRadius.circular(12),
+          child: CachedNetworkImage(
+            imageUrl: '${ApiEndPoints.DOMAIN}${attachment.fileUrl}',
+            width: 168,
+            height: 256,
+            color: AppColors.gray30,
+            placeholder:
+                (context, url) => const Center(
+                  child: SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  ),
+                ),
+            errorWidget: (context, url, error) {
+              print('Image load error: $error');
+              return const Icon(Icons.broken_image, color: Colors.grey);
+            },
+            fit: BoxFit.cover,
+          ),
+        );
+      default:
+        // 🔹 Xử lý các file khác (pdf, video, ...)
+        return Container(
+          width: 168,
+          height: 256,
+          decoration: BoxDecoration(
+            color: Colors.grey[200],
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.grey.shade400),
+          ),
+          child: const Center(
+            child: Icon(Icons.insert_drive_file, color: Colors.grey, size: 40),
+          ),
+        );
+    }
   }
 }

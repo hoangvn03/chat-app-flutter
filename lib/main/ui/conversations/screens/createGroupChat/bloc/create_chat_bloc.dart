@@ -46,16 +46,15 @@ class CreateChatBloc extends Bloc<CreateChatEvent, CreateChatState> {
         if (state is CreateChatSuccess) {
           final current = state as CreateChatSuccess;
           emit(current.copyWith(conversation: data, isCreateSuccess: true));
-        } else if (res.statusCode == 409) {
-          CreateChatFailure(
-            erorCode: res.statusCode,
-            '${res.statusCode} ${res.body['error']['message']}',
-          );
-        } else {
-          CreateChatFailure(
-            '${res.statusCode} ${res.body['error']['message']}',
-          );
+        }else{
+              emit(CreateChatSuccess(conversation: data, isCreateSuccess: true));
+
         }
+      } else if (res.statusCode == 409) {
+        CreateChatFailure(
+          erorCode: res.statusCode,
+          '${res.statusCode} ${res.body['error']['message']}',
+        );
       } else {
         emit(
           CreateChatFailure(

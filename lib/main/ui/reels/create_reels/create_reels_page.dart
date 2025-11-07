@@ -5,6 +5,7 @@ import 'package:chat_app/main/router/router.dart';
 import 'package:chat_app/main/ui/reels/create_reels/bloc/create_reels_bloc.dart';
 import 'package:chat_app/main/ui/reels/create_reels/bloc/create_reels_event.dart';
 import 'package:chat_app/main/ui/reels/create_reels/bloc/create_reels_state.dart';
+import 'package:chat_app/main/ui/reels/create_reels/widgets/edit_element_media.dart';
 import 'package:chat_app/main/utils/common_widget.dart';
 import 'package:chat_app/res/app_colors.dart';
 import 'package:chat_app/res/app_images.dart';
@@ -30,11 +31,12 @@ class _CreateReelsPageState extends State<CreateReelsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: BlocProvider(
-        create:
-            (_) => CreateReelsBloc()..add(LoadReelsMedia(widget.listMediaPath)),
+    return BlocProvider(
+      create:
+          (_) => CreateReelsBloc()..add(LoadReelsMedia(widget.listMediaPath)),
+      child: SafeArea(
         child: Scaffold(
+          resizeToAvoidBottomInset: true,
           backgroundColor: AppColors.black,
           body: Column(
             children: [
@@ -74,58 +76,44 @@ class _CreateReelsPageState extends State<CreateReelsPage> {
                       ),
                     ),
                   );
-                } else if (state is CreateReelsLoadedVideo) {
-                  return _videoMedia(height, state.controller);
-                } else if (state is CreateReelsLoadedImage) {
-                  return _imageMedia(height);
+                } else if (state is CreateReelsSuccess) {
+                  return state.asset != null
+                      ? _imageMedia(height)
+                      : _videoMedia(height, state.controller!);
                 }
                 return const SizedBox.shrink();
-
-                // ClipRRect(
-                //   borderRadius: BorderRadius.circular(24),
-                //   child: Stack(
-                //     children: [
-                //       (widget.listMediaPath.first is AssetEntity &&
-                //               widget.listMediaPath.first.type == AssetType.video)
-                //           ? _videoMedia(height)
-                //           : _imageMedia(height),
-                //       Positioned(
-                //         left: 0,
-                //         right: 0,
-                //         bottom: 0,
-                //         height: 120, // chiều cao vùng phủ
-                //         child: Container(
-                //           decoration: const BoxDecoration(
-                //             gradient: LinearGradient(
-                //               begin: Alignment.topCenter,
-                //               end: Alignment.bottomCenter,
-                //               colors: [
-                //                 Colors.transparent,
-                //                 Colors.black54, // đen trong suốt 50%
-                //               ],
-                //             ),
-                //           ),
-                //         ),
-                //       ),
-                //       Positioned(
-                //         left: 8,
-                //         right: 8,
-                //         top: 12,
-                //         child: _buildListHeaderIcon(),
-                //       ),
-                //       Positioned(
-                //         left: 16,
-                //         right: 16,
-                //         bottom: 16,
-                //         child: _buildAddNote(),
-                //       ),
-                //     ],
-                //   ),
-                // );
               },
             ),
           ),
+          BlocBuilder<CreateReelsBloc, CreateReelsState>(
+            buildWhen:
+                (previous, current) =>
+                    previous is CreateReelsSuccess &&
+                    current is CreateReelsSuccess &&
+                    previous.overlay != current.overlay,
+            builder: (context, state) {
+              if (state is CreateReelsSuccess && state.overlay != null) {
+                final overlay = state.overlay!;
+                if (overlay.content.isNotEmpty) {
+                  // Vị trí Positioned sử dụng x, y từ MediaOverlay
+                  // Tọa độ x, y trong MediaOverlay thường là tỷ lệ (0.0 đến 1.0)
+                  // Cần tính toán vị trí thực tế trên màn hình.
+                  final double screenHeight =
+                      height * 0.8; // Chiều cao của player
+                  final double screenWidth = MediaQuery.of(context).size.width;
 
+                  return Positioned(
+                    // Canh giữa dựa trên tỷ lệ x, y
+                    // Ví dụ: x=0.5 (giữa), y=0.5 (giữa)
+                    left: overlay.x * screenWidth,
+                    top: overlay.y * screenHeight,
+                    child: _buildOverlayContent(context, overlay),
+                  );
+                }
+              }
+              return const SizedBox.shrink(); // Không có overlay hoặc nội dung rỗng
+            },
+          ),
           Positioned(
             left: 0,
             right: 0,
@@ -144,7 +132,12 @@ class _CreateReelsPageState extends State<CreateReelsPage> {
               ),
             ),
           ),
-          Positioned(left: 8, right: 8, top: 12, child: _buildListHeaderIcon()),
+          Positioned(
+            left: 8,
+            right: 8,
+            top: 12,
+            child: _buildListHeaderIcon(context),
+          ),
           Positioned(left: 16, right: 16, bottom: 16, child: _buildAddNote()),
         ],
       ),
@@ -163,6 +156,16 @@ class _CreateReelsPageState extends State<CreateReelsPage> {
             );
           },
         )
+        // : Image.file(
+        //   editedFile,
+        //   fit: BoxFit.cover,
+        //   errorBuilder: (context, error, stackTrace) {
+        //     return Container(
+        //       color: Colors.grey,
+        //       child: const Center(child: Icon(Icons.error, color: Colors.red)),
+        //     );
+        //   },
+        // );
         : AssetEntityImage(
           widget.listMediaPath.first,
           isOriginal: false,
@@ -181,7 +184,7 @@ class _CreateReelsPageState extends State<CreateReelsPage> {
     );
   }
 
-  Widget _buildListHeaderIcon() {
+  Widget _buildListHeaderIcon(BuildContext con) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -198,13 +201,40 @@ class _CreateReelsPageState extends State<CreateReelsPage> {
           ),
         ),
         Spacer(),
-        IconButton.filledTonal(
-          onPressed: () {},
-          icon: SvgPicture.asset(AppImages.icText, color: AppColors.white),
-          style: IconButton.styleFrom(
-            backgroundColor: AppColors.gray100.withOpacity(0.6),
-          ),
+        BlocBuilder<CreateReelsBloc, CreateReelsState>(
+          builder: (context, state) {
+            return IconButton.filledTonal(
+              onPressed: () {
+                context.read<CreateReelsBloc>().add(
+                  EditTextStory(MediaOverlay()),
+                );
+                showDialog(
+                  context: context,
+                  barrierColor: Colors.black.withOpacity(
+                    0.5,
+                  ), // nền đen trong suốt
+                  builder: (dialogContext) {
+                    return BlocProvider.value(
+                      value:
+                          context
+                              .read<CreateReelsBloc>(), // ✅ lấy bloc hiện tại
+                      child: const Dialog(
+                        backgroundColor: Colors.transparent,
+                        insetPadding: EdgeInsets.zero, // full màn hình
+                        child: EditElementMedia(),
+                      ),
+                    );
+                  },
+                );
+              },
+              icon: SvgPicture.asset(AppImages.icText, color: AppColors.white),
+              style: IconButton.styleFrom(
+                backgroundColor: AppColors.gray100.withOpacity(0.6),
+              ),
+            );
+          },
         ),
+
         IconButton.filledTonal(
           onPressed: () {},
           icon: SvgPicture.asset(AppImages.icStickers, color: AppColors.white),
@@ -391,25 +421,63 @@ class _CreateReelsPageState extends State<CreateReelsPage> {
               ),
             ),
           ),
-          GestureDetector(
-            onTap: () {
-              final data = ReelModel(
-                assetList: widget.listMediaPath,
-                media: MediaType.image,
-                duration: Duration(seconds: 20),
+          BlocBuilder<CreateReelsBloc, CreateReelsState>(
+            builder: (context, state) {
+              return GestureDetector(
+                onTap: () {
+                  
+                  if (state is CreateReelsSuccess && state.editedFile != null) {
+                    context.read<CreateReelsBloc>().add(
+                      UploadReels(
+                        'typeMedia',
+                        state.editedFile!,
+                        'content',
+                        'h',
+                      ),
+                    );
+                    final data = ReelModel(
+                      assetList: [state.editedFile],
+                      media: MediaType.image,
+                      duration: Duration(seconds: 20),
+                    );
+                    context.pushNamed(PathName.listReelsPage, extra: [data]);
+                  }
+                },
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 15),
+                  decoration: BoxDecoration(
+                    color: AppColors.white,
+                    shape: BoxShape.circle,
+                  ),
+                  child: SvgPicture.asset(AppImages.icChevronRight),
+                ),
               );
-              context.pushNamed(PathName.listReelsPage, extra: [data]);
             },
-            child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 12, vertical: 15),
-              decoration: BoxDecoration(
-                color: AppColors.white,
-                shape: BoxShape.circle,
-              ),
-              child: SvgPicture.asset(AppImages.icChevronRight),
-            ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildOverlayContent(BuildContext context, MediaOverlay overlay) {
+    return Container(
+      padding: overlay.hasBackground ? const EdgeInsets.all(8.0) : null,
+      decoration:
+          overlay.hasBackground
+              ? BoxDecoration(
+                color: overlay.color.withOpacity(0.5), // Ví dụ background mờ
+                borderRadius: BorderRadius.circular(8),
+              )
+              : null,
+      child: Text(
+        overlay.content,
+        textAlign: overlay.textAlign,
+        style: TextStyle(
+          fontSize: overlay.size,
+          color: overlay.color,
+          fontFamily: overlay.fontText,
+          // Có thể thêm FontWeight nếu cần
+        ),
       ),
     );
   }

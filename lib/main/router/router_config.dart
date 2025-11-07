@@ -18,6 +18,7 @@ import 'package:chat_app/main/ui/profile/profile_page.dart';
 import 'package:chat_app/main/ui/profile/widgets/settings/setting_page.dart';
 import 'package:chat_app/main/ui/reels/camera/camera_page.dart';
 import 'package:chat_app/main/ui/reels/create_reels/create_reels_page.dart';
+import 'package:chat_app/main/ui/reels/create_reels/widgets/edit_element_media.dart';
 import 'package:chat_app/main/ui/reels/list_reels/list_reels_page.dart';
 import 'package:chat_app/main/ui/reels/media_picked/media_picked_page.dart';
 import 'package:chat_app/main/ui/reels/reels_page.dart';
@@ -102,7 +103,7 @@ class AppGoRouter {
               final data = state.extra as Conversation;
               return slidePage(ChatRoom(conversation: data));
             },
-          )
+          ),
         ],
         builder: (context, state) {
           final currentUser = state.extra as UserModel;
@@ -120,6 +121,15 @@ class AppGoRouter {
       GoRoute(
         name: PathName.createReelsPage,
         path: AppPath.createReelsPage,
+        routes: [
+          GoRoute(
+            name: PathName.editElementMedia,
+            path: AppPath.editElementMedia,
+            builder: (context, state) {
+              return EditElementMedia();
+            },
+          ),
+        ],
         builder: (context, state) {
           final listMediaPath = state.extra as List<dynamic>;
           return CreateReelsPage(listMediaPath: listMediaPath);

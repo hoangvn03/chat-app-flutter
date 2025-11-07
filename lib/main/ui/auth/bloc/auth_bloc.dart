@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'package:bloc/bloc.dart';
+import 'package:chat_app/main/helper/socket/socket_service.dart';
 import 'package:chat_app/main/networks/api_end_point.dart';
+import 'package:chat_app/main/networks/enum.dart';
 import 'package:chat_app/main/networks/model/login_in.dart';
 import 'package:chat_app/main/networks/model/user.dart';
 import 'package:chat_app/main/ui/auth/bloc/auth_event.dart';
@@ -14,10 +16,13 @@ import '../../../networks/api_util.dart';
 //alice@example.com
 //password123
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
-  AuthBloc() : super(AuthLoading()) {
+  final SocketService socketService;
+
+  AuthBloc(this.socketService) : super(AuthLoading()) {
     on<Login>(_onSignIn);
     on<Logout>(_signOut);
     on<CheckUser>(_checkRecentUser);
+    on<UpdateStatusUsers>(_updateStatusUser);
   }
 
   Future<void> _onSignIn(Login event, Emitter<AuthState> emit) async {
@@ -83,6 +88,23 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
             'Error ${res.statusCode}: ${res.body?['message'] ?? 'Unknown'}',
           ),
         );
+      }
+    } catch (e) {
+      emit(AuthFailure(e.toString()));
+    }
+  }
+
+  Future<void> _updateStatusUser(
+    UpdateStatusUsers event,
+    Emitter<AuthState> emit,
+  ) async {
+    if (state is! AuthSuccess) return;
+    final currentState = state as AuthSuccess;
+    try {
+      if (event.isInit) {
+        socketService.updateUserStatus(StatusUser.online.name);
+      } else {
+        emit(currentState.copyWith(statusUser: event.status));
       }
     } catch (e) {
       emit(AuthFailure(e.toString()));

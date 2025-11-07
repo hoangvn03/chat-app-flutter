@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:chat_app/main/networks/api_end_point.dart';
+import 'package:chat_app/main/networks/model/converation.dart';
 import 'package:chat_app/main/networks/model/post.dart';
 import 'package:chat_app/main/networks/model/reels.dart';
 import 'package:chat_app/main/networks/model/user.dart';
@@ -16,6 +17,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     on<LoadProfile>(_loadRequest);
     on<LoadProfileUserContact>(_loadProfileUserContact);
     on<ClearStrogeUser>(_clearUser);
+    on<LoadConveration>(_loadConverationUserContact);
   }
   UserModel user = UserModel(id: 999);
   bool isCurrientUser = true;
@@ -232,7 +234,26 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
       ApiResponse res = await ApiUtil.get(url);
       if (res.statusCode == 200) {
         final user = UserModel.fromJson(res.body['data']['user']);
-        emit(ProfileSuccess(user: user));
+        final converationId = res.body['data']['conversation_id'];
+        emit(ProfileSuccess(user: user,conversationId: converationId));
+      }
+    } catch (e) {
+      emit(ProfileFailure());
+    }
+    return;
+  }
+  Future<void> _loadConverationUserContact(
+    LoadConveration event,
+    Emitter<ProfileState> emit,
+  ) async {
+        final currentState = state as ProfileSuccess;
+
+    try {
+      var url = '${ApiEndPoints.CONVERATIONS}/${event.id}';
+      ApiResponse res = await ApiUtil.get(url);
+      if (res.statusCode == 200) {
+        final converation = Conversation.fromJson(res.body['data']['conversation']);
+        emit(currentState.copyWith(conversation: converation));
       }
     } catch (e) {
       emit(ProfileFailure());
