@@ -10,6 +10,9 @@ import 'package:chat_app/main/ui/conversations/screens/createGroupChat/bloc/crea
 import 'package:chat_app/main/ui/conversations/screens/createGroupChat/create_chat_page.dart';
 import 'package:chat_app/main/ui/conversations/screens/message/chat_room.dart';
 import 'package:chat_app/main/ui/home/home_page.dart';
+import 'package:chat_app/main/ui/home/widgets/create_post_page.dart';
+import 'package:chat_app/main/ui/home/widgets/edit_post_media_page.dart';
+import 'package:chat_app/main/ui/home/widgets/upload_post_page.dart';
 import 'package:chat_app/main/ui/notification/notification_page.dart';
 import 'package:chat_app/main/ui/personal/personal_page.dart';
 import 'package:chat_app/main/ui/post/post_page.dart';
@@ -116,6 +119,33 @@ class AppGoRouter {
         path: AppPath.profileListFollowerPage,
         builder: (context, state) {
           return ProfileListFollowerPage();
+        },
+      ),
+      GoRoute(
+        name: PathName.createPostPage,
+        path: AppPath.createPostPage,
+        routes: [
+          GoRoute(
+            name: PathName.imageEditorScreen,
+            path: AppPath.imageEditorScreen,
+            routes: [
+              GoRoute(
+                name: PathName.uploadPostPage,
+                path: AppPath.uploadPostPage,
+                builder: (context, state) {
+                   final data = state.extra as List<AssetEntity>;
+                  return UploadPostPage(assetImage: data);
+                },
+              ),
+            ],
+            builder: (context, state) {
+              final data = state.extra as List<AssetEntity>;
+              return ImageEditorScreen(assetImage: data);
+            },
+          ),
+        ],
+        builder: (context, state) {
+          return CreatePostPage();
         },
       ),
       GoRoute(

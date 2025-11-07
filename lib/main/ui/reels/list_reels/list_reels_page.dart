@@ -101,7 +101,7 @@ class _StoryScreenState extends State<StoryScreen>
                 final listAsset = widget.stories[i].assetList;
                 return (listAsset?.first is File)
                     ? Image.file(
-                      File(listAsset?[0]),
+                      listAsset?[0],
                       fit: BoxFit.cover,
                       errorBuilder: (context, error, stackTrace) {
                         return Container(

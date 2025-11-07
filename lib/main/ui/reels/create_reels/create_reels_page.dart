@@ -34,20 +34,32 @@ class _CreateReelsPageState extends State<CreateReelsPage> {
     return BlocProvider(
       create:
           (_) => CreateReelsBloc()..add(LoadReelsMedia(widget.listMediaPath)),
-      child: SafeArea(
-        child: Scaffold(
-          resizeToAvoidBottomInset: true,
-          backgroundColor: AppColors.black,
-          body: Column(
-            children: [
-              _buildMediaPlayer(context),
-              Expanded(
-                child: Align(
-                  alignment: Alignment.bottomCenter,
-                  child: _buildBottomTab(),
+      child: BlocListener<CreateReelsBloc, CreateReelsState>(
+        listener: (context, state) {
+          if (state is CreateReelsSuccess && state.editedFile != null) {
+            final data = ReelModel(
+              assetList: [state.editedFile],
+              media: MediaType.image,
+              duration: Duration(seconds: 20),
+            );
+            context.pushNamed(PathName.listReelsPage, extra: [data]);
+          }
+        },
+        child: SafeArea(
+          child: Scaffold(
+            resizeToAvoidBottomInset: true,
+            backgroundColor: AppColors.black,
+            body: Column(
+              children: [
+                _buildMediaPlayer(context),
+                Expanded(
+                  child: Align(
+                    alignment: Alignment.bottomCenter,
+                    child: _buildBottomTab(),
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -132,11 +144,37 @@ class _CreateReelsPageState extends State<CreateReelsPage> {
               ),
             ),
           ),
-          Positioned(
-            left: 8,
-            right: 8,
-            top: 12,
-            child: _buildListHeaderIcon(context),
+          Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: BlocBuilder<CreateReelsBloc, CreateReelsState>(
+              builder: (context, state) {
+                return (state is CreateReelsSuccess && state.isHideHeaderIcon)
+                    ? Align(
+                      alignment: Alignment.centerRight,
+                      child: GestureDetector(
+                        onTap: () {
+                          context.read<CreateReelsBloc>().add(
+                            ToggleHeaderIcons(false),
+                          );
+                        },
+                        child: const Text(
+                          'Xong',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    )
+                    : Positioned(
+                      left: 8,
+                      right: 8,
+                      top: 12,
+                      child: _buildListHeaderIcon(context),
+                    );
+              },
+            ),
           ),
           Positioned(left: 16, right: 16, bottom: 16, child: _buildAddNote()),
         ],
@@ -243,7 +281,9 @@ class _CreateReelsPageState extends State<CreateReelsPage> {
           ),
         ),
         IconButton.filledTonal(
-          onPressed: () {},
+          onPressed: () {
+            con.read<CreateReelsBloc>().add(ToggleHeaderIcons(true));
+          },
           icon: SvgPicture.asset(AppImages.icFilters, color: AppColors.white),
           style: IconButton.styleFrom(
             backgroundColor: AppColors.gray100.withOpacity(0.6),
@@ -425,22 +465,15 @@ class _CreateReelsPageState extends State<CreateReelsPage> {
             builder: (context, state) {
               return GestureDetector(
                 onTap: () {
-                  
-                  if (state is CreateReelsSuccess && state.editedFile != null) {
+                  if (state is CreateReelsSuccess && state.overlay != null) {
                     context.read<CreateReelsBloc>().add(
                       UploadReels(
                         'typeMedia',
-                        state.editedFile!,
                         'content',
                         'h',
+                        overlay: state.overlay!,
                       ),
                     );
-                    final data = ReelModel(
-                      assetList: [state.editedFile],
-                      media: MediaType.image,
-                      duration: Duration(seconds: 20),
-                    );
-                    context.pushNamed(PathName.listReelsPage, extra: [data]);
                   }
                 },
                 child: Container(

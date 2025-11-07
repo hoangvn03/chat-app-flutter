@@ -17,6 +17,12 @@ class CreateReelsBloc extends Bloc<CreateReelsEvent, CreateReelsState> {
     on<UploadReels>(_upLoadReels);
     on<UploadFileMedia>(_upLoadFileMedia);
     on<EditTextStory>(_editText);
+    on<ToggleHeaderIcons>((event, emit) {
+      if (state is CreateReelsSuccess) {
+        final current = state as CreateReelsSuccess;
+        emit(current.copyWith(isHideHeaderIcon: event.visible));
+      }
+    });
   }
   List<dynamic> _mediaPicked = [];
   Future<void> _loadMediaPicked(
@@ -94,7 +100,7 @@ class CreateReelsBloc extends Bloc<CreateReelsEvent, CreateReelsState> {
         _mediaPicked.first,
         overlay: event.overlay,
       );
-      emit(currentState.copyWith(editedFile: file));
+      emit(currentState.copyWith(editedFile: file, isHideHeaderIcon: true));
 
       // emit(CreateReelsLoading());
       // final url = 'https://timordev.ringme.vn/RingMeAPI/story/uploadStory';

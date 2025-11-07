@@ -15,7 +15,7 @@ class CreateReelsSuccess extends CreateReelsState {
   final String? decs;
   final File? editedFile;
   final MediaOverlay? overlay;
-
+  final bool isHideHeaderIcon;
   CreateReelsSuccess({
     this.asset,
     this.controller,
@@ -23,6 +23,7 @@ class CreateReelsSuccess extends CreateReelsState {
     this.decs,
     this.editedFile,
     this.overlay,
+    this.isHideHeaderIcon = false
   });
   CreateReelsSuccess copyWith({
     AssetEntity? asset,
@@ -31,6 +32,7 @@ class CreateReelsSuccess extends CreateReelsState {
     String? decs,
     File? editedFile,
     MediaOverlay? overlay,
+    bool? isHideHeaderIcon
   }) {
     return CreateReelsSuccess(
       asset: asset ?? this.asset,
@@ -39,6 +41,7 @@ class CreateReelsSuccess extends CreateReelsState {
       decs: decs ?? this.decs,
       editedFile: editedFile ?? this.editedFile,
       overlay: overlay ?? this.overlay,
+      isHideHeaderIcon: isHideHeaderIcon ?? this.isHideHeaderIcon,
     );
   }
 }

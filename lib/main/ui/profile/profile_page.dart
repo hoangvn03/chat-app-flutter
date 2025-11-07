@@ -373,7 +373,9 @@ class _ProfilePageState extends State<ProfilePage>
                   body: TabBarView(
                     controller: _tabController,
                     children: [
-                      _buildListPost(state.posts ?? [], 0),
+                      (state.posts != null && state.posts!.isNotEmpty)
+                          ? _buildListPost(state.posts ?? [], 0)
+                          : _buildEmptyPost(0),
                       _buildListPost(state.posts ?? [], 1),
                       _buildListPost(state.posts ?? [], 2),
                     ],
@@ -1100,6 +1102,32 @@ class _ProfilePageState extends State<ProfilePage>
           ),
           Text(reel.user!.username ?? "Unknown"),
         ],
+      ),
+    );
+  }
+
+  Widget _buildEmptyPost(int page) {
+    return GestureDetector(
+      onTap: () {},
+      child: Container(
+        child: Column(
+          children: [
+            Text('Tạo bài viêt đầu tiên', style: AppStyles.title1Bold),
+            Text(
+              'Thêm chút gì đó cho không gian này đi',
+              style: AppStyles.title2Regular,
+            ),
+            commonButton(
+              text: 'Tạo',
+              onTap: () {
+                context.pushNamed(PathName.createPostPage);
+              },
+              color: AppColors.blue60,
+              padding: EdgeInsets.symmetric(horizontal: 12, vertical: 0),
+              margin: EdgeInsets.zero,
+            ),
+          ],
+        ),
       ),
     );
   }

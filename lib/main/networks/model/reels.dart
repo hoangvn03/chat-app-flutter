@@ -69,6 +69,7 @@ class MediaOverlay {
   final Color color;
   final bool hasBackground;
   final TextAlign textAlign;
+  final Color? filter;
 
   MediaOverlay({
     this.type = OverlayType.text, // 👈 mặc định là text
@@ -79,9 +80,10 @@ class MediaOverlay {
     this.size = 24,
     this.color = AppColors.white, // 👈 trắng
     this.hasBackground = false, // 👈 trắng
-    this.textAlign = TextAlign.center, // 👈 trắng
+    this.textAlign = TextAlign.center, // 👈 trắng,
+    this.filter,
   });
-    MediaOverlay copyWith({
+  MediaOverlay copyWith({
     OverlayType? type,
     String? content,
     double? x,
@@ -91,6 +93,7 @@ class MediaOverlay {
     Color? color,
     bool? hasBackground,
     TextAlign? textAlign,
+    Color? filter,
   }) {
     return MediaOverlay(
       type: type ?? this.type,
@@ -102,10 +105,10 @@ class MediaOverlay {
       color: color ?? this.color,
       hasBackground: hasBackground ?? this.hasBackground,
       textAlign: textAlign ?? this.textAlign,
+      filter: filter ?? this.filter,
     );
   }
 }
-
 
 class MediaFilter {
   final String name;

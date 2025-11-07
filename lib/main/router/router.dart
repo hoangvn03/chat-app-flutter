@@ -22,6 +22,9 @@ class AppPath {
   static const String notificationPage = "/notificationPage";
   static const String createChatGroupPage = "/createChatGroupPage";
   static const String editElementMedia = "/editElementMedia";
+  static const String createPostPage = "/createPostPage";
+  static const String imageEditorScreen = "/imageEditorScreen";
+  static const String uploadPostPage = "/uploadPostPage";
 
   ///context.gp(AppPath.homePage)
 }
@@ -50,6 +53,9 @@ class PathName {
   static const String notificationPage = "notificationPage";
   static const String createChatGroupPage = "createChatGroupPage";
   static const String editElementMedia = "editElementMedia";
+  static const String createPostPage = "createPostPage";
+  static const String imageEditorScreen = "imageEditorScreen";
+  static const String uploadPostPage = "uploadPostPage";
 
   ///context.goNamed(PathName.homePage)
 }

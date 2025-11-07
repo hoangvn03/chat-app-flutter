@@ -46,6 +46,9 @@ class _EditElementMediaState extends State<EditElementMedia> {
                     child: GestureDetector(
                       onTap: () {
                         context.read<CreateReelsBloc>().add(
+                          ToggleHeaderIcons(false),
+                        );
+                        context.read<CreateReelsBloc>().add(
                           EditTextStory(
                             current.copyWith(content: _controller.text),
                           ),

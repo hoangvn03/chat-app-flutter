@@ -19,12 +19,16 @@ class UploadFileMedia extends CreateReelsEvent{
 class UploadReels extends CreateReelsEvent{
   String typeMedia;
   String content;
-  File fileMedia;
   String id;
   MediaOverlay? overlay;
-  UploadReels(this.typeMedia,this.fileMedia,this.content,this.id,{this.overlay});
+  UploadReels(this.typeMedia,this.content,this.id,{this.overlay});
 }
 class EditTextStory extends CreateReelsEvent {
   final MediaOverlay overlay;
   EditTextStory(this.overlay);
 }
+class ToggleHeaderIcons extends CreateReelsEvent {
+  final bool visible;
+  ToggleHeaderIcons(this.visible);
+}
+

@@ -217,7 +217,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
           ReelModel(user: UserModel(id: 999, username: "Hoang")),
           ReelModel(user: UserModel(id: 999, username: "Tuan Anh")),
         ];
-        emit(ProfileSuccess(reels: reels, posts: posts, user: user));
+        emit(ProfileSuccess(reels: [], posts: [], user: user));
       }
     } catch (e) {
       emit(ProfileFailure());
@@ -235,24 +235,27 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
       if (res.statusCode == 200) {
         final user = UserModel.fromJson(res.body['data']['user']);
         final converationId = res.body['data']['conversation_id'];
-        emit(ProfileSuccess(user: user,conversationId: converationId));
+        emit(ProfileSuccess(user: user, conversationId: converationId));
       }
     } catch (e) {
       emit(ProfileFailure());
     }
     return;
   }
+
   Future<void> _loadConverationUserContact(
     LoadConveration event,
     Emitter<ProfileState> emit,
   ) async {
-        final currentState = state as ProfileSuccess;
+    final currentState = state as ProfileSuccess;
 
     try {
       var url = '${ApiEndPoints.CONVERATIONS}/${event.id}';
       ApiResponse res = await ApiUtil.get(url);
       if (res.statusCode == 200) {
-        final converation = Conversation.fromJson(res.body['data']['conversation']);
+        final converation = Conversation.fromJson(
+          res.body['data']['conversation'],
+        );
         emit(currentState.copyWith(conversation: converation));
       }
     } catch (e) {
