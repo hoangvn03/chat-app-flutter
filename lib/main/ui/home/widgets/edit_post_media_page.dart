@@ -1,21 +1,36 @@
 import 'package:chat_app/main/router/router.dart';
+import 'package:chat_app/main/ui/home/bloc/home_bloc.dart';
 import 'package:chat_app/main/ui/home/widgets/page_view_choose_media.dart';
 import 'package:chat_app/res/app_colors.dart';
 import 'package:chat_app/res/app_images.dart';
 import 'package:chat_app/res/app_styles.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:photo_manager_image_provider/photo_manager_image_provider.dart';
 
-class ImageEditorScreen extends StatelessWidget {
+class ImageEditorScreen extends StatefulWidget {
+  const ImageEditorScreen({super.key, required this.assetImage});
   final List<AssetEntity> assetImage;
 
-  const ImageEditorScreen({super.key, required this.assetImage});
+  @override
+  State<ImageEditorScreen> createState() => _ImageEditorScreenState();
+}
+
+class _ImageEditorScreenState extends State<ImageEditorScreen> {
+
+  late HomeBloc homeBloc;
+
+  @override
+  void initState() {
+    super.initState();
+    homeBloc = context.read<HomeBloc>(); // Lưu lại bloc
+  }
+
   @override
   Widget build(BuildContext context) {
     final media = AppImages.imgAvatarDefault; // put your local image here
-
     return SafeArea(
       child: Scaffold(
         backgroundColor: Color(0xFF0F0F10),
@@ -23,7 +38,7 @@ class ImageEditorScreen extends StatelessWidget {
           children: [
             _buildTopBar(context),
             Expanded(child: const SizedBox()),
-            PageViewChooseMedia(assetImage: assetImage),
+            PageViewChooseMedia(assetImage: widget.assetImage),
             Expanded(child: const SizedBox()),
             // Bottom control row
             Padding(
@@ -62,7 +77,7 @@ class ImageEditorScreen extends StatelessWidget {
                     height: 48,
                     child: ElevatedButton(
                       onPressed: () {
-                        context.pushNamed(PathName.uploadPostPage,extra: assetImage);
+                        context.pushNamed(PathName.uploadPostPage,extra: [widget.assetImage,homeBloc]);
                       },
                       style: ElevatedButton.styleFrom(
                         shape: RoundedRectangleBorder(

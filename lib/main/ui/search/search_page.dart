@@ -90,18 +90,18 @@ class SearchPage extends StatelessWidget {
       fit: StackFit.expand,
       children: [
         Image.network(
-          post.postImage ?? '',
+          post.media![0].mediaUrl ?? '',
           fit: BoxFit.cover,
           width: double.infinity,
         ),
-        if (post.typePost != 'video')
+        if (post.media![0].mediaType != 'video')
           Positioned(
             right: 4,
             top: 4,
             child: SvgPicture.asset(
               width: 16,
               height: 16,
-              post.typePost == 'reels'
+              post.media![0].mediaType != 'image'
                   ? AppImages.icReelsActive
                   : AppImages.icGallery,
               color: AppColors.white,

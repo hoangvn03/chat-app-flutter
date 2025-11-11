@@ -74,4 +74,7 @@ class ApiEndPoints {
   static String get VIEWSTORY => "$DOMAISTORYS/view";
   static String get REMOTESTORY => "$DOMAISTORYS/removeStory";
   static String get CHECKSTORY => "$DOMAISTORYS/check";
+
+  static String get UPLOADPOST => "$DOMAIN/api/upload/post";
+  static String get LOADPOST => "$DOMAIN/api/posts";
 }

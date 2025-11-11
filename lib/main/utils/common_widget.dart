@@ -37,6 +37,7 @@ Widget commonButton({
           margin ?? (EdgeInsets.only(left: 12, top: 0, right: 12, bottom: 0)),
 
       height: hasHeight == null ? 50 : height,
+      width: width,
       padding: padding,
       alignment: Alignment.center,
       decoration: BoxDecoration(

@@ -7,6 +7,7 @@ import 'package:chat_app/main/networks/model/reels.dart';
 import 'package:chat_app/main/ui/reels/create_reels/bloc/create_reels_event.dart';
 import 'package:chat_app/main/ui/reels/create_reels/bloc/create_reels_state.dart';
 import 'package:chat_app/main/utils/common_function.dart';
+import 'package:flutter/material.dart';
 
 import 'package:photo_manager/photo_manager.dart';
 import 'package:video_player/video_player.dart';
@@ -17,11 +18,24 @@ class CreateReelsBloc extends Bloc<CreateReelsEvent, CreateReelsState> {
     on<UploadReels>(_upLoadReels);
     on<UploadFileMedia>(_upLoadFileMedia);
     on<EditTextStory>(_editText);
+    on<ChangeFilterMedia>(_changeFilterPage);
+    on<AddMediaItem>(_addMediaItem);
     on<ToggleHeaderIcons>((event, emit) {
       if (state is CreateReelsSuccess) {
         final current = state as CreateReelsSuccess;
         emit(current.copyWith(isHideHeaderIcon: event.visible));
       }
+    });
+    on<UpdateOverlayPosition>((event, emit) {
+      if (state is! CreateReelsSuccess) return;
+      final currentState = state as CreateReelsSuccess;
+      final currentOverlay = currentState.overlay;
+
+      if (currentOverlay == null) return;
+
+      final updatedOverlay = currentOverlay.copyWith(x: event.x, y: event.y);
+
+      emit(currentState.copyWith(overlay: updatedOverlay));
     });
   }
   List<dynamic> _mediaPicked = [];
@@ -96,11 +110,21 @@ class CreateReelsBloc extends Bloc<CreateReelsEvent, CreateReelsState> {
     if (state is! CreateReelsSuccess) return;
     final currentState = state as CreateReelsSuccess;
     try {
+      var stickerPath;
+      if (event.sticker != null) {
+        final sticker = await event.sticker!.originFile;
+        stickerPath = sticker!.path;
+        print('stickerPath: $stickerPath');
+      }
+
       final File? file = await FFmpegHelper.processMediaForStory(
         _mediaPicked.first,
         overlay: event.overlay,
+        colorFilter: getColorFilterStringByIndex(event.indexFilter),
+        logoPath: stickerPath,
+        // '/data/user/0/com.example.chat_app/cache/edited_story_1762694851042.jpg',
       );
-      emit(currentState.copyWith(editedFile: file, isHideHeaderIcon: true));
+      emit(currentState.copyWith(editedFile: file, isHideHeaderIcon: false));
 
       // emit(CreateReelsLoading());
       // final url = 'https://timordev.ringme.vn/RingMeAPI/story/uploadStory';
@@ -128,9 +152,61 @@ class CreateReelsBloc extends Bloc<CreateReelsEvent, CreateReelsState> {
     if (state is! CreateReelsSuccess) return;
     final currentState = state as CreateReelsSuccess;
     try {
-      emit(currentState.copyWith(overlay: event.overlay));
+      emit(
+        currentState.copyWith(overlay: event.overlay, isHideHeaderIcon: false),
+      );
     } catch (e) {
       emit(CreateReelsError(e.toString()));
     }
+  }
+
+  Future<void> _addMediaItem(
+    AddMediaItem event,
+    Emitter<CreateReelsState> emit,
+  ) async {
+    if (state is! CreateReelsSuccess) return;
+    final currentState = state as CreateReelsSuccess;
+    try {
+      emit(currentState.copyWith(sticker: event.item));
+    } catch (e) {
+      emit(CreateReelsError(e.toString()));
+    }
+  }
+
+  Future<void> _changeFilterPage(
+    ChangeFilterMedia event,
+    Emitter<CreateReelsState> emit,
+  ) async {
+    if (state is! CreateReelsSuccess) return;
+    final currentState = state as CreateReelsSuccess;
+
+    await event.pageController.animateToPage(
+      event.index,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeOut,
+    );
+
+    emit(currentState.copyWith(currentIndex: event.index));
+  }
+}
+
+// Hàm trả về string filter theo index
+String getColorFilterStringByIndex(int index) {
+  switch (index) {
+    case 1:
+      // Sepia
+      return 'eq=gamma_r=1.2:gamma_g=1.1:gamma_b=0.85:saturation=1.1:contrast=1.1';
+    case 2:
+      // BW
+      return 'eq=gamma_r=1.0:gamma_g=1.0:gamma_b=1.0:saturation=0.0:contrast=1.0';
+    case 3:
+      // Warm
+      return 'eq=gamma_r=1.1:gamma_g=1.05:gamma_b=0.95:saturation=1.1:contrast=1.05';
+    case 4:
+      // Cool
+      return 'eq=gamma_r=0.95:gamma_g=1.0:gamma_b=1.1:saturation=1.05:contrast=1.05';
+    default:
+      // Normal (không filter)
+      return 'eq=gamma_r=1.0:gamma_g=1.0:gamma_b=1.0:saturation=1.0:contrast=1.0';
   }
 }

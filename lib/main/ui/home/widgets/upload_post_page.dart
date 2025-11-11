@@ -1,5 +1,9 @@
+import 'package:chat_app/main/router/router.dart';
+import 'package:chat_app/main/ui/home/bloc/home_bloc.dart';
+import 'package:chat_app/main/ui/home/bloc/home_event.dart';
 import 'package:chat_app/main/utils/common_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:go_router/go_router.dart';
@@ -20,6 +24,14 @@ class UploadPostPage extends StatefulWidget {
 
 class _UploadPostPageState extends State<UploadPostPage> {
   bool _aiTag = false;
+  final TextEditingController _noteController = TextEditingController();
+  late HomeBloc homeBloc;
+
+  @override
+  void initState() {
+    super.initState();
+    homeBloc = context.read<HomeBloc>(); // Lưu lại bloc
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -173,7 +185,7 @@ class _UploadPostPageState extends State<UploadPostPage> {
         ),
       ),
       bottomSheet: Container(
-        padding: const EdgeInsets.symmetric(vertical: 12,horizontal: 12),
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
         decoration: BoxDecoration(
           color: AppColors.black,
           border: const Border(
@@ -186,7 +198,21 @@ class _UploadPostPageState extends State<UploadPostPage> {
         child: commonButton(
           radius: 8,
           text: 'Chia sẻ',
-          onTap: () {},
+          onTap: () {
+            
+            context.pushNamed(
+              PathName.homePage,
+              extra: [_noteController.text.trim(), 'Hà Nội', widget.assetImage],
+            );
+            // context.read<HomeBloc>().add(
+            //   CreatePost(
+            //     caption: _noteController.text.trim(),
+            //     location: 'Hà Nội',
+            //     assetImage: widget.assetImage,
+            //   ),
+            // );
+            // context.goNamed(PathName.homePage);
+          },
           margin: EdgeInsets.zero,
         ),
       ),
@@ -194,79 +220,42 @@ class _UploadPostPageState extends State<UploadPostPage> {
   }
 
   Widget _buildAddNote() {
-    return GestureDetector(
-      onTap: () {},
-      child: Text(
-        'Thêm chú thích...',
-        style: AppStyles.bodyRegular.copyWith(
-          color: Colors.white70,
-          fontSize: 16,
-        ),
-      ),
-    );
-  }
+    return TextField(
+      textAlignVertical: TextAlignVertical.center,
+      controller: _noteController,
+      style: AppStyles.bodyRegular.copyWith(color: AppColors.white),
+      onChanged: (_) {},
+      decoration: InputDecoration(
+        hintText: 'Thêm chú thích...',
+        hintStyle: AppStyles.bodyRegular.copyWith(color: AppColors.white),
 
-  Widget _buildMenuItem(IconData icon, String title, {String? trailingText}) {
-    return ListTile(
-      leading: Icon(icon, color: Colors.white),
-      title: Text(
-        title,
-        style: AppStyles.bodyRegular.copyWith(color: Colors.white),
-      ),
-      trailing:
-          trailingText != null
-              ? Text(
-                trailingText,
-                style: AppStyles.bodyRegular.copyWith(color: Colors.grey),
-              )
-              : const Icon(Icons.chevron_right, color: Colors.white54),
-      onTap: () {},
-    );
-  }
-
-  Widget _buildSwitchItem(String title, String description) {
-    bool isSwitched = false;
-    return StatefulBuilder(
-      builder: (context, setState) {
-        return ListTile(
-          leading: const Icon(Icons.smart_toy_outlined, color: Colors.white),
-          title: Text(
-            title,
-            style: AppStyles.bodyRegular.copyWith(color: Colors.white),
-          ),
-          subtitle: Text(
-            description,
-            style: AppStyles.bodyRegular.copyWith(
-              color: Colors.white54,
-              fontSize: 12,
-            ),
-          ),
-          trailing: Switch(
-            value: isSwitched,
-            onChanged: (val) => setState(() => isSwitched = val),
-            activeColor: AppColors.blue20,
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildShareButton() {
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton(
-        onPressed: () {},
-        style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.blue20,
-          padding: const EdgeInsets.symmetric(vertical: 14),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 12,
+          vertical: 12,
         ),
-        child: Text(
-          'Chia sẻ',
-          style: AppStyles.title1Bold.copyWith(color: Colors.white),
+        fillColor: AppColors.gray20,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide.none,
         ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide.none,
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide.none,
+        ),
+        suffixIcon:
+            _noteController.text.isNotEmpty
+                ? IconButton(
+                  icon: const Icon(Icons.send, color: Colors.white),
+                  onPressed: () {
+                    print('Nội dung: ${_noteController.text}');
+                    _noteController.clear();
+                  },
+                )
+                : null,
       ),
     );
   }

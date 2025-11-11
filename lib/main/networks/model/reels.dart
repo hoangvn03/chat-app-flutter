@@ -62,6 +62,7 @@ enum OverlayType { text, sticker }
 class MediaOverlay {
   final OverlayType type;
   final String content;
+  final String? mediaPath;
   final double x;
   final double y;
   final String fontText;
@@ -74,6 +75,7 @@ class MediaOverlay {
   MediaOverlay({
     this.type = OverlayType.text, // 👈 mặc định là text
     this.content = '',
+    this.mediaPath,
     this.x = 0.5, // 👈 giữa màn hình
     this.y = 0.5,
     this.fontText = 'Roboto',
@@ -86,6 +88,7 @@ class MediaOverlay {
   MediaOverlay copyWith({
     OverlayType? type,
     String? content,
+    String? mediaPath,
     double? x,
     double? y,
     String? fontText,
@@ -98,6 +101,7 @@ class MediaOverlay {
     return MediaOverlay(
       type: type ?? this.type,
       content: content ?? this.content,
+      mediaPath: mediaPath ?? this.mediaPath,
       x: x ?? this.x,
       y: y ?? this.y,
       fontText: fontText ?? this.fontText,

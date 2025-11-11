@@ -16,9 +16,9 @@ import 'package:photo_manager_image_provider/photo_manager_image_provider.dart';
 
 // ignore: must_be_immutable
 class MediaGridView extends StatelessWidget {
-  MediaGridView({super.key, this.onTap, this.isHideListChooseMedia});
+  MediaGridView({super.key, this.onTap, this.isHideListChooseMedia = true});
   VoidCallback? onTap;
-  bool? isHideListChooseMedia;
+  bool isHideListChooseMedia;
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -71,7 +71,7 @@ class MediaGridView extends StatelessWidget {
             },
           ),
         ),
-        isHideListChooseMedia ?? true
+        isHideListChooseMedia
             ? Positioned(
               bottom: 0,
               left: 0,

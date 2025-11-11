@@ -51,168 +51,80 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
       if (res.statusCode == 200) {
         final user = UserModel.fromJson(res.body['data']['user']);
         print(user.bio);
-        final List<PostModel> posts = [
-          PostModel(
-            id: "1",
-            user: UserModel(
-              id: 999,
-
-              username: 'hieu_pham',
-              avatar: AppImages.imgAvatarDefault,
-            ),
-            postImage: "https://picsum.photos/400/400?random=1",
-            caption: "Cuối tuần chill 😎",
-            likes: 120,
-            typePost: "reels",
-            timeAgo: "2 giờ trước",
+      final List<PostModel> posts = [
+        PostModel(
+          postId: 1,
+          userId: 1,
+          caption:
+              "Buổi sáng tuyệt vời tại Hà Nội! Thật sự thư giãn. #travel #hanoi",
+          location: "Bạch Thanh Trà",
+          isArchived: false,
+          createdAt: DateTime.parse("2025-11-08T06:29:07.000Z"),
+          updatedAt: DateTime.parse("2025-11-08T06:29:07.000Z"),
+          author: UserModel(
+            id: 1,
+            username: "alice",
+            avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Alice",
           ),
-          PostModel(
-            id: "2",
-            user: UserModel(
-              id: 999,
-
-              username: 'linh_nguyen',
-              avatar: AppImages.imgAvatarDefault,
-            ),
-            postImage: "https://picsum.photos/400/400?random=2",
-            caption: "Cà phê sáng ☕",
-            likes: 89,
-            timeAgo: "5 giờ trước",
+        ),
+        PostModel(
+          postId: 2,
+          userId: 2,
+          caption: "Cà phê sáng ở Đà Lạt thật chill ☕🌿 #coffee #dalat",
+          location: "Tiệm cà phê Mộc",
+          isArchived: false,
+          createdAt: DateTime.parse("2025-11-07T08:45:20.000Z"),
+          updatedAt: DateTime.parse("2025-11-07T08:45:20.000Z"),
+          author: UserModel(
+            id: 2,
+            username: "bob",
+            avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Bob",
           ),
-          PostModel(
-            id: "3",
-            user: UserModel(
-              id: 999,
-
-              username: 'lisa',
-              avatar: AppImages.imgAvatarDefault,
-            ),
-            postImage: "https://picsum.photos/400/400?random=3",
-            caption: "Coding all day 💻🔥",
-            likes: 300,
-            timeAgo: "1 ngày trước",
+        ),
+        PostModel(
+          postId: 3,
+          userId: 3,
+          caption: "Chiều hoàng hôn bên sông thật đẹp 🌅 #sunset #relax",
+          location: "Bến Bạch Đằng",
+          isArchived: false,
+          createdAt: DateTime.parse("2025-11-06T17:30:00.000Z"),
+          updatedAt: DateTime.parse("2025-11-06T17:30:00.000Z"),
+          author: UserModel(
+            id: 3,
+            username: "carol",
+            avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Carol",
           ),
-          PostModel(
-            id: "4",
-            user: UserModel(
-              id: 999,
-
-              username: 'thanh_nguyen',
-              avatar: AppImages.imgAvatarDefault,
-            ),
-            postImage: "https://picsum.photos/400/400?random=4",
-            caption: "Du lịch biển 🌊",
-            likes: 240,
-            timeAgo: "2 ngày trước",
+        ),
+        PostModel(
+          postId: 4,
+          userId: 4,
+          caption: "Làm việc chăm chỉ hôm nay để mai thành công 💪 #workhard",
+          location: "Hồ Chí Minh",
+          isArchived: false,
+          createdAt: DateTime.parse("2025-11-05T09:00:00.000Z"),
+          updatedAt: DateTime.parse("2025-11-05T09:00:00.000Z"),
+          author: UserModel(
+            id: 4,
+            username: "david",
+            avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=David",
           ),
-          PostModel(
-            id: "5",
-            user: UserModel(
-              id: 999,
-
-              username: 'tuan_anh',
-              avatar: AppImages.imgAvatarDefault,
-            ),
-            postImage: "https://picsum.photos/400/400?random=5",
-            caption: "Du lịch biển 🌊",
-            likes: 240,
-            timeAgo: "2 ngày trước",
+        ),
+        PostModel(
+          postId: 5,
+          userId: 5,
+          caption: "Một ngày nắng đẹp để đi dạo 🌞 #weekend #happy",
+          location: "Cầu Thủ Thiêm 2",
+          isArchived: false,
+          createdAt: DateTime.parse("2025-11-04T15:15:00.000Z"),
+          updatedAt: DateTime.parse("2025-11-04T15:15:00.000Z"),
+          author: UserModel(
+            id: 5,
+            username: "emma",
+            avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Emma",
           ),
-          PostModel(
-            id: "6",
-            typePost: "reels",
-            user: UserModel(
-              id: 999,
+        ),
+      ];
 
-              username: 'minh_hieu',
-              avatar: AppImages.imgAvatarDefault,
-            ),
-            postImage: "https://picsum.photos/400/400?random=6",
-            caption: "Du lịch biển 🌊",
-            likes: 240,
-            timeAgo: "2 ngày trước",
-          ),
-          PostModel(
-            id: "7",
-            typePost: "reels",
-            user: UserModel(
-              id: 999,
-
-              username: 'rosé',
-              avatar: AppImages.imgAvatarDefault,
-            ),
-            postImage: "https://picsum.photos/400/400?random=7",
-            caption: "Du lịch biển 🌊",
-            likes: 240,
-            timeAgo: "2 ngày trước",
-          ),
-          PostModel(
-            id: "8",
-            typePost: "video",
-            user: UserModel(
-              id: 999,
-
-              username: 'david',
-              avatar: AppImages.imgAvatarDefault,
-            ),
-            postImage: "https://picsum.photos/400/400?random=8",
-            caption: "Du lịch biển 🌊",
-            likes: 240,
-            timeAgo: "2 ngày trước",
-          ),
-          PostModel(
-            id: "9",
-            user: UserModel(
-              id: 999,
-
-              username: 'yasuo',
-              avatar: AppImages.imgAvatarDefault,
-            ),
-            postImage: "https://picsum.photos/400/400?random=9",
-            caption: "Du lịch biển 🌊",
-            likes: 240,
-            timeAgo: "2 ngày trước",
-          ),
-          PostModel(
-            id: "10",
-            user: UserModel(
-              id: 999,
-
-              username: 'hasagi',
-              avatar: AppImages.imgAvatarDefault,
-            ),
-            postImage: "https://picsum.photos/400/400?random=10",
-            caption: "Du lịch biển 🌊",
-            likes: 240,
-            timeAgo: "2 ngày trước",
-          ),
-          PostModel(
-            id: "11",
-            user: UserModel(
-              id: 999,
-
-              username: 'anna',
-              avatar: AppImages.imgAvatarDefault,
-            ),
-            postImage: "https://picsum.photos/400/400?random=11",
-            caption: "Du lịch biển 🌊",
-            likes: 240,
-            timeAgo: "2 ngày trước",
-          ),
-          PostModel(
-            id: "12",
-            user: UserModel(
-              id: 999,
-
-              username: 'hieu_pham',
-              avatar: AppImages.imgAvatarDefault,
-            ),
-            postImage: "https://picsum.photos/400/400?random=4",
-            caption: "Du lịch biển 🌊",
-            likes: 240,
-            timeAgo: "2 ngày trước",
-          ),
-        ];
         final reels = [
           ReelModel(user: UserModel(id: 999, username: "Hoang")),
           ReelModel(user: UserModel(id: 999, username: "Tuan Anh")),

@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 import 'package:chat_app/main/networks/model/reels.dart';
 import 'package:ffmpeg_kit_flutter_new/ffmpeg_kit.dart';
@@ -51,8 +52,9 @@ class FFmpegHelper {
       outputPath: outputPath,
       overlay: overlay,
       logoPath: logoPath,
+      filter: colorFilter,
     );
-
+    log('Command FFmpeg: $command');
     return await _executeFfmpegCommand(command, outputPath);
   }
 
@@ -64,9 +66,10 @@ class FFmpegHelper {
     required String outputPath,
     MediaOverlay? overlay,
     String? logoPath,
+    String? filter,
   }) async {
     final bool hasLogo = logoPath != null && await File(logoPath).exists();
-
+    print('Logo: $hasLogo');
     if (hasLogo) {
       return _buildComplexFilterCommand(
         inputFile: inputFile,
@@ -75,6 +78,7 @@ class FFmpegHelper {
         outputPath: outputPath,
         overlay: overlay,
         logoPath: logoPath,
+        filter: filter,
       );
     } else {
       return _buildSimpleFilterCommand(
@@ -83,6 +87,7 @@ class FFmpegHelper {
         isVideo: isVideo,
         outputPath: outputPath,
         overlay: overlay,
+        filter: filter,
       );
     }
   }
@@ -115,7 +120,6 @@ class FFmpegHelper {
     return fontFile.path;
   }
 
-  // Hàm xây dựng command với complex filter (có logo)
   static Future<String> _buildComplexFilterCommand({
     required File inputFile,
     required Directory tempDir,
@@ -123,26 +127,39 @@ class FFmpegHelper {
     required String outputPath,
     MediaOverlay? overlay,
     required String logoPath,
+    String? filter,
+
+    // 🎯 Thêm các tùy chọn mới
+    double logoWidth = 300,
+    double logoHeight = 300,
+    String logoX = '(main_w-overlay_w)/2',
+    String logoY = '(main_h-overlay_h)/2',
   }) async {
-    final colorFilter = _getColorFilter();
+    final colorFilter = filter ?? _getColorFilter();
     final textOverlay = await _getTextOverlayFilter(
       tempDir: tempDir,
       overlay: overlay,
     );
 
-    final filterCommand =
-        '[0:v]$colorFilter[color];' +
-        '[color]$textOverlay[text];' +
-        '[1:v]scale=w=100:h=100[logo];' +
-        '[text][logo]overlay=W-w-10:10[out]';
+    // 🎨 Tạo command linh hoạt
+    final filterCommand = [
+      '[0:v]$colorFilter[color]',
+      '[color]$textOverlay[text]',
+      '[1:v]scale=w=$logoWidth:h=$logoHeight[logo]',
+      '[text][logo]overlay=x=$logoX:y=$logoY[out]',
+    ].join(';');
 
-    return '-i ${inputFile.path} ' +
-        '-i $logoPath ' +
-        '-filter_complex "$filterCommand" ' +
-        '-map "[out]" ' +
-        (isVideo ? '-c:v libx264 -preset fast -crf 23 ' : '') +
-        (isVideo ? '-c:a copy ' : '') +
-        '-y $outputPath';
+    final cmd = [
+      '-i "${inputFile.path}"',
+      '-i "$logoPath"',
+      '-filter_complex "$filterCommand"',
+      '-map "[out]"',
+      if (isVideo) '-c:v libx264 -preset fast -crf 23',
+      if (isVideo) '-c:a copy',
+      '-y "$outputPath"',
+    ].join(' ');
+
+    return cmd;
   }
 
   // Hàm xây dựng command với simple filter (không logo)
@@ -152,8 +169,9 @@ class FFmpegHelper {
     required bool isVideo,
     required String outputPath,
     MediaOverlay? overlay,
+    String? filter,
   }) async {
-    final colorFilter = _getColorFilter();
+    final colorFilter = filter ?? _getColorFilter();
     final textOverlay = await _getTextOverlayFilter(
       tempDir: tempDir,
       overlay: overlay,
@@ -217,7 +235,7 @@ class FFmpegHelper {
         'drawtext=' +
         "fontfile='$fontPath':" +
         "text='${overlay.content.replaceAll("'", r"\'")}':" +
-        "fontsize=${overlay.size * 3}:" +
+        "fontsize=${overlay.size * 5}:" +
         "fontcolor=$colorHex:" +
         "x=$xPosExpression:" +
         "y=$yPosExpression" +

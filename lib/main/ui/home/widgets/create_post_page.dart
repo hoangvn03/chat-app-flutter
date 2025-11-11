@@ -1,4 +1,6 @@
+import 'package:chat_app/main/helper/socket/socket_service.dart';
 import 'package:chat_app/main/router/router.dart';
+import 'package:chat_app/main/ui/home/bloc/home_bloc.dart';
 import 'package:chat_app/main/ui/home/widgets/edit_post_media_page.dart';
 import 'package:chat_app/main/ui/reels/media_picked/bloc/media_picked_bloc.dart';
 import 'package:chat_app/main/ui/reels/media_picked/bloc/media_picked_event.dart';
@@ -28,12 +30,17 @@ class _CreatePostPageState extends State<CreatePostPage> {
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
 
-    return BlocProvider(
-      create:
-          (_) =>
-              MediaPickedBloc()..add(
-                LoadRequest(requestType: RequestType.common, maxCount: 5),
-              ),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create:
+              (_) =>
+                  MediaPickedBloc()..add(
+                    LoadRequest(requestType: RequestType.common, maxCount: 5),
+                  ),
+        ),
+        BlocProvider(create: (_) => HomeBloc(context.read<SocketService>())),
+      ],
       child: Scaffold(
         backgroundColor: AppColors.black,
         body: Stack(
@@ -58,7 +65,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
                 }
 
                 // Nếu chưa load xong → hiển thị loading
-                return const CircularProgressIndicator();
+                return Container(color: AppColors.gray70);
               },
             ),
             Positioned(
@@ -89,7 +96,10 @@ class _CreatePostPageState extends State<CreatePostPage> {
                                 // Trong file main.dart hoặc nơi bạn muốn sử dụng
                                 context.pushNamed(
                                   PathName.imageEditorScreen,
-                                  extra: state.selectedAsset,
+                                  extra: [
+                                    state.selectedAsset,
+                                    BlocProvider.of<HomeBloc>(context),
+                                  ],
                                 );
                               }
                             },
@@ -117,7 +127,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
                   child: Container(
                     color: AppColors.black,
                     height: height * 0.5,
-                    child: MediaGridView(),
+                    child: MediaGridView(isHideListChooseMedia: true),
                   ),
                 ),
                 // MediaHeaderOption - có thể điều chỉnh vị trí

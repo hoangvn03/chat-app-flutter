@@ -18,6 +18,13 @@ String formatDateTime(String isoString) {
   return '$weekday $time';
 }
 
+String formatDateTimeV2(DateTime? dateTime) {
+  if (dateTime == null) return '';
+  final formatter = DateFormat('HH:mm - dd/MM/yyyy');
+  return formatter.format(dateTime);
+}
+
+
 Future<List<File>> convertAssetEntitiesToFiles(List<AssetEntity> assets) async {
   final List<File> files = [];
 

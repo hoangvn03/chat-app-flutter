@@ -9,6 +9,7 @@ import 'package:chat_app/main/ui/conversations/conversations_page.dart';
 import 'package:chat_app/main/ui/conversations/screens/createGroupChat/bloc/create_chat_bloc.dart';
 import 'package:chat_app/main/ui/conversations/screens/createGroupChat/create_chat_page.dart';
 import 'package:chat_app/main/ui/conversations/screens/message/chat_room.dart';
+import 'package:chat_app/main/ui/home/bloc/home_bloc.dart';
 import 'package:chat_app/main/ui/home/home_page.dart';
 import 'package:chat_app/main/ui/home/widgets/create_post_page.dart';
 import 'package:chat_app/main/ui/home/widgets/edit_post_media_page.dart';
@@ -133,14 +134,22 @@ class AppGoRouter {
                 name: PathName.uploadPostPage,
                 path: AppPath.uploadPostPage,
                 builder: (context, state) {
-                   final data = state.extra as List<AssetEntity>;
-                  return UploadPostPage(assetImage: data);
+                  final data = state.extra as List<dynamic>;
+                  final homeBloc = data[1] as HomeBloc;
+                  return BlocProvider.value(
+                    value: homeBloc,
+                    child: UploadPostPage(assetImage: data[0]),
+                  );
                 },
               ),
             ],
             builder: (context, state) {
-              final data = state.extra as List<AssetEntity>;
-              return ImageEditorScreen(assetImage: data);
+              final data = state.extra as List<dynamic>;
+              final homeBloc = data[1] as HomeBloc;
+              return BlocProvider.value(
+                value: homeBloc,
+                child: ImageEditorScreen(assetImage: data[0]),
+              );
             },
           ),
         ],
@@ -191,6 +200,7 @@ class AppGoRouter {
 
       //Bottom Bar
       StatefulShellRoute.indexedStack(
+        parentNavigatorKey: _rootNavigatorKey,
         builder:
             (context, state, navigationShell) =>
                 MainPage(navigationShell: navigationShell),
@@ -211,7 +221,8 @@ class AppGoRouter {
                   ),
                 ],
                 builder: (context, state) {
-                  return HomePage();
+                  final extras = state.extra as List<dynamic>?;
+                  return HomePage(extras: extras);
                 },
               ),
             ],

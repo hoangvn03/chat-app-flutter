@@ -1,4 +1,4 @@
-import 'package:chat_app/main/ui/widget/interaction_button/interaction_button.dart';
+import 'package:chat_app/main/ui/widget/post/widgets/interaction_button.dart';
 import 'package:chat_app/main/utils/common_widget.dart';
 import 'package:chat_app/res/app_colors.dart';
 import 'package:chat_app/res/app_images.dart';

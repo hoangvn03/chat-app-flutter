@@ -1,6 +1,6 @@
 import 'package:chat_app/main/ui/widget/account_suggest/cubit/account_suggest_cubit.dart';
 import 'package:chat_app/main/ui/widget/account_suggest/cubit/account_suggest_state.dart';
-import 'package:chat_app/main/ui/widget/interaction_button/interaction_button.dart';
+import 'package:chat_app/main/ui/widget/post/widgets/interaction_button.dart';
 import 'package:chat_app/main/networks/model/user.dart';
 import 'package:chat_app/main/router/router.dart';
 import 'package:chat_app/main/utils/common_widget.dart';

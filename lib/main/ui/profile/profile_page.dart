@@ -7,8 +7,8 @@ import 'package:chat_app/main/ui/conversations/screens/createGroupChat/bloc/crea
 import 'package:chat_app/main/ui/conversations/screens/message/bloc/chat_bloc.dart';
 import 'package:chat_app/main/ui/conversations/screens/message/bloc/chat_state.dart';
 import 'package:chat_app/main/ui/widget/account_suggest/account_suggest_widget.dart';
-import 'package:chat_app/main/ui/widget/interaction_button/bloc/interaction_cubit.dart';
-import 'package:chat_app/main/ui/widget/interaction_button/interaction_button.dart';
+import 'package:chat_app/main/ui/widget/post/bloc/interaction_cubit.dart';
+import 'package:chat_app/main/ui/widget/post/widgets/interaction_button.dart';
 import 'package:chat_app/main/networks/model/common_item.dart';
 import 'package:chat_app/main/networks/model/post.dart';
 import 'package:chat_app/main/networks/model/reels.dart';
@@ -1109,18 +1109,23 @@ class _ProfilePageState extends State<ProfilePage>
   Widget _buildEmptyPost(int page) {
     return GestureDetector(
       onTap: () {},
-      child: Container(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 64),
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
             Text('Tạo bài viêt đầu tiên', style: AppStyles.title1Bold),
             Text(
               'Thêm chút gì đó cho không gian này đi',
               style: AppStyles.title2Regular,
             ),
+            const SizedBox(height: 48),
             commonButton(
               text: 'Tạo',
+              width: 100,
+              radius: 16,
               onTap: () {
-                context.pushNamed(PathName.createPostPage);
+                context.goNamed(PathName.createPostPage);
               },
               color: AppColors.blue60,
               padding: EdgeInsets.symmetric(horizontal: 12, vertical: 0),
@@ -1156,18 +1161,18 @@ class _ProfilePageState extends State<ProfilePage>
       fit: StackFit.expand,
       children: [
         Image.network(
-          post.postImage ?? '',
+          post.media![0].mediaUrl ?? '',
           fit: BoxFit.cover,
           width: double.infinity,
         ),
-        if (post.typePost != 'video')
+        if (post.media![0].mediaType != 'video')
           Positioned(
             right: 4,
             top: 4,
             child: SvgPicture.asset(
               width: 16,
               height: 16,
-              post.typePost == 'reels'
+              post.media![0].mediaType != 'image'
                   ? AppImages.icReelsActive
                   : AppImages.icGallery,
               color: AppColors.white,

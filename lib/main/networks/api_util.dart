@@ -138,6 +138,7 @@ class ApiUtil {
   static Future<ApiResponse> postFiles({
     required String url,
     required List<File> files,
+    String? key
   }) async {
     try {
       final token = await AppStorage.getToken();
@@ -151,7 +152,7 @@ class ApiUtil {
         print('Uploading ${file.path} with MIME type $mimeType');
         request.files.add(
           await http.MultipartFile.fromPath(
-            'files',
+            key ?? 'files',
             file.path,
             contentType: MediaType(mimeSplit[0], mimeSplit[1]),
           ),

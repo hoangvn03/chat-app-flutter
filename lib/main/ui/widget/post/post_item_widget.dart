@@ -1,13 +1,14 @@
-import 'package:chat_app/main/ui/widget/interaction_button/bloc/interaction_state.dart';
-import 'package:chat_app/main/ui/widget/interaction_button/interaction_button.dart';
-import 'package:chat_app/main/ui/widget/interaction_button/bloc/interaction_cubit.dart';
-import 'package:chat_app/main/ui/widget/post/action/action_widget.dart';
-import 'package:chat_app/main/ui/widget/post/action/bloc/action_bloc.dart';
-import 'package:chat_app/main/ui/widget/post/action/bloc/action_event.dart';
-import 'package:chat_app/main/ui/widget/post/action/bloc/action_state.dart';
+import 'package:chat_app/main/ui/widget/post/bloc/interaction_state.dart';
+import 'package:chat_app/main/ui/widget/post/widgets/interaction_button.dart';
+import 'package:chat_app/main/ui/widget/post/bloc/interaction_cubit.dart';
+import 'package:chat_app/main/ui/widget/post/widgets/action/action_widget.dart';
+import 'package:chat_app/main/ui/widget/post/widgets/action/bloc/action_bloc.dart';
+import 'package:chat_app/main/ui/widget/post/widgets/action/bloc/action_event.dart';
+import 'package:chat_app/main/ui/widget/post/widgets/action/bloc/action_state.dart';
 import 'package:chat_app/main/networks/model/post.dart';
 import 'package:chat_app/main/networks/model/user.dart';
 import 'package:chat_app/main/router/router.dart';
+import 'package:chat_app/main/utils/common_function.dart';
 import 'package:chat_app/main/utils/common_widget.dart';
 import 'package:chat_app/res/app_colors.dart';
 import 'package:chat_app/res/app_images.dart';
@@ -21,161 +22,249 @@ import 'package:go_router/go_router.dart';
 class PostWidget extends StatelessWidget {
   PostWidget({super.key, required this.post});
   PostModel post;
-
+  final TextEditingController _commetController = TextEditingController();
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Header
-        // _buildHeaderPost(context),
-        commonTileItem(
-          title: post.user.username ?? 'Unknown',
-          subtitle: post.timePost ?? '1 ngày trước',
-          titleWidget: GestureDetector(
-            onTap: () {
-              context.pushNamed(PathName.profilePage, extra: post.user);
-            },
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      post.user.username ?? 'Unknown',
-                      style: AppStyles.headlineBold,
-                    ),
-                    Text(
-                      post.timePost ?? '1 ngày trước',
-                      style: AppStyles.footnoteRegular,
-                    ),
-                  ],
-                ),
-                // followButton(),
-                interactionButton(type: InteractionType.follow),
-              ],
-            ),
-          ),
-          onTapTralling: () {
-            showModalBottomSheet(
-              context: context,
-              useSafeArea: true,
-              backgroundColor: AppColors.white,
-              isScrollControlled: true,
-              shape: const RoundedRectangleBorder(
-                borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+    return BlocProvider(
+      create: (_) => ActionBloc(),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header
+          // _buildHeaderPost(context),
+          commonTileItem(
+            title: post.author!.username ?? 'Unknown',
+            subtitle: formatDateTimeV2(post.updatedAt),
+            titleWidget: GestureDetector(
+              onTap: () {
+                context.pushNamed(PathName.profilePage, extra: post.author);
+              },
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        post.author!.username ?? 'Unknown',
+                        style: AppStyles.headlineBold,
+                      ),
+                      Text(
+                        formatDateTimeV2(post.updatedAt),
+                        style: AppStyles.footnoteRegular,
+                      ),
+                    ],
+                  ),
+                  // followButton(),
+                  interactionButton(type: InteractionType.follow),
+                ],
               ),
-              builder: (context) => _buildBottomSheetPostOption(context),
-            );
-          },
-        ),
+            ),
+            onTapTralling: () {
+              showModalBottomSheet(
+                context: context,
+                useSafeArea: true,
+                backgroundColor: AppColors.white,
+                isScrollControlled: true,
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+                ),
+                builder: (context) => _buildBottomSheetPostOption(context),
+              );
+            },
+          ),
 
-        // Post Image
-        _buildPostContent(),
+          // Post Image
+          _buildPostContent(),
 
-        // Action bar
-        _buildActionBar(context),
+          // Action bar
+          _buildActionBar(context),
 
-        //User Like
-        _buildListUserLikePost(
-          users: [
-            UserModel(                            id:999,
-username: 'hieu_pham', avatar: AppImages.imgAvatarDefault),
-            UserModel(                            id:999,
-username: 'tuan_anh', avatar: AppImages.imgAvatarDefault),
-         UserModel(                            id:999,
-username: 'ngoc_hoang', avatar: AppImages.imgAvatarDefault),
-            UserModel(                            id:999,
-username: 'minh_hieu', avatar: AppImages.imgAvatarDefault),
-          ],
-        ),
-        // Caption
-        _builCaptionPost(),
-      ],
+          //User Like
+          _buildListUserLikePost(
+            users: [
+              UserModel(
+                id: 999,
+                username: 'hieu_pham',
+                avatar: AppImages.imgAvatarDefault,
+              ),
+              UserModel(
+                id: 999,
+                username: 'tuan_anh',
+                avatar: AppImages.imgAvatarDefault,
+              ),
+              UserModel(
+                id: 999,
+                username: 'ngoc_hoang',
+                avatar: AppImages.imgAvatarDefault,
+              ),
+              UserModel(
+                id: 999,
+                username: 'minh_hieu',
+                avatar: AppImages.imgAvatarDefault,
+              ),
+            ],
+          ),
+          // Caption
+          _builCaptionPost(),
+        ],
+      ),
     );
   }
 
   Widget _buildPostContent() {
-    return Image.network(
-      post.postImage ?? '',
-      fit: BoxFit.cover,
-      width: double.infinity,
+    final mediaList = post.media ?? [];
+
+    if (mediaList.isEmpty) {
+      return const SizedBox(
+        height: 300,
+        child: Center(child: Text('Không có ảnh')),
+      );
+    }
+
+    return SizedBox(
       height: 300,
+      child: PageView.builder(
+        itemCount: mediaList.length,
+        itemBuilder: (context, index) {
+          final media = mediaList[index];
+          return Image.network(
+            media.mediaUrl ?? '',
+            fit: BoxFit.cover,
+            width: double.infinity,
+            errorBuilder:
+                (context, error, stackTrace) =>
+                    const Center(child: Icon(Icons.broken_image)),
+          );
+        },
+      ),
     );
   }
 
   Widget _buildActionBar(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-      child: Row(
-        children: [
-          // likeButton(),
-          interactionButton(type: InteractionType.like),
-          SizedBox(width: 4),
-          Text('${post.likes}', style: AppStyles.calloutBold),
-          SizedBox(width: 12),
-          GestureDetector(
-            onTap: () {
-              showModalBottomSheet(
+    print('IsLikes: ${post.isLiked} ${post.likesCount}');
+    return BlocBuilder<ActionBloc, ActionState>(
+      builder: (context, state) {
+        var likeCount, isSelected;
+        if (state is ActionSuccess) {
+          if (state.data != null) {
+            likeCount = state.data as int;
+          }
+          isSelected = state.isSelected;
+        } else {
+          isSelected = post.isLiked;
+          likeCount = post.likesCount ?? 0;
+        }
+        return Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+          child: Row(
+            children: [
+              likeButton(
                 context: context,
-                useSafeArea: true,
-                isScrollControlled: true,
-                shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-                ),
-                builder: (context) {
-                  return commentPageBottomSheet();
+                icon: isSelected ? AppImages.icLikeDark : AppImages.icLike,
+                onTap: () {
+                  context.read<ActionBloc>().add(
+                    ActionPost(
+                      typeAction: InteractionType.like,
+                      postId: post.postId ?? -1,
+                    ),
+                  );
                 },
-              );
-            },
-            child: SvgPicture.asset(AppImages.icComment, width: 24, height: 24),
-          ),
-          SizedBox(width: 4),
-          Text('${post.likes ?? 0}', style: AppStyles.calloutBold),
-          SizedBox(width: 12),
-          GestureDetector(
-            onTap: () {
-              showModalBottomSheet(
-                context: context,
-                useSafeArea: true,
-                isScrollControlled: true,
-                shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-                ),
-                builder: (context) {
-                  return commentPageBottomSheet();
-                },
-              );
-            },
-            child: SvgPicture.asset(AppImages.icShare, width: 24, height: 24),
-          ),
-          SizedBox(width: 4),
-          Text(
-            '${post.likes ?? 0}',
-            style: AppStyles.calloutBold,
-          ), // Sửa thành comments count
-          Spacer(),
-          interactionButton(
-            type: InteractionType.save,
-            onTapState1: () {
-              showModalBottomSheet(
-                context: context,
-                useSafeArea: true,
-                isScrollControlled: true,
-                shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-                ),
-                builder: (context) {
-                  return commentPageBottomSheet();
-                },
-              );
-            },
-          ),
+              ),
 
-          // saveButton(),
-        ],
-      ),
+              // interactionButton(type: InteractionType.like),
+              SizedBox(width: 4),
+              Text('$likeCount', style: AppStyles.calloutBold),
+              SizedBox(width: 12),
+              GestureDetector(
+                onTap: () {
+                  showModalBottomSheet(
+                    context: context,
+                    useSafeArea: true,
+                    isScrollControlled: true,
+                    shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.vertical(
+                        top: Radius.circular(16),
+                      ),
+                    ),
+                    builder: (context) {
+                      return CommentWidget(
+                        comments: post.comments ?? [],
+                        textController: _commetController,
+                        postId: post.postId ?? -1,
+                      );
+                    },
+                  );
+                },
+                child: SvgPicture.asset(
+                  AppImages.icComment,
+                  width: 24,
+                  height: 24,
+                ),
+              ),
+              SizedBox(width: 4),
+              Text('${post.commentsCount ?? 0}', style: AppStyles.calloutBold),
+              SizedBox(width: 12),
+              GestureDetector(
+                onTap: () {
+                  showModalBottomSheet(
+                    context: context,
+                    useSafeArea: true,
+                    isScrollControlled: true,
+                    shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.vertical(
+                        top: Radius.circular(16),
+                      ),
+                    ),
+                    builder: (context) {
+                      return CommentWidget(
+                        comments: post.comments ?? [],
+                        textController: _commetController,
+                        postId: post.postId ?? -1,
+                      );
+                    },
+                  );
+                },
+                child: SvgPicture.asset(
+                  AppImages.icShare,
+                  width: 24,
+                  height: 24,
+                ),
+              ),
+              SizedBox(width: 4),
+              Text(
+                '${post.saveCount ?? 0}',
+                style: AppStyles.calloutBold,
+              ), // Sửa thành comments count
+              Spacer(),
+              interactionButton(
+                type: InteractionType.save,
+                onTapState1: () {
+                  showModalBottomSheet(
+                    context: context,
+                    useSafeArea: true,
+                    isScrollControlled: true,
+                    shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.vertical(
+                        top: Radius.circular(16),
+                      ),
+                    ),
+                    builder: (context) {
+                      return CommentWidget(
+                        comments: post.comments ?? [],
+                        textController: _commetController,
+                        postId: post.postId ?? -1,
+                      );
+                    },
+                  );
+                },
+              ),
+
+              // saveButton(),
+            ],
+          ),
+        );
+      },
     );
   }
 
@@ -187,8 +276,8 @@ username: 'minh_hieu', avatar: AppImages.imgAvatarDefault),
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               SizedBox(
-                height: 16,
-                width: 16,
+                height: 24,
+                width: 24,
                 child: Stack(
                   clipBehavior: Clip.none,
                   children:
@@ -254,7 +343,10 @@ username: 'minh_hieu', avatar: AppImages.imgAvatarDefault),
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('${post.user.username ?? ''} ', style: AppStyles.headlineBold),
+          Text(
+            '${post.author!.username ?? ''} ',
+            style: AppStyles.headlineBold,
+          ),
           Expanded(
             child: readMoreDescription(
               " ${post.caption}",

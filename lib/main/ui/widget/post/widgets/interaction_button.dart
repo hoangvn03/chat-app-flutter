@@ -1,5 +1,5 @@
-import 'package:chat_app/main/ui/widget/interaction_button/bloc/interaction_cubit.dart';
-import 'package:chat_app/main/ui/widget/interaction_button/bloc/interaction_state.dart';
+import 'package:chat_app/main/ui/widget/post/bloc/interaction_cubit.dart';
+import 'package:chat_app/main/ui/widget/post/bloc/interaction_state.dart';
 import 'package:chat_app/main/utils/common_widget.dart';
 import 'package:chat_app/res/app_colors.dart';
 import 'package:chat_app/res/app_images.dart';
@@ -20,6 +20,7 @@ Widget interactionButton({
   Color? colorBorder,
   TextStyle? textStyle,
   InteractionType? type,
+  dynamic data
 }) {
   return BlocProvider(
     create: (_) => InteractionCubit(),
