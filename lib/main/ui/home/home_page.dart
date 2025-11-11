@@ -1,6 +1,6 @@
 import 'package:chat_app/main/helper/socket/socket_service.dart';
 import 'package:chat_app/main/networks/api_end_point.dart';
-import 'package:chat_app/main/ui/widget/post/bloc/interaction_cubit.dart';
+import 'package:chat_app/main/ui/widget/post/widgets/bloc/interaction_cubit.dart';
 import 'package:chat_app/main/ui/widget/post/post_item_widget.dart';
 import 'package:chat_app/main/networks/model/post.dart';
 import 'package:chat_app/main/networks/model/reels.dart';

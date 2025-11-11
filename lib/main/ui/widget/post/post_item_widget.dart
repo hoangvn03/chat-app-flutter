@@ -1,10 +1,10 @@
-import 'package:chat_app/main/ui/widget/post/bloc/interaction_state.dart';
+import 'package:chat_app/main/ui/widget/post/widgets/bloc/interaction_state.dart';
 import 'package:chat_app/main/ui/widget/post/widgets/interaction_button.dart';
-import 'package:chat_app/main/ui/widget/post/bloc/interaction_cubit.dart';
-import 'package:chat_app/main/ui/widget/post/widgets/action/action_widget.dart';
-import 'package:chat_app/main/ui/widget/post/widgets/action/bloc/action_bloc.dart';
-import 'package:chat_app/main/ui/widget/post/widgets/action/bloc/action_event.dart';
-import 'package:chat_app/main/ui/widget/post/widgets/action/bloc/action_state.dart';
+import 'package:chat_app/main/ui/widget/post/widgets/bloc/interaction_cubit.dart';
+import 'package:chat_app/main/ui/widget/post/widgets/action_widget.dart';
+import 'package:chat_app/main/ui/widget/post/bloc/action_bloc.dart';
+import 'package:chat_app/main/ui/widget/post/bloc/action_event.dart';
+import 'package:chat_app/main/ui/widget/post/bloc/action_state.dart';
 import 'package:chat_app/main/networks/model/post.dart';
 import 'package:chat_app/main/networks/model/user.dart';
 import 'package:chat_app/main/router/router.dart';
@@ -141,29 +141,34 @@ class PostWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildActionBar(BuildContext context) {
+  Widget _buildActionBar(BuildContext con) {
     print('IsLikes: ${post.isLiked} ${post.likesCount}');
     return BlocBuilder<ActionBloc, ActionState>(
-      builder: (context, state) {
-        var likeCount, isSelected;
+      builder: (con, state) {
+        var likeCount, isSelected, cmtCount, shareCount;
         if (state is ActionSuccess) {
-          if (state.data != null) {
-            likeCount = state.data as int;
-          }
+          likeCount = (state.data != null) ? state.data : post.likesCount;
+          cmtCount =
+              (state.cmtCount != null) ? state.cmtCount : post.commentsCount;
+          shareCount =
+              (state.shareCount != null) ? state.shareCount : post.saveCount;
+
           isSelected = state.isSelected;
         } else {
           isSelected = post.isLiked;
           likeCount = post.likesCount ?? 0;
+          cmtCount = post.commentsCount ?? 0;
+          shareCount = post.saveCount ?? 0;
         }
         return Padding(
           padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
           child: Row(
             children: [
               likeButton(
-                context: context,
+                context: con,
                 icon: isSelected ? AppImages.icLikeDark : AppImages.icLike,
                 onTap: () {
-                  context.read<ActionBloc>().add(
+                  con.read<ActionBloc>().add(
                     ActionPost(
                       typeAction: InteractionType.like,
                       postId: post.postId ?? -1,
@@ -179,7 +184,7 @@ class PostWidget extends StatelessWidget {
               GestureDetector(
                 onTap: () {
                   showModalBottomSheet(
-                    context: context,
+                    context: con,
                     useSafeArea: true,
                     isScrollControlled: true,
                     shape: const RoundedRectangleBorder(
@@ -188,10 +193,13 @@ class PostWidget extends StatelessWidget {
                       ),
                     ),
                     builder: (context) {
-                      return CommentWidget(
-                        comments: post.comments ?? [],
-                        textController: _commetController,
-                        postId: post.postId ?? -1,
+                      return BlocProvider.value(
+                        value: BlocProvider.of<ActionBloc>(con),
+                        child: CommentWidget(
+                          textController: _commetController,
+                          postId: post.postId ?? -1,
+                          postModel: post,
+                        ),
                       );
                     },
                   );
@@ -203,12 +211,12 @@ class PostWidget extends StatelessWidget {
                 ),
               ),
               SizedBox(width: 4),
-              Text('${post.commentsCount ?? 0}', style: AppStyles.calloutBold),
+              Text('$cmtCount', style: AppStyles.calloutBold),
               SizedBox(width: 12),
               GestureDetector(
                 onTap: () {
                   showModalBottomSheet(
-                    context: context,
+                    context: con,
                     useSafeArea: true,
                     isScrollControlled: true,
                     shape: const RoundedRectangleBorder(
@@ -218,9 +226,9 @@ class PostWidget extends StatelessWidget {
                     ),
                     builder: (context) {
                       return CommentWidget(
-                        comments: post.comments ?? [],
                         textController: _commetController,
                         postId: post.postId ?? -1,
+                        postModel: post,
                       );
                     },
                   );
@@ -233,7 +241,7 @@ class PostWidget extends StatelessWidget {
               ),
               SizedBox(width: 4),
               Text(
-                '${post.saveCount ?? 0}',
+                '$shareCount',
                 style: AppStyles.calloutBold,
               ), // Sửa thành comments count
               Spacer(),
@@ -241,7 +249,7 @@ class PostWidget extends StatelessWidget {
                 type: InteractionType.save,
                 onTapState1: () {
                   showModalBottomSheet(
-                    context: context,
+                    context: con,
                     useSafeArea: true,
                     isScrollControlled: true,
                     shape: const RoundedRectangleBorder(
@@ -251,9 +259,9 @@ class PostWidget extends StatelessWidget {
                     ),
                     builder: (context) {
                       return CommentWidget(
-                        comments: post.comments ?? [],
                         textController: _commetController,
                         postId: post.postId ?? -1,
+                        postModel: post,
                       );
                     },
                   );

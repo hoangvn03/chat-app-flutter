@@ -1,5 +1,5 @@
-import 'package:chat_app/main/ui/widget/post/bloc/interaction_cubit.dart';
-import 'package:chat_app/main/ui/widget/post/bloc/interaction_state.dart';
+import 'package:chat_app/main/ui/widget/post/widgets/bloc/interaction_cubit.dart';
+import 'package:chat_app/main/ui/widget/post/widgets/bloc/interaction_state.dart';
 import 'package:chat_app/main/utils/common_widget.dart';
 import 'package:chat_app/res/app_colors.dart';
 import 'package:chat_app/res/app_images.dart';

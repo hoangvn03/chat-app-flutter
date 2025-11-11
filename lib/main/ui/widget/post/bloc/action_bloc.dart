@@ -2,8 +2,8 @@ import 'dart:async';
 import 'dart:math';
 import 'package:bloc/bloc.dart';
 import 'package:chat_app/main/networks/api_util.dart';
-import 'package:chat_app/main/ui/widget/post/widgets/action/bloc/action_event.dart';
-import 'package:chat_app/main/ui/widget/post/widgets/action/bloc/action_state.dart';
+import 'package:chat_app/main/ui/widget/post/bloc/action_event.dart';
+import 'package:chat_app/main/ui/widget/post/bloc/action_state.dart';
 import 'package:chat_app/main/networks/api_end_point.dart';
 import 'package:chat_app/main/networks/model/comment.dart';
 import 'package:chat_app/main/networks/model/post.dart';
@@ -18,14 +18,50 @@ class ActionBloc extends Bloc<ActionEvent, ActionState> {
     on<PostCommnetReply>(_postCommentReply);
     on<ActionPost>(_actionPost);
   }
-
+  final _listComment = <CommentModel>[];
   Future<void> _loadRequest(
     LoadComment event,
     Emitter<ActionState> emit,
   ) async {
     try {
-      emit(ActionSuccess(comments: event.listComments));
+      final url = '${ApiEndPoints.LOADPOST}/${event.post.postId}';
+      ApiResponse res = await ApiUtil.get(url);
+      if (res.statusCode == 200) {
+        final rawComments = res.body['comments'] as List<dynamic>?;
+        final listComment =
+            rawComments
+                ?.map((e) => CommentModel.fromJson(e as Map<String, dynamic>))
+                .toList() ??
+            [];
+        _listComment.clear();
+        _listComment.addAll(listComment);
+        print(_listComment.length);
+        if (state is ActionSuccess) {
+          print('has cmt');
+          final currentState = state as ActionSuccess;
+          emit(
+            currentState.copyWith(
+              comments: _listComment,
+              cmtCount: event.post.commentsCount,
+              data: event.post.likesCount,
+              shareCount: event.post.saveCount,
+              isSelected: event.post.isLiked,
+            ),
+          );
+        } else {
+          emit(
+            ActionSuccess(
+              comments: _listComment,
+              cmtCount: event.post.commentsCount,
+              data: event.post.likesCount,
+              shareCount: event.post.saveCount,
+              isSelected: event.post.isLiked ?? false,
+            ),
+          );
+        }
+      }
     } catch (e) {
+      print(e.toString());
       emit(ActionFailure());
     }
     return;
@@ -45,16 +81,15 @@ class ActionBloc extends Bloc<ActionEvent, ActionState> {
         data: params,
       );
       if (res.statusCode == 201) {
-        final newComment = CommentModel.fromJson(res.body);
+        final newComment = CommentModel.fromJson(res.body['newComment']);
         final updatedComments = <CommentModel>[
           ...currentState.comments, // các comment cũ giữ nguyên thứ tự
           newComment, // comment mới thêm vào cuối
         ];
-        emit(currentState.copyWith(comments: updatedComments));
-
-        emit(currentState.copyWith(comments: updatedComments));
-        // event.controller
-        //     ?.clear(); // nếu bạn truyền TextEditingController qua event
+        final int cmtCount = res.body['commnetCount'];
+        emit(
+          currentState.copyWith(comments: updatedComments, cmtCount: cmtCount),
+        );
       }
     } catch (e) {
       print(e.toString());
@@ -86,8 +121,6 @@ class ActionBloc extends Bloc<ActionEvent, ActionState> {
           newComment,
         );
         emit(currentState.copyWith(comments: updatedComments));
-        // event.controller
-        //     ?.clear(); // nếu bạn truyền TextEditingController qua event
       }
     } catch (e) {
       print(e.toString());

@@ -1,12 +1,13 @@
 import 'package:chat_app/main/networks/model/comment.dart';
+import 'package:chat_app/main/networks/model/post.dart';
 import 'package:chat_app/main/networks/model/user.dart';
 import 'package:chat_app/main/ui/widget/post/widgets/interaction_button.dart';
 
 abstract class ActionEvent {}
 
 class LoadComment extends ActionEvent {
-  final List<CommentModel> listComments;
-  LoadComment({required this.listComments});
+  final PostModel post;
+  LoadComment({required this.post});
 }
 
 class PostCommnet extends ActionEvent {

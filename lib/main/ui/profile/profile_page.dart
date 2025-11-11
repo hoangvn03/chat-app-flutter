@@ -7,7 +7,7 @@ import 'package:chat_app/main/ui/conversations/screens/createGroupChat/bloc/crea
 import 'package:chat_app/main/ui/conversations/screens/message/bloc/chat_bloc.dart';
 import 'package:chat_app/main/ui/conversations/screens/message/bloc/chat_state.dart';
 import 'package:chat_app/main/ui/widget/account_suggest/account_suggest_widget.dart';
-import 'package:chat_app/main/ui/widget/post/bloc/interaction_cubit.dart';
+import 'package:chat_app/main/ui/widget/post/widgets/bloc/interaction_cubit.dart';
 import 'package:chat_app/main/ui/widget/post/widgets/interaction_button.dart';
 import 'package:chat_app/main/networks/model/common_item.dart';
 import 'package:chat_app/main/networks/model/post.dart';

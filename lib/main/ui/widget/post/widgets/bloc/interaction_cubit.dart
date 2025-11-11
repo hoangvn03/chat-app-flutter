@@ -1,6 +1,6 @@
 import 'package:chat_app/main/networks/api_end_point.dart';
 import 'package:chat_app/main/networks/api_util.dart';
-import 'package:chat_app/main/ui/widget/post/bloc/interaction_state.dart';
+import 'package:chat_app/main/ui/widget/post/widgets/bloc/interaction_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class InteractionCubit extends Cubit<InteractionState> {
