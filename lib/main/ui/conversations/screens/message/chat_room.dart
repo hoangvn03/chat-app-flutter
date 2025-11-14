@@ -77,135 +77,160 @@ class _ChatRoomState extends State<ChatRoom> {
                   ),
         ),
       ],
-      child: Scaffold(
-        backgroundColor: AppColors.white,
-        resizeToAvoidBottomInset: true,
-        appBar: AppBar(
+      child: BlocListener<ChatBloc, ChatState>(
+        listener: (context, state) {
+          if (state is ChatFailure) {
+            showDialog(
+              context: context,
+              builder:
+                  (context) => AlertDialog(
+                    title: const Text("Lỗi"),
+                    content: Text(state.errorMessage),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text("OK"),
+                      ),
+                    ],
+                  ),
+            );
+          }
+        },
+        child: Scaffold(
           backgroundColor: AppColors.white,
-          surfaceTintColor: AppColors.white,
-          title: GestureDetector(
-            onTap: () {},
-            child: ListTile(
-              contentPadding: EdgeInsets.zero,
-              dense: true,
-              leading: groupUserAvatar(
-                images: listImage,
-                avatarSize: widget.conversation.isGroup ? 42 : 42,
-              ),
-              title: Text(
-                widget.conversation.isGroup
-                    ? widget.conversation.conversationName ?? 'Unknown'
-                    : widget.conversation.participants[1].username ?? 'Unknown',
-                style: AppStyles.title2Bold,
-              ),
-
-              subtitle:
+          resizeToAvoidBottomInset: true,
+          appBar: AppBar(
+            backgroundColor: AppColors.white,
+            surfaceTintColor: AppColors.white,
+            title: GestureDetector(
+              onTap: () {},
+              child: ListTile(
+                contentPadding: EdgeInsets.zero,
+                dense: true,
+                leading: groupUserAvatar(
+                  images: listImage,
+                  avatarSize: widget.conversation.isGroup ? 42 : 42,
+                ),
+                title: Text(
                   widget.conversation.isGroup
-                      ? _buildListUserOnline()
-                      : _buildStatusUserContact(),
-            ),
-          ),
-          actions: [
-            IconButton(
-              onPressed: () {},
-              icon: SvgPicture.asset(AppImages.icSearch),
-            ),
-            // IconButton(
-            //   onPressed: () {},
-            //   icon: SvgPicture.asset(AppImages.ic),
-            // ),
-            // IconButton(
-            //   onPressed: () {},
-            //   icon: SvgPicture.asset(AppImages.icSearch),
-            // ),
-            const SizedBox(width: 8),
-          ],
-          leading: IconButton(
-            onPressed: () {
-              context.pop();
-            },
-            icon: Transform.flip(
-              flipX: true,
-              child: SvgPicture.asset(AppImages.icNextRight),
-            ),
-          ),
-        ),
-        body: BlocBuilder<ChatBloc, ChatState>(
-          builder: (context, state) {
-            if (state is ChatLoading) {
-              return const Center(child: CircularProgressIndicator());
-            } else if (state is ChatSuccess) {
-              return Column(
-                children: [
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.all(12.0),
-                      child: SingleChildScrollView(
-                        reverse: true,
-                        child: Column(
-                          children: [
-                            const SizedBox(height: 38),
-                            widget.conversation.isGroup
-                                ? Builder(
-                                  builder: (innerContext) {
-                                    return _buildInfoGroup(
-                                      listImage,
-                                      innerContext,
-                                    );
-                                  },
-                                )
-                                : _buildInfoUserContact(),
-                            const SizedBox(height: 64),
-                            Text(
-                              formatDateTimeV3(widget.conversation.createdAt),
-                            ),
-                            const SizedBox(height: 16),
+                      ? widget.conversation.conversationName ?? 'Unknown'
+                      : widget.conversation.participants[1].username ??
+                          'Unknown',
+                  style: AppStyles.title2Bold,
+                ),
 
-                            BlocSelector<
-                              ChatBloc,
-                              ChatState,
-                              List<MessageEntity>
-                            >(
-                              selector: (state) {
-                                if (state is ChatSuccess) {
-                                  return state.messages ?? [];
-                                }
-                                return [];
-                              },
-                              builder: (context, messages) {
-                                return _buildListMessage(messages);
-                              },
-                            ),
-                            BlocSelector<ChatBloc, ChatState, List<UserModel>>(
-                              selector: (state) {
-                                if (state is ChatSuccess &&
-                                    state.typingUsers != null) {
-                                  print(state.typingUsers!.length);
-                                  return state.typingUsers ?? [];
-                                }
-                                return [];
-                              },
-                              builder: (context, data) {
-                                return _buildTypingIndicator(data);
-                              },
-                            ),
-                          ],
+                subtitle:
+                    widget.conversation.isGroup
+                        ? _buildListUserOnline()
+                        : _buildStatusUserContact(),
+              ),
+            ),
+            actions: [
+              IconButton(
+                onPressed: () {},
+                icon: SvgPicture.asset(AppImages.icSearch),
+              ),
+              // IconButton(
+              //   onPressed: () {},
+              //   icon: SvgPicture.asset(AppImages.ic),
+              // ),
+              // IconButton(
+              //   onPressed: () {},
+              //   icon: SvgPicture.asset(AppImages.icSearch),
+              // ),
+              const SizedBox(width: 8),
+            ],
+            leading: IconButton(
+              onPressed: () {
+                context.pop();
+              },
+              icon: Transform.flip(
+                flipX: true,
+                child: SvgPicture.asset(AppImages.icNextRight),
+              ),
+            ),
+          ),
+          body: BlocBuilder<ChatBloc, ChatState>(
+            builder: (context, state) {
+              if (state is ChatLoading) {
+                return const Center(child: CircularProgressIndicator());
+              } else if (state is ChatSuccess) {
+                return Column(
+                  children: [
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.all(12.0),
+                        child: SingleChildScrollView(
+                          reverse: true,
+                          child: Column(
+                            children: [
+                              const SizedBox(height: 38),
+                              widget.conversation.isGroup
+                                  ? Builder(
+                                    builder: (innerContext) {
+                                      return _buildInfoGroup(
+                                        listImage,
+                                        innerContext,
+                                      );
+                                    },
+                                  )
+                                  : _buildInfoUserContact(),
+                              const SizedBox(height: 64),
+                              Text(
+                                formatDateTimeV3(widget.conversation.createdAt),
+                              ),
+                              const SizedBox(height: 16),
+
+                              BlocSelector<
+                                ChatBloc,
+                                ChatState,
+                                List<MessageEntity>
+                              >(
+                                selector: (state) {
+                                  if (state is ChatSuccess) {
+                                    return state.messages ?? [];
+                                  }
+                                  return [];
+                                },
+                                builder: (context, messages) {
+                                  return _buildListMessage(messages);
+                                },
+                              ),
+                              BlocSelector<
+                                ChatBloc,
+                                ChatState,
+                                List<UserModel>
+                              >(
+                                selector: (state) {
+                                  if (state is ChatSuccess &&
+                                      state.typingUsers != null) {
+                                    print(state.typingUsers!.length);
+                                    return state.typingUsers ?? [];
+                                  }
+                                  return [];
+                                },
+                                builder: (context, data) {
+                                  return _buildTypingIndicator(data);
+                                },
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
-                  ),
 
-                  Padding(
-                    padding: EdgeInsets.only(left: 8, right: 8, bottom: 8),
-                    child: _buildTextFieldMessage(context),
-                  ),
-                ],
-              );
-            } else if (state is ChatFailure) {
-              return Center(child: Text(state.errorMessage));
-            }
-            return const Text('nnnn');
-          },
+                    Padding(
+                      padding: EdgeInsets.only(left: 8, right: 8, bottom: 8),
+                      child: _buildTextFieldMessage(context),
+                    ),
+                  ],
+                );
+              } else if (state is ChatFailure) {
+                return Center(child: Text(state.errorMessage));
+              }
+              return const Text('nnnn');
+            },
+          ),
         ),
       ),
     );

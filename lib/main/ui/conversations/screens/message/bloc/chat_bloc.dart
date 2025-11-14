@@ -317,6 +317,8 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
         print('Upload FIle Step 3: ${_listFile.length}');
         emit(currentState.copyWith(file: data));
       } else {
+              emit(ChatFailure(res.body['message'] ?? 'Upload file failed'));
+
         print('Upload FIle Step 3: Error');
       }
     } catch (e) {
