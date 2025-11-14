@@ -1,11 +1,11 @@
-import 'package:chat_app/main/ui/reels/media_picked/widget/all_album_media.dart';
+import 'package:chat_app/main/ui/reels/widgets/media_picked/widget/all_album_media.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:photo_manager/photo_manager.dart';
-import 'package:chat_app/main/ui/reels/media_picked/bloc/media_picked_bloc.dart';
-import 'package:chat_app/main/ui/reels/media_picked/bloc/media_picked_event.dart';
-import 'package:chat_app/main/ui/reels/media_picked/bloc/media_picked_state.dart';
+import 'package:chat_app/main/ui/reels/widgets/media_picked/bloc/media_picked_bloc.dart';
+import 'package:chat_app/main/ui/reels/widgets/media_picked/bloc/media_picked_event.dart';
+import 'package:chat_app/main/ui/reels/widgets/media_picked/bloc/media_picked_state.dart';
 import 'package:chat_app/res/app_colors.dart';
 import 'package:chat_app/res/app_images.dart';
 import 'package:chat_app/res/app_styles.dart';

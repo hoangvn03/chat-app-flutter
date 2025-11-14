@@ -21,7 +21,7 @@ import 'package:go_router/go_router.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({super.key, this.extras});
-  List<dynamic>? extras;
+  final Map<String, dynamic>? extras;
   @override
   State<HomePage> createState() => _HomePageState();
 }
@@ -44,17 +44,25 @@ class _HomePageState extends State<HomePage> {
         listener: (context, state) {
           if (state is HomeSuccess &&
               widget.extras != null &&
+              widget.extras != {} &&
               widget.extras!.isNotEmpty &&
               state.posts != null) {
             print('Uplaod post');
-            context.read<HomeBloc>().add(
-              CreatePost(
-                caption: widget.extras![0],
-                location: widget.extras![1],
-                assetImage: widget.extras![2],
-              ),
-            );
-            widget.extras?.clear();
+            final ex = widget.extras!;
+            final caption = ex['note'] as String?;
+            final location = ex['location'] as String?;
+            final image = ex['image'];
+
+            if (caption != null && location != null && image != null) {
+              context.read<HomeBloc>().add(
+                CreatePost(
+                  caption: caption,
+                  location: location,
+                  assetImage: image,
+                ),
+              );
+              widget.extras?.clear();
+            }
           }
         },
         child: Scaffold(
@@ -180,7 +188,7 @@ class _HomePageState extends State<HomePage> {
                     ),
 
                     // List posts
-                    SliverToBoxAdapter(child: _buildListPost(state)),
+                    SliverToBoxAdapter(child: _buildListPost(state)), 
                   ],
                 );
               } else if (state is HomeFailure) {

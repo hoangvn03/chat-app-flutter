@@ -27,7 +27,7 @@ class CommentWidget extends StatefulWidget {
     super.key,
     required this.textController,
     required this.postId,
-    required this.postModel
+    required this.postModel,
   });
 
   @override
@@ -105,7 +105,7 @@ class _CommentWidgetState extends State<CommentWidget> {
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
                           itemCount: state.comments.length,
-                          itemBuilder: (context, index) {
+                          itemBuilder: (con, index) {
                             final comment = state.comments[index];
                             if (comment.commenter != null) {
                               print(comment.commenter!.avatar);
@@ -213,12 +213,17 @@ class _CommentWidgetState extends State<CommentWidget> {
     );
   }
 
-  /// Hiển thị từng comment (bao gồm cả comment con)
+  // Hiển thị từng comment (bao gồm cả comment con)
   Widget _commentItem(
     CommentModel item,
     BuildContext context, {
     bool isRoot = true,
   }) {
+    if (item.commenter != null) {
+      print(item.commenter!.avatar);
+    } else {
+      print('null');
+    }
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Column(
@@ -230,7 +235,7 @@ class _CommentWidgetState extends State<CommentWidget> {
               // Avatar
               ClipOval(
                 child: SvgPicture.network(
-                  item.commenter!.avatar ?? '',
+                  item.commenter?.avatar ?? '',
                   width: 42,
                   height: 42,
                   fit: BoxFit.cover,

@@ -1,8 +1,8 @@
 import 'package:camera/camera.dart';
 import 'package:chat_app/main/router/router.dart';
-import 'package:chat_app/main/ui/reels/camera/bloc/camera_bloc.dart';
-import 'package:chat_app/main/ui/reels/camera/bloc/camera_event.dart';
-import 'package:chat_app/main/ui/reels/camera/bloc/camera_state.dart';
+import 'package:chat_app/main/ui/reels/widgets/camera/bloc/camera_bloc.dart';
+import 'package:chat_app/main/ui/reels/widgets/camera/bloc/camera_event.dart';
+import 'package:chat_app/main/ui/reels/widgets/camera/bloc/camera_state.dart';
 import 'package:chat_app/res/app_colors.dart';
 import 'package:chat_app/res/app_images.dart';
 import 'package:chat_app/res/app_styles.dart';

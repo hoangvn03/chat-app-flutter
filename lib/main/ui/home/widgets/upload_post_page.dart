@@ -1,6 +1,7 @@
 import 'package:chat_app/main/router/router.dart';
 import 'package:chat_app/main/ui/home/bloc/home_bloc.dart';
 import 'package:chat_app/main/ui/home/bloc/home_event.dart';
+import 'package:chat_app/main/ui/home/bloc/home_state.dart';
 import 'package:chat_app/main/utils/common_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -199,19 +200,15 @@ class _UploadPostPageState extends State<UploadPostPage> {
           radius: 8,
           text: 'Chia sẻ',
           onTap: () {
-            
-            context.pushNamed(
+            print('Tap');
+            context.goNamed(
               PathName.homePage,
-              extra: [_noteController.text.trim(), 'Hà Nội', widget.assetImage],
+              extra: {
+                'note': _noteController.text.trim(),
+                'location': 'Hà Nội',
+                'image': widget.assetImage,
+              },
             );
-            // context.read<HomeBloc>().add(
-            //   CreatePost(
-            //     caption: _noteController.text.trim(),
-            //     location: 'Hà Nội',
-            //     assetImage: widget.assetImage,
-            //   ),
-            // );
-            // context.goNamed(PathName.homePage);
           },
           margin: EdgeInsets.zero,
         ),

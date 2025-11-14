@@ -20,6 +20,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     on<GetNotificationCount>(_getUnreadNotiCount);
     on<UpdateStatusUsers>(_updateStatusUser);
     on<CreatePost>(_createPost);
+    on<AddNewPost>(_addPost);
   }
   UserModel user = UserModel(id: 999);
   final List<PostModel> _posts = [];
@@ -183,11 +184,14 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         if (loadImagePost.statusCode == 201) {
           ApiResponse res = await ApiUtil.get('$url/${post.postId}');
           if (res.statusCode == 200) {
+            print('Post: ${currentState.posts}');
             final newPost = PostModel.fromJson(res.body);
             final updatedPosts = <PostModel>[
               newPost,
               ...currentState.posts ?? [],
             ];
+            print('Post 2: ${updatedPosts}');
+
             emit(currentState.copyWith(posts: updatedPosts, isLoading: false));
           }
         }
@@ -195,6 +199,20 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     } catch (e) {
       print('Step Error: Create Post');
 
+      print(e.toString());
+      emit(HomeFailure(errorMessage: e.toString()));
+    }
+  }
+
+  Future<void> _addPost(AddNewPost event, Emitter<HomeState> emit) async {
+    final currentState =
+        state is HomeSuccess ? state as HomeSuccess : HomeSuccess(posts: []);
+    try {
+      print('Step 2: Add Post');
+      final updatedPosts = <PostModel>[event.post, ...currentState.posts ?? []];
+      emit(currentState.copyWith(posts: updatedPosts, isLoading: false));
+    } catch (e) {
+      print('Step Error: Create Post');
       print(e.toString());
       emit(HomeFailure(errorMessage: e.toString()));
     }

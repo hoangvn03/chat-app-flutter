@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:bloc/bloc.dart';
 import 'package:chat_app/main/helper/socket/socket_service.dart';
 import 'package:chat_app/main/networks/api_end_point.dart';
@@ -39,6 +40,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   final List<UserModel> _userOnline = [];
   final List<Attachment> _listFile = [];
   final List<AssetEntity> _listFilesSend = [];
+  final List<File> _listFilesPath = [];
   Future<void> _loadListMessage(
     LoadMessage event,
     Emitter<ChatState> emit,
@@ -104,8 +106,10 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
         'conversation_id': event.conversationId,
         'content': event.message,
       };
-      if (event.files != null) {
-        _listFilesSend.addAll(event.files!);
+      if (event.mediaFiles != null) {
+        _listFilesSend.addAll(event.mediaFiles!);
+      } else if (event.files != null) {
+        _listFilesPath.addAll(event.files!);
       }
       socketService.sendMessage(params);
     } catch (e) {
@@ -127,6 +131,20 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
         add(
           UploadFileMessage(
             file: _listFilesSend,
+            conversationId:
+                msg['conversation_id'] is String
+                    ? int.tryParse(msg['conversation_id']) ?? 0
+                    : (msg['conversation_id'] ?? 0),
+            messageId:
+                msg['message_id'] is String
+                    ? int.tryParse(msg['message_id']) ?? 0
+                    : (msg['message_id'] ?? 0),
+          ),
+        );
+      } else if (_listFilesPath.isNotEmpty) {
+        add(
+          UploadFileMessage(
+            file: _listFilesPath,
             conversationId:
                 msg['conversation_id'] is String
                     ? int.tryParse(msg['conversation_id']) ?? 0
@@ -279,7 +297,14 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     final currentState = state as ChatSuccess;
     try {
       _listFile.clear();
-      final files = await convertAssetEntitiesToFiles(event.file);
+      var files;
+      if (event.file is List<AssetEntity>) {
+        files = await convertAssetEntitiesToFiles(
+          event.file as List<AssetEntity>,
+        );
+      } else if (event.file is List<File>) {
+        files = event.file;
+      }
       final url = '${ApiEndPoints.SENDFILE}/${event.messageId}';
       print('Upload FIle Step 2: ${files.length}');
       ApiResponse res = await ApiUtil.postFiles(url: url, files: files);

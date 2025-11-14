@@ -1,6 +1,6 @@
-import 'package:chat_app/main/ui/reels/media_picked/bloc/media_picked_bloc.dart';
-import 'package:chat_app/main/ui/reels/media_picked/bloc/media_picked_event.dart';
-import 'package:chat_app/main/ui/reels/media_picked/bloc/media_picked_state.dart';
+import 'package:chat_app/main/ui/reels/widgets/media_picked/bloc/media_picked_bloc.dart';
+import 'package:chat_app/main/ui/reels/widgets/media_picked/bloc/media_picked_event.dart';
+import 'package:chat_app/main/ui/reels/widgets/media_picked/bloc/media_picked_state.dart';
 import 'package:chat_app/res/app_colors.dart';
 import 'package:chat_app/res/app_images.dart';
 import 'package:chat_app/res/app_styles.dart';

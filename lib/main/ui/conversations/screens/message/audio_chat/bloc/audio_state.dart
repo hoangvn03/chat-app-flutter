@@ -4,6 +4,7 @@ abstract class AudioState {}
 
 class AudioStateSuccess extends AudioState {
   final bool isPlaying;
+  bool isPlayVoiceMessage;
   final int currentId;
   final String currentUrl;
   final int currentDuration;
@@ -12,6 +13,7 @@ class AudioStateSuccess extends AudioState {
 
   AudioStateSuccess({
     this.isPlaying = false,
+    this.isPlayVoiceMessage = false,
     this.currentId = -1,
     this.currentUrl = '',
     this.currentDuration = 0,
@@ -21,6 +23,7 @@ class AudioStateSuccess extends AudioState {
 
   AudioStateSuccess copyWith({
     bool? isPlaying,
+    bool? isPlayVoiceMessage,
     int? currentId,
     String? currentUrl,
     int? currentDuration,
@@ -29,6 +32,7 @@ class AudioStateSuccess extends AudioState {
   }) {
     return AudioStateSuccess(
       isPlaying: isPlaying ?? this.isPlaying,
+      isPlayVoiceMessage: isPlayVoiceMessage ?? this.isPlayVoiceMessage,
       currentId: currentId ?? this.currentId,
       currentUrl: currentUrl ?? this.currentUrl,
       currentDuration: currentDuration ?? this.currentDuration,
@@ -39,26 +43,23 @@ class AudioStateSuccess extends AudioState {
 
   @override
   List<Object?> get props => [
-        isPlaying,
-        currentId,
-        currentUrl,
-        currentDuration,
-        totalDuration,
-        progress
-      ];
+    isPlaying,
+    isPlayVoiceMessage,
+    currentId,
+    currentUrl,
+    currentDuration,
+    totalDuration,
+    progress,
+  ];
 }
 
 class AudioInitial extends AudioState {}
+
 class AudioFailured extends AudioState {}
 
 class AudioRecording extends AudioState {
   final String path;
   AudioRecording({required this.path});
-}
-
-class AudioRecorded extends AudioState {
-  final String path;
-  AudioRecorded({required this.path});
 }
 
 class AudioError extends AudioState {

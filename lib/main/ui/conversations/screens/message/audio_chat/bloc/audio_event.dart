@@ -5,10 +5,15 @@ abstract class AudioEvent {}
 class PlayAudioEvent extends AudioEvent {
   final String url;
   final int id;
-  PlayAudioEvent(this.url, this.id);
+  final bool isPlayVoiceMessage;
+  PlayAudioEvent(this.url, this.id,{this.isPlayVoiceMessage = false});
 }
 
-class PauseAudioEvent extends AudioEvent {}
+class PauseAudioEvent extends AudioEvent {
+
+  final bool isPlayVoiceMessage;
+  PauseAudioEvent({this.isPlayVoiceMessage = false});
+}
 
 class StopAudioEvent extends AudioEvent {}
 

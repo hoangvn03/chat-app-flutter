@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:chat_app/main/networks/enum.dart';
 import 'package:chat_app/main/networks/model/converation.dart';
 import 'package:chat_app/main/networks/model/user.dart';
@@ -19,9 +21,10 @@ class LoadDetailConveration extends ChatEvent {
 class SendMessage extends ChatEvent {
   final int conversationId;
   final String message;
-  List<AssetEntity>? files;
+  List<AssetEntity>? mediaFiles;
+  List<File>? files;
 
-  SendMessage(this.conversationId, this.message, {this.files});
+  SendMessage(this.conversationId, this.message, {this.mediaFiles,this.files});
 }
 
 class ReceiveMessage extends ChatEvent {
@@ -93,7 +96,7 @@ class UpdateStatusMessage extends ChatEvent {
 }
 
 class UploadFileMessage extends ChatEvent {
-  List<AssetEntity> file;
+  List<dynamic> file;
   int conversationId;
   int messageId;
   UploadFileMessage({

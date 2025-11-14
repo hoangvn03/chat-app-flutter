@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chat_app/main/helper/socket/socket_service.dart';
 import 'package:chat_app/main/networks/api_end_point.dart';
@@ -5,16 +7,17 @@ import 'package:chat_app/main/networks/model/converation.dart';
 import 'package:chat_app/main/networks/model/message.dart';
 import 'package:chat_app/main/networks/model/user.dart';
 import 'package:chat_app/main/router/router.dart';
+import 'package:chat_app/main/ui/conversations/screens/message/audio_chat/audio_item.dart';
 import 'package:chat_app/main/ui/conversations/screens/message/audio_chat/bloc/audio_bloc.dart';
 import 'package:chat_app/main/ui/conversations/screens/message/bloc/chat_bloc.dart';
 import 'package:chat_app/main/ui/conversations/screens/message/bloc/chat_event.dart';
 import 'package:chat_app/main/ui/conversations/screens/message/bloc/chat_state.dart';
-import 'package:chat_app/main/ui/reels/media_picked/bloc/media_picked_bloc.dart';
-import 'package:chat_app/main/ui/reels/media_picked/bloc/media_picked_event.dart';
-import 'package:chat_app/main/ui/reels/media_picked/bloc/media_picked_state.dart';
-import 'package:chat_app/main/ui/reels/media_picked/widget/media_option_header.dart';
-import 'package:chat_app/main/ui/reels/media_picked/widget/media_picked.dart';
-import 'package:chat_app/main/ui/reels/media_picked/widget/all_album_media.dart';
+import 'package:chat_app/main/ui/reels/widgets/media_picked/bloc/media_picked_bloc.dart';
+import 'package:chat_app/main/ui/reels/widgets/media_picked/bloc/media_picked_event.dart';
+import 'package:chat_app/main/ui/reels/widgets/media_picked/bloc/media_picked_state.dart';
+import 'package:chat_app/main/ui/reels/widgets/media_picked/widget/media_option_header.dart';
+import 'package:chat_app/main/ui/reels/widgets/media_picked/widget/media_picked.dart';
+import 'package:chat_app/main/ui/reels/widgets/media_picked/widget/all_album_media.dart';
 import 'package:chat_app/main/utils/common_function.dart';
 import 'package:chat_app/main/utils/common_widget.dart';
 import 'package:chat_app/main/utils/shared_preference.dart';
@@ -48,6 +51,15 @@ class _ChatRoomState extends State<ChatRoom> {
 
   @override
   Widget build(BuildContext context) {
+    var listImage = [
+      widget.conversation.participants[0].avatar ?? AppImages.icStickers,
+      widget.conversation.participants[1].avatar ?? AppImages.icStickers,
+    ];
+    if (!widget.conversation.isGroup) {
+      listImage = [
+        widget.conversation.participants[1].avatar ?? AppImages.icStickers,
+      ];
+    }
     return MultiBlocProvider(
       providers: [
         BlocProvider(
@@ -76,10 +88,9 @@ class _ChatRoomState extends State<ChatRoom> {
             child: ListTile(
               contentPadding: EdgeInsets.zero,
               dense: true,
-              leading: Image.asset(
-                AppImages.imgAvatarDefault,
-                width: 28,
-                height: 28,
+              leading: groupUserAvatar(
+                images: listImage,
+                avatarSize: widget.conversation.isGroup ? 42 : 42,
               ),
               title: Text(
                 widget.conversation.isGroup
@@ -87,12 +98,28 @@ class _ChatRoomState extends State<ChatRoom> {
                     : widget.conversation.participants[1].username ?? 'Unknown',
                 style: AppStyles.title2Bold,
               ),
+
               subtitle:
                   widget.conversation.isGroup
                       ? _buildListUserOnline()
                       : _buildStatusUserContact(),
             ),
           ),
+          actions: [
+            IconButton(
+              onPressed: () {},
+              icon: SvgPicture.asset(AppImages.icSearch),
+            ),
+            // IconButton(
+            //   onPressed: () {},
+            //   icon: SvgPicture.asset(AppImages.ic),
+            // ),
+            // IconButton(
+            //   onPressed: () {},
+            //   icon: SvgPicture.asset(AppImages.icSearch),
+            // ),
+            const SizedBox(width: 8),
+          ],
           leading: IconButton(
             onPressed: () {
               context.pop();
@@ -118,8 +145,22 @@ class _ChatRoomState extends State<ChatRoom> {
                         child: Column(
                           children: [
                             const SizedBox(height: 38),
-                            _buildInfoUserContact(),
-                            const SizedBox(height: 58),
+                            widget.conversation.isGroup
+                                ? Builder(
+                                  builder: (innerContext) {
+                                    return _buildInfoGroup(
+                                      listImage,
+                                      innerContext,
+                                    );
+                                  },
+                                )
+                                : _buildInfoUserContact(),
+                            const SizedBox(height: 64),
+                            Text(
+                              formatDateTimeV3(widget.conversation.createdAt),
+                            ),
+                            const SizedBox(height: 16),
+
                             BlocSelector<
                               ChatBloc,
                               ChatState,
@@ -225,6 +266,134 @@ class _ChatRoomState extends State<ChatRoom> {
     );
   }
 
+  Widget _buildInfoGroup(List<String> listImage, BuildContext con) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        groupUserAvatar(
+          images: listImage,
+          avatarSize: widget.conversation.isGroup ? 86 : 86,
+          overlap: 64,
+        ),
+        const SizedBox(height: 16),
+
+        Text(
+          widget.conversation.isGroup
+              ? widget.conversation.conversationName ?? 'Unknown'
+              : widget.conversation.participants[1].username ?? 'Unknown',
+          style: AppStyles.title2Bold,
+        ),
+        GestureDetector(
+          onTap: () {
+            final chatBloc = con.read<ChatBloc>();
+            final audioBloc = con.read<AudioBloc>();
+            final mediaBloc = con.read<MediaPickedBloc>();
+
+            context.pushNamed(
+              PathName.editInfomationGroupPage,
+              extra: {
+                'chatBloc': chatBloc,
+                'audioBloc': audioBloc,
+                'mediaBloc': mediaBloc,
+                'conversation': widget.conversation,
+              },
+            );
+          },
+          child: Text(
+            'Đổi tên và hình ảnh',
+            style: AppStyles.title2Bold.copyWith(color: AppColors.blue60),
+          ),
+        ),
+        const SizedBox(height: 16),
+        _buildListIconHeaderGroup(),
+      ],
+    );
+  }
+
+  Widget _buildListIconHeaderGroup() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          child: Column(
+            children: [
+              SvgPicture.asset(AppImages.icLink, width: 32, height: 32),
+              const SizedBox(height: 8),
+              SizedBox(
+                width: 68,
+                child: Text(
+                  'Liên kết mới',
+                  style: AppStyles.bodyRegular,
+                  textAlign: TextAlign.center,
+                  softWrap: true,
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(width: 8),
+
+        Expanded(
+          child: Column(
+            children: [
+              SvgPicture.asset(AppImages.icAddUser, width: 32, height: 32),
+              const SizedBox(height: 8),
+              SizedBox(
+                width: 68,
+                child: Text(
+                  'Thêm người',
+                  style: AppStyles.bodyRegular,
+                  textAlign: TextAlign.center,
+
+                  softWrap: true,
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(width: 8),
+
+        Expanded(
+          child: Column(
+            children: [
+              SvgPicture.asset(AppImages.icShare, width: 32, height: 32),
+              const SizedBox(height: 8),
+              SizedBox(
+                width: 68,
+                child: Text(
+                  'Chia sẻ',
+                  style: AppStyles.bodyRegular,
+                  textAlign: TextAlign.center,
+                  softWrap: true,
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(width: 8),
+
+        Expanded(
+          child: Column(
+            children: [
+              SvgPicture.asset(AppImages.icComment, width: 32, height: 32),
+              const SizedBox(height: 8),
+              SizedBox(
+                width: 68,
+                child: Text(
+                  'Chủ đề',
+                  style: AppStyles.bodyRegular,
+                  textAlign: TextAlign.center,
+                  softWrap: true,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _buildListMessage(List<MessageEntity> messages) {
     print('${messages.length}');
     return ListView.builder(
@@ -275,7 +444,7 @@ class _ChatRoomState extends State<ChatRoom> {
     );
   }
 
-  Widget _buildTextFieldMessage(BuildContext context) {
+  Widget _buildTextFieldMessage(BuildContext con) {
     return commonTextFieldV2(
       radius: 32,
       height: 56,
@@ -284,14 +453,14 @@ class _ChatRoomState extends State<ChatRoom> {
       padding: EdgeInsets.symmetric(vertical: 8, horizontal: 8),
       onChanged: (value) {
         if (value.isNotEmpty) {
-          context.read<ChatBloc>().add(
+          con.read<ChatBloc>().add(
             UserTypingOrStopTypingEvent(
               conversationId: widget.conversation.conversationId,
               isStop: false,
             ),
           );
         } else {
-          context.read<ChatBloc>().add(
+          con.read<ChatBloc>().add(
             UserTypingOrStopTypingEvent(
               conversationId: widget.conversation.conversationId,
               isStop: true,
@@ -311,111 +480,162 @@ class _ChatRoomState extends State<ChatRoom> {
           backgroundColor: AppColors.blue60.withOpacity(0.6),
         ),
       ),
-      suffixIcon: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          BlocBuilder<AudioBloc, AudioState>(
-            builder: (context, audioState) {
-              final isRecording = audioState is AudioRecording; // lấy từ state
-              return GestureDetector(
-                onTap: () async {
-                  if (!isRecording) {
-                    context.read<AudioBloc>().add(StartRecordEvent());
-                  } else {
-                    context.read<AudioBloc>().add(StopRecordEvent());
-                  }
-                },
-                child: Icon(
-                  size: 24,
-                  isRecording ? Icons.stop : Icons.mic,
-                  color: isRecording ? Colors.red : Colors.black,
+      suffixIcon: BlocBuilder<AudioBloc, AudioState>(
+        builder: (context, state) {
+          return Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              // Nếu đang ghi âm → hiển thị nút Stop
+              if (state is AudioRecording) ...[
+                GestureDetector(
+                  onTap: () {
+                    con.read<AudioBloc>().add(StopRecordEvent());
+                  },
+                  child: const Icon(Icons.stop, color: Colors.red, size: 24),
                 ),
-              );
-            },
-          ),
-          const SizedBox(width: 12),
-          BlocBuilder<MediaPickedBloc, MediaPickedState>(
-            builder: (context, state) {
-              return GestureDetector(
-                onTap: () {
-                  showModalBottomSheet(
-                    backgroundColor: Colors.black,
-                    context: context,
-                    useSafeArea: true,
-                    isScrollControlled: true,
-                    shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.vertical(
-                        top: Radius.circular(16),
-                      ),
-                    ),
-                    builder: (_) {
-                      final height = MediaQuery.of(context).size.height;
-                      return BlocProvider.value(
-                        value: context.read<MediaPickedBloc>(),
-                        child: SizedBox(
-                          height: height * 0.75,
-                          child: Column(
-                            children: [
-                              const SizedBox(height: 12),
-                              iconCloseBottomSheet(context),
-                              Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 12.0,
-                                  vertical: 12,
-                                ),
-                                child: MediaHeaderOption(
-                                  pageController: _pageController,
-                                ),
-                              ),
-                              Expanded(
-                                child: MediaGridView(
-                                  onTap: () {
-                                    if (state is MediaPickedSuccess &&
-                                        state.selectedAsset != null) {
-                                      print("Uplaod FIle Step 1");
-                                      // context.read<ChatBloc>().add(
-                                      //   UploadFileMessage(
-                                      //     state.selectedAsset!,
-                                      //     widget.conversation.conversationId,
-                                      //   ),
-                                      // );
-                                      context.read<ChatBloc>().add(
-                                        SendMessage(
-                                          widget.conversation.conversationId,
-                                          'Đã gửi 1 ảnh',
-                                          files: state.selectedAsset,
-                                        ),
-                                      );
-                                    }
-                                  },
-                                ),
-                              ),
-                            ],
-                          ),
+              ] else if (state is AudioStateSuccess &&
+                  !state.isPlayVoiceMessage) ...[
+                audio(
+                  message: state.currentUrl,
+                  isCurrentUser: true,
+                  index: 0,
+                  time: '00:00',
+                  duration: formatDuration(state.totalDuration),
+                  isPlayVoiceMessage: false,
+                ),
+              ] else ...[
+                // Nếu không → hiển thị nút mic
+                GestureDetector(
+                  onTap: () {
+                    con.read<AudioBloc>().add(StartRecordEvent());
+                  },
+                  child: const Icon(Icons.mic, color: Colors.black, size: 24),
+                ),
+              ],
+
+              const SizedBox(width: 12),
+
+              // Nút gửi audio nếu đã có file
+              if (state is AudioStateSuccess &&
+                  state.currentUrl.isNotEmpty &&
+                  !state.isPlayVoiceMessage) ...[
+                IconButton.filledTonal(
+                  onPressed: () async {
+                    final File audioFile = File(state.currentUrl);
+
+                    if (await audioFile.exists()) {
+                      con.read<ChatBloc>().add(
+                        SendMessage(
+                          widget.conversation.conversationId,
+                          'Đã gửi 1 đoạn giọng nói',
+                          files: [audioFile],
                         ),
                       );
-                    },
-                  );
-                },
-                child: SvgPicture.asset(
-                  AppImages.icPictureGallery,
-                  width: 24,
-                  height: 24,
+                    }
+                  },
+                  icon: SvgPicture.asset(
+                    AppImages.icShare,
+                    color: AppColors.white,
+                  ),
+                  style: IconButton.styleFrom(
+                    backgroundColor: AppColors.blue60.withOpacity(0.6),
+                  ),
                 ),
-              );
-            },
-          ),
-          const SizedBox(width: 12),
-          GestureDetector(
-            onTap: () {},
-            child: SvgPicture.asset(
-              AppImages.icStickers,
-              width: 24,
-              height: 24,
-            ),
-          ),
-        ],
+              ] else ...[
+                BlocBuilder<MediaPickedBloc, MediaPickedState>(
+                  builder: (context, state) {
+                    final mediaPickedBloc = context.read<MediaPickedBloc>();
+                    return InkWell(
+                      onTap: () {
+                        showModalBottomSheet(
+                          backgroundColor: Colors.black,
+                          context: context,
+                          useSafeArea: true,
+                          isScrollControlled: true,
+                          shape: const RoundedRectangleBorder(
+                            borderRadius: BorderRadius.vertical(
+                              top: Radius.circular(16),
+                            ),
+                          ),
+                          builder: (_) {
+                            final height = MediaQuery.of(context).size.height;
+                            return BlocProvider.value(
+                              value: mediaPickedBloc,
+                              child: SizedBox(
+                                height: height * 0.8,
+                                child: Column(
+                                  children: [
+                                    const SizedBox(height: 12),
+                                    iconCloseBottomSheet(context),
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 12.0,
+                                        vertical: 12,
+                                      ),
+                                      child: MediaHeaderOption(
+                                        pageController: _pageController,
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: MediaGridView(
+                                        onTap: () {
+                                          final mediaState =
+                                              mediaPickedBloc.state;
+                                          if (mediaState
+                                                  is MediaPickedSuccess &&
+                                              mediaState.selectedAsset !=
+                                                  null) {
+                                            print("Upload File Step 1");
+                                            con.read<ChatBloc>().add(
+                                              SendMessage(
+                                                widget
+                                                    .conversation
+                                                    .conversationId,
+                                                'Đã gửi 1 ảnh',
+                                                mediaFiles:
+                                                    mediaState.selectedAsset,
+                                              ),
+                                            );
+                                          }
+                                          context.pop();
+                                        },
+                                        isHideListChooseMedia: true,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                        );
+                      },
+                      child: SvgPicture.asset(
+                        AppImages.icPictureGallery,
+                        width: 24,
+                        height: 24,
+                      ),
+                    );
+                  },
+                ),
+
+                const SizedBox(width: 12),
+
+                // Nút sticker
+                GestureDetector(
+                  onTap: () {},
+                  child: SvgPicture.asset(
+                    AppImages.icStickers,
+                    width: 24,
+                    height: 24,
+                  ),
+                ),
+                const SizedBox(width: 12),
+              ],
+            ],
+          );
+        },
       ),
+
       onPressSuffixIcon: IconButton.filledTonal(
         onPressed: () {
           final text = _messageController.text.trim();
@@ -517,6 +737,29 @@ class _ChatRoomState extends State<ChatRoom> {
                     msg.attachments!.isNotEmpty &&
                     msg.content == 'Đã gửi 1 ảnh')
                 ? _itemFile(msg.attachments![0])
+                : (msg.content == 'Đã gửi 1 đoạn giọng nói' &&
+                    msg.attachments!.isNotEmpty &&
+                    msg.attachments != null)
+                ? BlocBuilder<AudioBloc, AudioState>(
+                  builder: (context, state) {
+                    final url =
+                        '${ApiEndPoints.DOMAIN}${msg.attachments![0].fileUrl}';
+                    return FutureBuilder<String>(
+                      future: context.read<AudioBloc>().getAudioDuration(url),
+                      builder: (context, snapshot) {
+                        final duration = snapshot.data ?? '00:00';
+                        return audio(
+                          message: url,
+                          index: 1,
+                          isCurrentUser: true,
+                          time: '',
+                          duration: duration,
+                          isPlayVoiceMessage: true,
+                        );
+                      },
+                    );
+                  },
+                )
                 : Column(
                   mainAxisAlignment: MainAxisAlignment.end,
                   crossAxisAlignment: CrossAxisAlignment.end,
@@ -572,26 +815,33 @@ class _ChatRoomState extends State<ChatRoom> {
   Widget _itemFile(Attachment attachment) {
     switch (attachment.fileType) {
       case 'image':
-        return ClipRRect(
-          borderRadius: BorderRadius.circular(12),
-          child: CachedNetworkImage(
-            imageUrl: '${ApiEndPoints.DOMAIN}${attachment.fileUrl}',
-            width: 168,
-            height: 256,
-            color: AppColors.gray30,
-            placeholder:
-                (context, url) => const Center(
-                  child: SizedBox(
-                    width: 24,
-                    height: 24,
-                    child: CircularProgressIndicator(strokeWidth: 2),
+        // print('${ApiEndPoints.DOMAIN}${attachment.fileUrl}');
+        return GestureDetector(
+          onTap:
+              () => showImageNetWork(
+                context,
+                imageUrl: '${ApiEndPoints.DOMAIN}${attachment.fileUrl}',
+              ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: CachedNetworkImage(
+              imageUrl: '${ApiEndPoints.DOMAIN}${attachment.fileUrl}',
+              width: 168,
+              height: 256,
+              placeholder:
+                  (context, url) => const Center(
+                    child: SizedBox(
+                      width: 24,
+                      height: 24,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    ),
                   ),
-                ),
-            errorWidget: (context, url, error) {
-              print('Image load error: $error');
-              return const Icon(Icons.broken_image, color: Colors.grey);
-            },
-            fit: BoxFit.cover,
+              errorWidget: (context, url, error) {
+                print('Image load error: $error');
+                return const Icon(Icons.broken_image, color: Colors.red);
+              },
+              fit: BoxFit.cover,
+            ),
           ),
         );
       default:
@@ -605,7 +855,7 @@ class _ChatRoomState extends State<ChatRoom> {
             border: Border.all(color: Colors.grey.shade400),
           ),
           child: const Center(
-            child: Icon(Icons.insert_drive_file, color: Colors.grey, size: 40),
+            child: Icon(Icons.insert_drive_file, color: Colors.amber, size: 40),
           ),
         );
     }

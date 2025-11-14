@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:camera/camera.dart';
-import 'package:chat_app/main/ui/reels/camera/bloc/camera_event.dart';
-import 'package:chat_app/main/ui/reels/camera/bloc/camera_state.dart';
+import 'package:chat_app/main/ui/reels/widgets/camera/bloc/camera_event.dart';
+import 'package:chat_app/main/ui/reels/widgets/camera/bloc/camera_state.dart';
 import 'package:flutter/material.dart';
 
 class CameraBloc extends Bloc<CameraEvent, CameraState> {

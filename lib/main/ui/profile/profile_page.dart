@@ -375,7 +375,7 @@ class _ProfilePageState extends State<ProfilePage>
                     children: [
                       (state.posts != null && state.posts!.isNotEmpty)
                           ? _buildListPost(state.posts ?? [], 0)
-                          : _buildEmptyPost(0),
+                          : _buildEmptyPost(0, isCurrientUser),
                       _buildListPost(state.posts ?? [], 1),
                       _buildListPost(state.posts ?? [], 2),
                     ],
@@ -1032,17 +1032,30 @@ class _ProfilePageState extends State<ProfilePage>
                   },
                 ),
           ] else ...[
-            Expanded(
-              child: commonButton(
-                margin: EdgeInsets.only(right: 6),
-                hasHeight: true,
-                padding: EdgeInsets.symmetric(vertical: 6, horizontal: 8),
-                maxLine: 1,
-                text: 'Chỉnh sửa trang cá nhân',
-                textStyle: AppStyles.bodyBold.copyWith(color: AppColors.white),
-                onTap: () {},
-                radius: 6,
-              ),
+            BlocBuilder<ProfileBloc, ProfileState>(
+              builder: (context, state) {
+                return Expanded(
+                  child: commonButton(
+                    margin: EdgeInsets.only(right: 6),
+                    hasHeight: true,
+                    padding: EdgeInsets.symmetric(vertical: 6, horizontal: 8),
+                    maxLine: 1,
+                    text: 'Chỉnh sửa trang cá nhân',
+                    textStyle: AppStyles.bodyBold.copyWith(
+                      color: AppColors.white,
+                    ),
+                    onTap: () {
+                      if (state is ProfileSuccess) {
+                        context.pushNamed(
+                          PathName.editProfilePage,
+                          extra: state.user,
+                        );
+                      }
+                    },
+                    radius: 6,
+                  ),
+                );
+              },
             ),
             Expanded(
               child: commonButton(
@@ -1106,35 +1119,45 @@ class _ProfilePageState extends State<ProfilePage>
     );
   }
 
-  Widget _buildEmptyPost(int page) {
-    return GestureDetector(
-      onTap: () {},
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 64),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
+  Widget _buildEmptyPost(int page, bool isCurrientUser) {
+    return !isCurrientUser
+        ? GestureDetector(
+          onTap: () {},
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 64),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text('Tạo bài viêt đầu tiên', style: AppStyles.title1Bold),
+                Text(
+                  'Thêm chút gì đó cho không gian này đi',
+                  style: AppStyles.title2Regular,
+                ),
+                const SizedBox(height: 48),
+                commonButton(
+                  text: 'Tạo',
+                  width: 100,
+                  radius: 16,
+                  onTap: () {
+                    context.goNamed(PathName.createPostPage);
+                  },
+                  color: AppColors.blue60,
+                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 0),
+                  margin: EdgeInsets.zero,
+                ),
+              ],
+            ),
+          ),
+        )
+        : Column(
           children: [
-            Text('Tạo bài viêt đầu tiên', style: AppStyles.title1Bold),
-            Text(
-              'Thêm chút gì đó cho không gian này đi',
-              style: AppStyles.title2Regular,
-            ),
-            const SizedBox(height: 48),
-            commonButton(
-              text: 'Tạo',
-              width: 100,
-              radius: 16,
-              onTap: () {
-                context.goNamed(PathName.createPostPage);
-              },
-              color: AppColors.blue60,
-              padding: EdgeInsets.symmetric(horizontal: 12, vertical: 0),
-              margin: EdgeInsets.zero,
-            ),
+            const SizedBox(height: 32),
+
+            SvgPicture.asset(AppImages.icCamera, width: 86, height: 86),
+            const SizedBox(height: 12),
+            Text('Chưa có bài viết', style: AppStyles.title1Bold),
           ],
-        ),
-      ),
-    );
+        );
   }
 
   Widget _buildListPost(List<PostModel> posts, int tabIndex) {

@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:chat_app/main/helper/media/media_helper.dart';
-import 'package:chat_app/main/ui/reels/media_picked/bloc/media_picked_event.dart';
-import 'package:chat_app/main/ui/reels/media_picked/bloc/media_picked_state.dart';
+import 'package:chat_app/main/ui/reels/widgets/media_picked/bloc/media_picked_event.dart';
+import 'package:chat_app/main/ui/reels/widgets/media_picked/bloc/media_picked_state.dart';
 
 import 'package:photo_manager/photo_manager.dart';
 

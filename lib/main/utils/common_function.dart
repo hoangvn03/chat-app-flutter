@@ -23,7 +23,15 @@ String formatDateTimeV2(DateTime? dateTime) {
   final formatter = DateFormat('HH:mm - dd/MM/yyyy');
   return formatter.format(dateTime);
 }
+String formatDateTimeV3(DateTime? dateTime) {
+  if (dateTime == null) return '';
 
+  final hourMinute = DateFormat('HH:mm').format(dateTime);
+  final day = dateTime.day;
+  final month = dateTime.month;
+
+  return '$hourMinute Ngày $day tháng $month';
+}
 
 Future<List<File>> convertAssetEntitiesToFiles(List<AssetEntity> assets) async {
   final List<File> files = [];
@@ -36,6 +44,12 @@ Future<List<File>> convertAssetEntitiesToFiles(List<AssetEntity> assets) async {
   }
 
   return files;
+}
+String formatDuration(int milliseconds) {
+  final seconds = (milliseconds / 1000).truncate();
+  final minutes = (seconds ~/ 60).toString().padLeft(2, '0');
+  final remainingSeconds = (seconds % 60).toString().padLeft(2, '0');
+  return "$minutes:$remainingSeconds";
 }
 
 

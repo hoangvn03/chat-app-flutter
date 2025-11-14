@@ -1,3 +1,4 @@
+import 'package:chat_app/main/ui/widget/post/media_item.dart';
 import 'package:chat_app/main/ui/widget/post/widgets/bloc/interaction_state.dart';
 import 'package:chat_app/main/ui/widget/post/widgets/interaction_button.dart';
 import 'package:chat_app/main/ui/widget/post/widgets/bloc/interaction_cubit.dart';
@@ -74,8 +75,7 @@ class PostWidget extends StatelessWidget {
             },
           ),
 
-          // Post Image
-          _buildPostContent(),
+          MediaItem(media: post.media),
 
           // Action bar
           _buildActionBar(context),
@@ -142,7 +142,7 @@ class PostWidget extends StatelessWidget {
   }
 
   Widget _buildActionBar(BuildContext con) {
-    print('IsLikes: ${post.isLiked} ${post.likesCount}');
+    // print('IsLikes: ${post.isLiked} ${post.likesCount}');
     return BlocBuilder<ActionBloc, ActionState>(
       builder: (con, state) {
         var likeCount, isSelected, cmtCount, shareCount;
@@ -150,8 +150,7 @@ class PostWidget extends StatelessWidget {
           likeCount = (state.data != null) ? state.data : post.likesCount;
           cmtCount =
               (state.cmtCount != null) ? state.cmtCount : post.commentsCount;
-          shareCount =
-              (state.shareCount != null) ? state.shareCount : post.saveCount;
+          shareCount = 0;
 
           isSelected = state.isSelected;
         } else {

@@ -114,7 +114,7 @@ class ActionBloc extends Bloc<ActionEvent, ActionState> {
         data: params,
       );
       if (res.statusCode == 201) {
-        final newComment = CommentModel.fromJson(res.body);
+        final newComment = CommentModel.fromJson(res.body['newComment']);
         final updatedComments = _addReplyRecursive(
           currentState.comments,
           event.commentId,

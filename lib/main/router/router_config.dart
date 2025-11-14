@@ -8,7 +8,9 @@ import 'package:chat_app/main/ui/auth/auth_page.dart';
 import 'package:chat_app/main/ui/conversations/conversations_page.dart';
 import 'package:chat_app/main/ui/conversations/screens/createGroupChat/bloc/create_chat_bloc.dart';
 import 'package:chat_app/main/ui/conversations/screens/createGroupChat/create_chat_page.dart';
+import 'package:chat_app/main/ui/conversations/screens/message/bloc/chat_bloc.dart';
 import 'package:chat_app/main/ui/conversations/screens/message/chat_room.dart';
+import 'package:chat_app/main/ui/conversations/screens/message/edit_infomation_group.dart';
 import 'package:chat_app/main/ui/home/bloc/home_bloc.dart';
 import 'package:chat_app/main/ui/home/home_page.dart';
 import 'package:chat_app/main/ui/home/widgets/create_post_page.dart';
@@ -17,14 +19,15 @@ import 'package:chat_app/main/ui/home/widgets/upload_post_page.dart';
 import 'package:chat_app/main/ui/notification/notification_page.dart';
 import 'package:chat_app/main/ui/personal/personal_page.dart';
 import 'package:chat_app/main/ui/post/post_page.dart';
+import 'package:chat_app/main/ui/profile/widgets/edit_profile_page.dart';
 import 'package:chat_app/main/ui/profile/widgets/profile_list_follower.dart';
 import 'package:chat_app/main/ui/profile/profile_page.dart';
 import 'package:chat_app/main/ui/profile/widgets/settings/setting_page.dart';
-import 'package:chat_app/main/ui/reels/camera/camera_page.dart';
-import 'package:chat_app/main/ui/reels/create_reels/create_reels_page.dart';
-import 'package:chat_app/main/ui/reels/create_reels/widgets/edit_element_media.dart';
-import 'package:chat_app/main/ui/reels/list_reels/list_reels_page.dart';
-import 'package:chat_app/main/ui/reels/media_picked/media_picked_page.dart';
+import 'package:chat_app/main/ui/reels/widgets/camera/camera_page.dart';
+import 'package:chat_app/main/ui/reels/widgets/create_storys/create_reels_page.dart';
+import 'package:chat_app/main/ui/reels/widgets/create_storys/widgets/edit_element_media.dart';
+import 'package:chat_app/main/ui/reels/story/list_story/list_reels_page.dart';
+import 'package:chat_app/main/ui/reels/widgets/media_picked/media_picked_page.dart';
 import 'package:chat_app/main/ui/reels/reels_page.dart';
 import 'package:chat_app/main/ui/search/search_page.dart';
 import 'package:chat_app/main/ui/search/search_result_page.dart';
@@ -84,6 +87,15 @@ class AppGoRouter {
         },
       ),
       GoRoute(
+        name: PathName.editProfilePage,
+        path: AppPath.editProfilePage,
+        builder: (context, state) {
+          final data = state.extra as UserModel;
+          return EditProfilePage(user: data);
+        },
+      ),
+      
+      GoRoute(
         name: PathName.chatPage,
         path: AppPath.chatPage,
         routes: [
@@ -103,6 +115,27 @@ class AppGoRouter {
           GoRoute(
             name: PathName.chatRoomPage,
             path: AppPath.chatRoomPage,
+            routes: [
+              GoRoute(
+                name: PathName.editInfomationGroupPage,
+                path: AppPath.editInfomationGroupPage,
+                pageBuilder: (context, state) {
+                  final extra = state.extra as Map<String, dynamic>;
+                  return slidePage(
+                    MultiBlocProvider(
+                      providers: [
+                        BlocProvider.value(value: extra['chatBloc']),
+                        BlocProvider.value(value: extra['audioBloc']),
+                        BlocProvider.value(value: extra['mediaBloc']),
+                      ],
+                      child: EditInfomationGroup(
+                        conversation: extra['conversation'],
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ],
             pageBuilder: (context, state) {
               final data = state.extra as Conversation;
               return slidePage(ChatRoom(conversation: data));
@@ -221,7 +254,7 @@ class AppGoRouter {
                   ),
                 ],
                 builder: (context, state) {
-                  final extras = state.extra as List<dynamic>?;
+                  final extras = state.extra as Map<String, dynamic>? ?? {};
                   return HomePage(extras: extras);
                 },
               ),

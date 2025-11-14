@@ -5,8 +5,8 @@ import 'package:chat_app/main/networks/api_end_point.dart';
 import 'package:chat_app/main/networks/api_util.dart';
 import 'package:chat_app/main/networks/model/reels.dart';
 import 'package:chat_app/main/networks/model/user.dart';
-import 'package:chat_app/main/ui/reels/list_reels/bloc/list_reels_event.dart';
-import 'package:chat_app/main/ui/reels/list_reels/bloc/list_reels_state.dart';
+import 'package:chat_app/main/ui/reels/story/list_story/bloc/list_reels_event.dart';
+import 'package:chat_app/main/ui/reels/story/list_story/bloc/list_reels_state.dart';
 import 'package:chat_app/main/utils/shared_preference.dart';
 
 import 'package:photo_manager/photo_manager.dart';

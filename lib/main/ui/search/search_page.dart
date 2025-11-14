@@ -54,7 +54,7 @@ class SearchPage extends StatelessWidget {
                 ],
               );
             } else if (state is SearchFailure) {
-              return const Center(child: Text('Failed to load users'));
+              return Center(child: Text(state.errorMessage));
             }
             return const Center(child: Text('Welcome to the Search Page!'));
           },
@@ -79,35 +79,40 @@ class SearchPage extends StatelessWidget {
         ],
       ),
       delegate: SliverChildBuilderDelegate(
-        (context, index) => _itemSearchInit(posts[index]),
+        (context, index) => _itemSearchInit(posts[index], context),
         childCount: posts.length, // Use actual post count
       ),
     );
   }
 
-  Widget _itemSearchInit(PostModel post) {
-    return Stack(
-      fit: StackFit.expand,
-      children: [
-        Image.network(
-          post.media![0].mediaUrl ?? '',
-          fit: BoxFit.cover,
-          width: double.infinity,
-        ),
-        if (post.media![0].mediaType != 'video')
-          Positioned(
-            right: 4,
-            top: 4,
-            child: SvgPicture.asset(
-              width: 16,
-              height: 16,
-              post.media![0].mediaType != 'image'
-                  ? AppImages.icReelsActive
-                  : AppImages.icGallery,
-              color: AppColors.white,
-            ),
+  Widget _itemSearchInit(PostModel post, BuildContext context) {
+    return InkWell(
+      onTap: () {
+        context.pushNamed(PathName.reelsPage);
+      },
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          Image.network(
+            post.media![0].mediaUrl ?? '',
+            fit: BoxFit.cover,
+            width: double.infinity,
           ),
-      ],
+          if (post.media![0].mediaType != 'video')
+            Positioned(
+              right: 4,
+              top: 4,
+              child: SvgPicture.asset(
+                width: 16,
+                height: 16,
+                post.media![0].mediaType != 'image'
+                    ? AppImages.icReelsActive
+                    : AppImages.icGallery,
+                color: AppColors.white,
+              ),
+            ),
+        ],
+      ),
     );
   }
 }

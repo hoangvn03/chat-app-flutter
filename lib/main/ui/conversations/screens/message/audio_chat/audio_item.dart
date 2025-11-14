@@ -9,7 +9,9 @@ Widget audio({
   required int index,
   required String time,
   required String duration,
+  bool? isPlayVoiceMessage,
 }) {
+  isPlayVoiceMessage ?? false;
   return BlocBuilder<AudioBloc, AudioState>(
     builder: (context, state) {
       bool isPlaying = false;
@@ -21,15 +23,17 @@ Widget audio({
         isPlaying = state.isPlaying;
         progress = state.progress;
         currentId = state.currentId;
+        print('$isPlayVoiceMessage');
       }
 
       return Container(
         width: MediaQuery.of(context).size.width * 0.5,
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: isCurrentUser
-              ? AppColors.blue20
-              : AppColors.blue20.withOpacity(0.18),
+          color:
+              isCurrentUser
+                  ? AppColors.blue20
+                  : AppColors.blue20.withOpacity(0.18),
           borderRadius: BorderRadius.circular(10),
         ),
         child: Row(
@@ -38,9 +42,17 @@ Widget audio({
               onTap: () {
                 final bloc = context.read<AudioBloc>();
                 if (isPlaying && currentId == index) {
-                  bloc.add(PauseAudioEvent());
+                  bloc.add(
+                    PauseAudioEvent(isPlayVoiceMessage: isPlayVoiceMessage!),
+                  );
                 } else {
-                  bloc.add(PlayAudioEvent(message, index));
+                  bloc.add(
+                    PlayAudioEvent(
+                      message,
+                      index,
+                      isPlayVoiceMessage: isPlayVoiceMessage!,
+                    ),
+                  );
                 }
               },
               child: Icon(

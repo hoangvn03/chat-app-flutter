@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chat_app/main/networks/model/user.dart';
 import 'package:chat_app/res/app_colors.dart';
 import 'package:chat_app/res/app_images.dart';
@@ -553,8 +554,7 @@ Widget commonTileItemV2({
   );
 }
 
-Widget groupUserAvatar({required List<String> images, double avatarSize = 48}) {
-  const double overlap = 32;
+Widget groupUserAvatar({required List<String> images, double avatarSize = 48,double overlap = 32}) {
   return SizedBox(
     height: avatarSize + (images.length - 1) * (avatarSize - overlap),
     width: avatarSize + (images.length - 1) * (avatarSize - overlap),
@@ -747,5 +747,62 @@ Widget iconMeta() {
       const SizedBox(width: 4),
       Text("Meta", style: AppStyles.title3Bold),
     ],
+  );
+}
+
+void showImageNetWork(BuildContext context, {required String imageUrl}) {
+  showDialog(
+    context: context,
+    barrierDismissible: true, // tap ngoài để đóng
+    builder: (_) {
+      return Dialog(
+        backgroundColor: Colors.transparent,
+        insetPadding: const EdgeInsets.all(10),
+        child: Stack(
+          alignment: Alignment.topRight,
+          children: [
+            // Container chứa ảnh
+            ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: CachedNetworkImage(
+                imageUrl: imageUrl,
+                placeholder:
+                    (context, url) => Container(
+                      width: double.infinity,
+                      height: 300,
+                      color: Colors.grey.shade300,
+                      child: const Center(child: CircularProgressIndicator()),
+                    ),
+                errorWidget:
+                    (context, url, error) => Container(
+                      width: double.infinity,
+                      height: 300,
+                      color: Colors.grey.shade300,
+                      child: const Icon(
+                        Icons.error,
+                        color: Colors.red,
+                        size: 50,
+                      ),
+                    ),
+                fit: BoxFit.contain,
+              ),
+            ),
+            // Nút đóng
+            Positioned(
+              top: 5,
+              right: 5,
+              child: GestureDetector(
+                onTap: () => Navigator.of(context).pop(),
+                child: const CircleAvatar(
+                  radius: 14,
+                  backgroundColor: Colors.black54,
+                  child: Icon(Icons.close, color: Colors.white, size: 18),
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    },
   );
 }

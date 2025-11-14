@@ -37,7 +37,7 @@ class ApiUtil {
       );
 
       debugPrint('✅ [GET] Status code: ${response.statusCode}');
-      debugPrint('📦 [GET] Response body: ${response.body}');
+      debugPrint('📦 [GET] Response body: ${response.body}', wrapWidth: 1024);
 
       return await _handleResponse(response);
     } catch (e, stackTrace) {
@@ -138,7 +138,7 @@ class ApiUtil {
   static Future<ApiResponse> postFiles({
     required String url,
     required List<File> files,
-    String? key
+    String? key,
   }) async {
     try {
       final token = await AppStorage.getToken();

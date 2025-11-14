@@ -20,7 +20,7 @@ class ApiEndPoints {
           _customDomain = "http://10.0.2.2:8080";
           break;
         case ENV.preprod:
-          _customDomain = "http://192.168.1.77:8080";
+          _customDomain = "http://10.0.2.2:8080";
           break;
         case ENV.prod:
           _customDomain = "http://192.168.1.77:8080";

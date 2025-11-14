@@ -1,7 +1,7 @@
 import 'package:chat_app/main/networks/model/reels.dart';
-import 'package:chat_app/main/ui/reels/create_reels/bloc/create_reels_bloc.dart';
-import 'package:chat_app/main/ui/reels/create_reels/bloc/create_reels_event.dart';
-import 'package:chat_app/main/ui/reels/create_reels/bloc/create_reels_state.dart';
+import 'package:chat_app/main/ui/reels/widgets/create_storys/bloc/create_reels_bloc.dart';
+import 'package:chat_app/main/ui/reels/widgets/create_storys/bloc/create_reels_event.dart';
+import 'package:chat_app/main/ui/reels/widgets/create_storys/bloc/create_reels_state.dart';
 import 'package:chat_app/res/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';

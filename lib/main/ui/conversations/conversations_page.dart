@@ -97,6 +97,7 @@ class _ChatPageState extends State<ChatPage> {
                 );
               },
             ),
+            const SizedBox(width: 8),
           ],
         ),
         body: BlocListener<CreateChatBloc, CreateChatState>(
@@ -185,17 +186,17 @@ class _ChatPageState extends State<ChatPage> {
 
   Widget _buildSearchBar() {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       decoration: BoxDecoration(
         color: AppColors.gray20,
-        borderRadius: const BorderRadius.all(Radius.circular(24)),
+        borderRadius: const BorderRadius.all(Radius.circular(32)),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           SvgPicture.asset(AppImages.icAddHighlight),
           const SizedBox(width: 16),
-          Text('Hỏi Meta AI hoặc tìm kiếm'),
+          Text('Hỏi Meta AI hoặc tìm kiếm', style: AppStyles.title3Regular),
         ],
       ),
     );

@@ -69,6 +69,7 @@ class AudioBloc extends Bloc<AudioEvent, AudioState> {
         isPlaying: true,
         currentId: event.id,
         currentUrl: event.url,
+        isPlayVoiceMessage: event.isPlayVoiceMessage,
       ),
     );
   }
@@ -80,7 +81,12 @@ class AudioBloc extends Bloc<AudioEvent, AudioState> {
   ) async {
     await _audioPlayer.pause();
     if (state is AudioStateSuccess) {
-      emit((state as AudioStateSuccess).copyWith(isPlaying: false));
+      emit(
+        (state as AudioStateSuccess).copyWith(
+          isPlaying: false,
+          isPlayVoiceMessage: event.isPlayVoiceMessage,
+        ),
+      );
     }
   }
 
@@ -124,17 +130,43 @@ class AudioBloc extends Bloc<AudioEvent, AudioState> {
     }
   }
 
-  // --- STOP RECORDING ---
   Future<void> _onStopRecord(
     StopRecordEvent event,
     Emitter<AudioState> emit,
   ) async {
     final path = await _record.stop();
     if (path != null) {
-      emit(AudioRecorded(path: path));
+      final tempPlayer = AudioPlayer();
+      await tempPlayer.setSource(DeviceFileSource(path));
+      final totalDuration = await tempPlayer.getDuration();
+      await tempPlayer.dispose();
+      emit(
+        AudioStateSuccess(
+          currentUrl: path,
+          totalDuration: totalDuration?.inMilliseconds ?? 0,
+        ),
+      );
     } else {
       emit(AudioError("Ghi âm thất bại"));
     }
+  }
+
+  final Map<String, String> _cachedDurations = {};
+
+  Future<String> getAudioDuration(String url) async {
+    if (_cachedDurations.containsKey(url)) return _cachedDurations[url]!;
+    final player = AudioPlayer();
+    await player.setSourceUrl(url);
+    final duration = await player.getDuration();
+    player.dispose();
+    if (duration != null) {
+      final seconds = duration.inSeconds;
+      final formatted =
+          '${(seconds ~/ 60).toString().padLeft(2, '0')}:${(seconds % 60).toString().padLeft(2, '0')}';
+      _cachedDurations[url] = formatted;
+      return formatted;
+    }
+    return '00:00';
   }
 
   @override

@@ -1,8 +1,8 @@
 import 'package:chat_app/main/router/router.dart';
-import 'package:chat_app/main/ui/reels/media_picked/bloc/media_picked_bloc.dart';
-import 'package:chat_app/main/ui/reels/media_picked/bloc/media_picked_event.dart';
-import 'package:chat_app/main/ui/reels/media_picked/bloc/media_picked_state.dart';
-import 'package:chat_app/main/ui/reels/media_picked/widget/media_picked.dart';
+import 'package:chat_app/main/ui/reels/widgets/media_picked/bloc/media_picked_bloc.dart';
+import 'package:chat_app/main/ui/reels/widgets/media_picked/bloc/media_picked_event.dart';
+import 'package:chat_app/main/ui/reels/widgets/media_picked/bloc/media_picked_state.dart';
+import 'package:chat_app/main/ui/reels/widgets/media_picked/widget/media_picked.dart';
 import 'package:chat_app/main/utils/common_widget.dart';
 import 'package:chat_app/res/app_colors.dart';
 import 'package:chat_app/res/app_images.dart';
@@ -16,9 +16,15 @@ import 'package:photo_manager_image_provider/photo_manager_image_provider.dart';
 
 // ignore: must_be_immutable
 class MediaGridView extends StatelessWidget {
-  MediaGridView({super.key, this.onTap, this.isHideListChooseMedia = true});
+  MediaGridView({
+    super.key,
+    this.onTap,
+    this.onTapMedia,
+    this.isHideListChooseMedia,
+  });
   VoidCallback? onTap;
-  bool isHideListChooseMedia;
+  VoidCallback? onTapMedia;
+  bool? isHideListChooseMedia;
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -71,7 +77,7 @@ class MediaGridView extends StatelessWidget {
             },
           ),
         ),
-        isHideListChooseMedia
+        isHideListChooseMedia ?? true
             ? Positioned(
               bottom: 0,
               left: 0,
@@ -93,20 +99,24 @@ class MediaGridView extends StatelessWidget {
               isSelected ? selectedAssets.indexOf(asset) + 1 : null;
 
           return GestureDetector(
-            onTap: () {
-              if (selectedAssets.isNotEmpty || state.isSelecting == true) {
-                context.read<MediaPickedBloc>().add(
-                  ChooseMedia(asset: asset, isSelecting: true),
-                );
-              } else {
-                context
-                    .pushNamed(PathName.createReelsPage, extra: [asset])
-                    .then((_) {
-                      state.selectedAsset?.clear();
-                      state.isSelecting = false;
-                    });
-              }
-            },
+            onTap:
+                onTapMedia ??
+                () {
+                  if (selectedAssets.isNotEmpty ||
+                      state.isSelecting == true ||
+                      isHideListChooseMedia == true) {
+                    context.read<MediaPickedBloc>().add(
+                      ChooseMedia(asset: asset, isSelecting: true),
+                    );
+                  } else {
+                    context
+                        .pushNamed(PathName.createReelsPage, extra: [asset])
+                        .then((_) {
+                          state.selectedAsset?.clear();
+                          state.isSelecting = false;
+                        });
+                  }
+                },
             onLongPress: () {
               context.read<MediaPickedBloc>().add(
                 ChooseMedia(asset: asset, isSelecting: true),

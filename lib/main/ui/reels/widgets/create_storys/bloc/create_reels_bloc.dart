@@ -4,8 +4,8 @@ import 'package:bloc/bloc.dart';
 import 'package:chat_app/main/helper/media/ffmpeg_helper.dart';
 import 'package:chat_app/main/networks/api_util.dart';
 import 'package:chat_app/main/networks/model/reels.dart';
-import 'package:chat_app/main/ui/reels/create_reels/bloc/create_reels_event.dart';
-import 'package:chat_app/main/ui/reels/create_reels/bloc/create_reels_state.dart';
+import 'package:chat_app/main/ui/reels/widgets/create_storys/bloc/create_reels_event.dart';
+import 'package:chat_app/main/ui/reels/widgets/create_storys/bloc/create_reels_state.dart';
 import 'package:chat_app/main/utils/common_function.dart';
 import 'package:flutter/material.dart';
 

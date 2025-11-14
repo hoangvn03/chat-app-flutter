@@ -39,7 +39,7 @@ class _LoginPageState extends State<LoginPage> {
       child: BlocListener<AuthBloc, AuthState>(
         listener: (context, state) {
           if (state is AuthSuccess && state.hasLocalUser == false) {
-            context.goNamed(PathName.homePage, extra: state.user);
+            context.goNamed(PathName.homePage);
           } else if (state is AuthFailure) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
