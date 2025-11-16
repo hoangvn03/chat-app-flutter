@@ -30,3 +30,4 @@ class UpdateCurrentDurationEvent extends AudioEvent {
 class StartRecordEvent extends AudioEvent {}
 
 class StopRecordEvent extends AudioEvent {}
+class ResetAudioEvent extends AudioEvent {}

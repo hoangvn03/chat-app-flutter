@@ -79,21 +79,24 @@ class _ChatRoomState extends State<ChatRoom> {
       ],
       child: BlocListener<ChatBloc, ChatState>(
         listener: (context, state) {
-          if (state is ChatFailure) {
-            showDialog(
-              context: context,
-              builder:
-                  (context) => AlertDialog(
-                    title: const Text("Lỗi"),
-                    content: Text(state.errorMessage),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.pop(context),
-                        child: const Text("OK"),
-                      ),
-                    ],
-                  ),
-            );
+          if (state is ChatSuccess) {
+            if (state.statusMessage != null) {
+              print("Status Message: ${state.statusMessage}");
+              showDialog(
+                context: context,
+                builder:
+                    (context) => AlertDialog(
+                      title: const Text("Lỗi"),
+                      content: Text(state.statusMessage ?? 'Đã có lỗi xảy ra'),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: const Text("OK"),
+                        ),
+                      ],
+                    ),
+              );
+            }
           }
         },
         child: Scaffold(
@@ -225,9 +228,10 @@ class _ChatRoomState extends State<ChatRoom> {
                     ),
                   ],
                 );
-              } else if (state is ChatFailure) {
-                return Center(child: Text(state.errorMessage));
               }
+              // else if (state is ChatFailure) {
+              //   return Center(child: Text(state.errorMessage));
+              // }
               return const Text('nnnn');
             },
           ),
@@ -549,6 +553,7 @@ class _ChatRoomState extends State<ChatRoom> {
                     final File audioFile = File(state.currentUrl);
 
                     if (await audioFile.exists()) {
+                      // ignore: use_build_context_synchronously
                       con.read<ChatBloc>().add(
                         SendMessage(
                           widget.conversation.conversationId,
@@ -556,6 +561,8 @@ class _ChatRoomState extends State<ChatRoom> {
                           files: [audioFile],
                         ),
                       );
+                      // ignore: use_build_context_synchronously
+                      con.read<AudioBloc>().add(ResetAudioEvent());
                     }
                   },
                   icon: SvgPicture.asset(
@@ -572,6 +579,8 @@ class _ChatRoomState extends State<ChatRoom> {
                     final mediaPickedBloc = context.read<MediaPickedBloc>();
                     return InkWell(
                       onTap: () {
+                        mediaPickedBloc.add(ResetMediaPicked());
+
                         showModalBottomSheet(
                           backgroundColor: Colors.black,
                           context: context,
@@ -665,10 +674,10 @@ class _ChatRoomState extends State<ChatRoom> {
         onPressed: () {
           final text = _messageController.text.trim();
           if (text.isEmpty) return;
-          context.read<ChatBloc>().add(
+          con.read<ChatBloc>().add(
             SendMessage(widget.conversation.conversationId, text),
           );
-          context.read<ChatBloc>().add(
+          con.read<ChatBloc>().add(
             UserTypingOrStopTypingEvent(
               conversationId: widget.conversation.conversationId,
               isStop: true,

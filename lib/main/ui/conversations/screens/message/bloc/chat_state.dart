@@ -20,7 +20,7 @@ class ChatSuccess extends ChatState {
     required this.messages,
     this.typingUsers = const [],
     this.onlineUsers = const [],
-    this.statusMessage = '',
+    this.statusMessage,
     this.file = const [],
     this.userStatuses = const {},
     this.statusUserContact = StatusUser.offline,

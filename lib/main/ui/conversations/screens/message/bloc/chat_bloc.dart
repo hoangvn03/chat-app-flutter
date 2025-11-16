@@ -31,7 +31,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     on<UpdateTypingEvent>(_updateStateTyping);
     on<UpdateOnlineUsers>(_updateOnlineUser);
     on<UpdateStatusUsers>(_updateStatusUser);
-    on<UploadFileMessage>(_uploadFileMessage);
+    // on<UploadFileMessage>(_uploadFileMessage);
     on<UpdateStatusMessage>(_updateStatusMessage);
   }
   // final SocketService socketService = SocketService();
@@ -123,52 +123,46 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   ) async {
     if (state is! ChatSuccess) return;
     final currentState = state as ChatSuccess;
+    emit(
+      ChatSuccess(
+        messages: List.from(currentState.messages),
+        statusMessage: null, 
+      ),
+    );
     try {
-      print('B2 Receive Message');
-      print(event.message);
       final msg = event.message['message'] ?? event.message;
-      if (_listFilesSend.isNotEmpty) {
-        add(
+      List<Attachment> attachments = [];
+
+      if (_listFilesSend.isNotEmpty || _listFilesPath.isNotEmpty) {
+        final fileList =
+            _listFilesSend.isNotEmpty ? _listFilesSend : _listFilesPath;
+        final uploaded = await _uploadFileMessage(
           UploadFileMessage(
-            file: _listFilesSend,
-            conversationId:
-                msg['conversation_id'] is String
-                    ? int.tryParse(msg['conversation_id']) ?? 0
-                    : (msg['conversation_id'] ?? 0),
-            messageId:
-                msg['message_id'] is String
-                    ? int.tryParse(msg['message_id']) ?? 0
-                    : (msg['message_id'] ?? 0),
+            file: fileList,
+            conversationId: int.tryParse("${msg['conversation_id']}") ?? 0,
+            messageId: int.tryParse("${msg['message_id']}") ?? 0,
           ),
         );
-      } else if (_listFilesPath.isNotEmpty) {
-        add(
-          UploadFileMessage(
-            file: _listFilesPath,
-            conversationId:
-                msg['conversation_id'] is String
-                    ? int.tryParse(msg['conversation_id']) ?? 0
-                    : (msg['conversation_id'] ?? 0),
-            messageId:
-                msg['message_id'] is String
-                    ? int.tryParse(msg['message_id']) ?? 0
-                    : (msg['message_id'] ?? 0),
-          ),
-        );
+        print("Upload file result: ${uploaded.errorMessage}");
+        if (uploaded.errorMessage != null) {
+          _listFilesSend.clear();
+          _listFilesPath.clear();
+          _listFile.clear();
+          emit(
+            ChatSuccess(
+              messages: List.from(currentState.messages),
+              statusMessage: uploaded.errorMessage,
+            ),
+          );
+          return;
+        }
+        attachments = uploaded.attachments ?? [];
       }
+
       final message = MessageEntity(
-        messageId:
-            msg['message_id'] is String
-                ? int.tryParse(msg['message_id']) ?? 0
-                : (msg['message_id'] ?? 0),
-        conversationId:
-            msg['conversation_id'] is String
-                ? int.tryParse(msg['conversation_id']) ?? 0
-                : (msg['conversation_id'] ?? 0),
-        senderId:
-            msg['sender_id'] is String
-                ? int.tryParse(msg['sender_id']) ?? 0
-                : (msg['sender_id'] ?? 0),
+        messageId: int.tryParse("${msg['message_id']}") ?? 0,
+        conversationId: int.tryParse("${msg['conversation_id']}") ?? 0,
+        senderId: int.tryParse("${msg['sender_id']}") ?? 0,
         content: msg['content'] ?? '',
         createdAt: DateTime.tryParse(msg['created_at'] ?? '') ?? DateTime.now(),
         isRead: msg['is_read'] ?? false,
@@ -180,10 +174,15 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
                     .map((e) => Status.fromJson(e))
                     .toList()
                 : [],
-        attachments: _listFile,
+        attachments: attachments,
       );
-      _messages.add(message);
-      emit(currentState.copyWith(messages: List.from(_messages)));
+
+      final newMessages = List<MessageEntity>.from(currentState.messages)
+        ..add(message);
+      _listFilesSend.clear();
+      _listFilesPath.clear();
+      _listFile.clear();
+      emit(ChatSuccess(messages: newMessages, statusMessage: null));
     } catch (e) {
       emit(ChatFailure(e.toString()));
     }
@@ -289,15 +288,10 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     }
   }
 
-  Future<void> _uploadFileMessage(
-    UploadFileMessage event,
-    Emitter<ChatState> emit,
-  ) async {
-    if (state is! ChatSuccess) return;
-    final currentState = state as ChatSuccess;
+  Future<UploadResult> _uploadFileMessage(UploadFileMessage event) async {
     try {
-      _listFile.clear();
       var files;
+
       if (event.file is List<AssetEntity>) {
         files = await convertAssetEntitiesToFiles(
           event.file as List<AssetEntity>,
@@ -305,24 +299,23 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
       } else if (event.file is List<File>) {
         files = event.file;
       }
+
       final url = '${ApiEndPoints.SENDFILE}/${event.messageId}';
-      print('Upload FIle Step 2: ${files.length}');
       ApiResponse res = await ApiUtil.postFiles(url: url, files: files);
+
       if (res.statusCode == 201) {
         final data =
             (res.body['data'] as List)
                 .map((e) => Attachment.fromJson(e))
                 .toList();
-        _listFile.addAll(data);
-        print('Upload FIle Step 3: ${_listFile.length}');
-        emit(currentState.copyWith(file: data));
+        return UploadResult(attachments: data);
       } else {
-              emit(ChatFailure(res.body['error']['message'] ?? 'Upload file failed'));
-
-        print('Upload FIle Step 3: Error');
+        return UploadResult(
+          errorMessage: res.body['error']['message'] ?? 'Upload file failed',
+        );
       }
     } catch (e) {
-      emit(ChatFailure(e.toString()));
+      return UploadResult(errorMessage: e.toString());
     }
   }
 
@@ -335,4 +328,11 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     socketService.socket.off('online_users');
     return super.close();
   }
+}
+
+class UploadResult {
+  final List<Attachment>? attachments;
+  final String? errorMessage;
+
+  UploadResult({this.attachments, this.errorMessage});
 }

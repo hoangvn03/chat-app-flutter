@@ -28,3 +28,4 @@ class ChooseMedia extends MediaPickedEvent {
 
   ChooseMedia({this.asset, this.isSelecting});
 }
+class ResetMediaPicked extends MediaPickedEvent {}

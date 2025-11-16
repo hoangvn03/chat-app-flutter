@@ -56,6 +56,9 @@ class AudioBloc extends Bloc<AudioEvent, AudioState> {
         );
       }
     });
+  on<ResetAudioEvent>((event, emit) {
+  emit(AudioInitial());
+});
   }
 
   // --- PLAY AUDIO ---

@@ -11,6 +11,7 @@ class MediaPickedBloc extends Bloc<MediaPickedEvent, MediaPickedState> {
     on<LoadRequest>(_loadRequest);
     on<ChooseMedia>(_chooseMedia);
     on<ToggleSelectingMode>(_toggleSelectingMode); // ✅ thêm dòng này
+    on<ResetMediaPicked>(_resetMediaPicked); // ✅ thêm dòng này
   }
   List<AssetPathEntity> albumList = [];
   List<AssetPathEntity> albumAll = [];
@@ -105,5 +106,22 @@ class MediaPickedBloc extends Bloc<MediaPickedEvent, MediaPickedState> {
     } catch (e) {
       emit(MediaPickedFailure(e.toString()));
     }
+  }
+
+  Future<void> _resetMediaPicked(
+    ResetMediaPicked event,
+    Emitter<MediaPickedState> emit,
+  ) async {
+    if (state is! MediaPickedSuccess) return;
+
+    final current = state as MediaPickedSuccess;
+
+    emit(
+      current.copyWith(
+        selectedAsset: [], // reset lựa chọn
+        isSelecting: false,
+        errorMessage: null,
+      ),
+    );
   }
 }
