@@ -56,6 +56,7 @@ class AppImages {
   static const String icCamera = 'assets/icons/ic_camera.svg';
   static const String icCameraDark = 'assets/icons/ic_camera_dark.svg';
   static const String icNoteCreate = 'assets/icons/ic_note_create.svg';
+  static const String icError = 'assets/icons/ic_error.svg';
   //png
     static const String icMetaPng = 'assets/icons/ic_meta.png';
 

@@ -20,7 +20,7 @@ import 'package:chat_app/main/ui/notification/notification_page.dart';
 import 'package:chat_app/main/ui/personal/personal_page.dart';
 import 'package:chat_app/main/ui/post/post_page.dart';
 import 'package:chat_app/main/ui/profile/widgets/edit_profile_page.dart';
-import 'package:chat_app/main/ui/profile/widgets/profile_list_follower.dart';
+import 'package:chat_app/main/ui/profile/widgets/profile_list_user.dart';
 import 'package:chat_app/main/ui/profile/profile_page.dart';
 import 'package:chat_app/main/ui/profile/widgets/settings/setting_page.dart';
 import 'package:chat_app/main/ui/reels/widgets/camera/camera_page.dart';
@@ -86,6 +86,7 @@ class AppGoRouter {
           return ProfilePage(user: data);
         },
       ),
+
       GoRoute(
         name: PathName.editProfilePage,
         path: AppPath.editProfilePage,
@@ -94,7 +95,7 @@ class AppGoRouter {
           return EditProfilePage(user: data);
         },
       ),
-      
+
       GoRoute(
         name: PathName.chatPage,
         path: AppPath.chatPage,
@@ -152,7 +153,10 @@ class AppGoRouter {
         name: PathName.profileListFollowerPage,
         path: AppPath.profileListFollowerPage,
         builder: (context, state) {
-          return ProfileListFollowerPage();
+          final extra = state.extra as List;
+          final currentUser = extra[0] as UserModel;
+          final index = extra[1] as int;
+          return ProfileListFollowerPage(user: currentUser, index: index);
         },
       ),
       GoRoute(

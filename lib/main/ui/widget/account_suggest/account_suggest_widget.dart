@@ -14,15 +14,9 @@ import 'package:go_router/go_router.dart';
 
 // ignore: must_be_immutable
 class AccountSuggestWidget extends StatelessWidget {
-  AccountSuggestWidget({
-    super.key,
-    required this.isHorirontal,
-    required this.users,
-    this.title,
-  });
+  AccountSuggestWidget({super.key, required this.isHorirontal, this.title});
   bool isHorirontal;
   String? title;
-  List<UserModel> users;
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
@@ -31,7 +25,8 @@ class AccountSuggestWidget extends StatelessWidget {
         builder: (context, state) {
           if (state is AccountSuggestLoading) {
             return const Center(child: CircularProgressIndicator());
-          } else if (state is AccountSuggestSuccess) {
+          } else if (state is AccountSuggestSuccess &&
+              state.contactList.isNotEmpty) {
             final data = state.contactList;
             return Column(
               children: [
@@ -58,10 +53,7 @@ class AccountSuggestWidget extends StatelessWidget {
                             (context, index) => const SizedBox(width: 4),
                         itemCount: data.length,
                         itemBuilder: (context, index) {
-                          return _itemUserSuggestV2(
-                            data[index].friend!,
-                            context,
-                          );
+                          return _itemUserSuggestV2(data[index], context);
                         },
                       ),
                     )
@@ -71,12 +63,16 @@ class AccountSuggestWidget extends StatelessWidget {
                       itemCount: data.length,
                       itemBuilder:
                           (context, index) =>
-                              _itemUserSuggestV1(data[index].friend!, context),
+                              _itemUserSuggestV1(data[index], context),
                     ),
               ],
             );
+          } else if (state is AccountSuggestFailure) {
+            return const Center(child: Text('Failed to load users'));
           }
-          return SizedBox.shrink();
+          return const Center(
+            child: Text('Không có tài khoản nào được gợi ý!'),
+          );
         },
       ),
     );

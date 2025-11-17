@@ -116,7 +116,7 @@ class SearchResultPage extends StatelessWidget {
         ),
 
         title: Text(user.username ?? 'Unknown', style: AppStyles.title2Bold),
-        subtitle: Text(user.email ?? '', style: AppStyles.bodyRegular),
+        subtitle: Text(user.fullname ?? '', style: AppStyles.bodyRegular),
         onTap: () {
           context.pushNamed(PathName.profilePage, extra: user);
         },

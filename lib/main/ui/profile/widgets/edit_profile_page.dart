@@ -1,8 +1,12 @@
 import 'package:chat_app/main/networks/model/user.dart';
+import 'package:chat_app/main/ui/profile/bloc/profile_bloc.dart';
+import 'package:chat_app/main/ui/profile/bloc/profile_event.dart';
+import 'package:chat_app/main/ui/profile/bloc/profile_state.dart';
 import 'package:chat_app/main/utils/common_widget.dart';
 import 'package:chat_app/res/app_colors.dart';
 import 'package:chat_app/res/app_styles.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 
 class EditProfilePage extends StatefulWidget {
@@ -19,16 +23,20 @@ class _EditProfilePageState extends State<EditProfilePage> {
   late TextEditingController bioController;
 
   bool showThreads = true;
-  String gender = "Nam";
+  String gender = "male";
 
   @override
   void initState() {
     super.initState();
     // Khởi tạo controller ở đây
-    nameController = TextEditingController(text: "Nguyễn Ngọc Hoàng");
-    usernameController = TextEditingController(text: "hoang_vn03");
+    nameController = TextEditingController(
+      text: widget.user.fullname ?? "Hoàng Văn Nam",
+    );
+    usernameController = TextEditingController(
+      text: widget.user.username ?? "hoangvannam",
+    );
     pronounController = TextEditingController();
-    bioController = TextEditingController();
+    bioController = TextEditingController(text: widget.user.bio ?? "Bio");
   }
 
   @override
@@ -43,131 +51,148 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
+    return BlocProvider<ProfileBloc>(
+      create: (_) => ProfileBloc(),
+      child: Scaffold(
         backgroundColor: Colors.white,
-        elevation: 0,
-        centerTitle: true,
-        actions: [
-          GestureDetector(
-            onTap: () {},
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Text('Xong', style: AppStyles.title2Regular),
-            ),
-          ),
-        ],
-        title: const Text(
-          "Chỉnh sửa trang cá nhân",
-          style: AppStyles.title1Bold,
-        ),
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            // Ảnh đại diện
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(40),
-                  child: Container(
-                    width: 80,
-                    height: 80,
-                    color: AppColors.gray20, // nền xám
-                    child: SvgPicture.network(
-                      widget.user.avatar ??
-                          'https://www.svgrepo.com/show/170523/user-profile.svg',
-                      width: 80,
-                      height: 80,
-                      fit: BoxFit.cover,
-                      placeholderBuilder:
-                          (context) => const Center(
-                            child: Icon(
-                              Icons.person_outline,
-                              size: 40,
-                              color: AppColors.gray30,
-                            ),
-                          ),
-                    ),
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          elevation: 0,
+          centerTitle: true,
+          actions: [
+            BlocBuilder<ProfileBloc, ProfileState>(
+              builder: (context, state) {
+                return GestureDetector(
+                  onTap: () {
+                    context.read<ProfileBloc>().add(
+                      EditProfile(
+                        UserModel(
+                          id: widget.user.id,
+                          fullname: nameController.text,
+                          username: usernameController.text,
+                          bio: bioController.text,
+                          gender: gender,
+                          status: widget.user.status,
+                          email: widget.user.email,
+                          avatar: widget.user.avatar,
+                          isPrivate: widget.user.isPrivate,
+                        ),
+                      ),
+                    );
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Text('Xong', style: AppStyles.title2Regular),
                   ),
-                ),
-
-                const SizedBox(width: 16),
-                const CircleAvatar(
-                  radius: 40,
-                  backgroundColor: Color(0xFFEFEFEF),
-                  child: Icon(
-                    Icons.person_outline,
-                    size: 40,
-                    color: Colors.grey,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            GestureDetector(
-              onTap: () {
-                // TODO: Chọn ảnh đại diện
+                );
               },
-              child: const Text(
-                "Đổi ảnh đại diện",
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.blue,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-            const SizedBox(height: 24),
-
-            // Các trường thông tin
-            _buildTextField("Tên", nameController),
-            _buildTextField("Tên người dùng", usernameController),
-            _buildTextField("Danh xưng", pronounController),
-            _buildTextField("Tiểu sử", bioController),
-            const SizedBox(height: 8),
-
-            _buildSectionTitle("Thêm liên kết"),
-            const Divider(height: 24, color: Colors.grey),
-
-            _buildSectionTitle("Biểu ngữ"),
-            const SizedBox(height: 8),
-
-            // Giới tính
-            _buildDropdownGender(),
-
-            const SizedBox(height: 8),
-
-            // Nhạc
-            ListTile(
-              contentPadding: EdgeInsets.zero,
-              title: const Text("Nhạc"),
-              subtitle: const Text(
-                "Thêm nhạc vào trang cá nhân của bạn",
-                style: TextStyle(color: Colors.grey),
-              ),
-              trailing: const Icon(Icons.chevron_right),
-              onTap: () {},
-            ),
-
-            const SizedBox(height: 8),
-            const Divider(),
-
-            // Toggle
-            SwitchListTile(
-              title: const Text("Hiển thị biểu ngữ Threads"),
-              subtitle: const Text(
-                "Khi bạn tắt, biểu tượng Instagram trên trang cá nhân Threads cũng sẽ biến mất.",
-                style: TextStyle(color: Colors.grey),
-              ),
-              value: showThreads,
-              onChanged: (v) => setState(() => showThreads = v),
-              activeColor: Colors.blue,
             ),
           ],
+          title: const Text(
+            "Chỉnh sửa trang cá nhân",
+            style: AppStyles.title1Bold,
+          ),
+        ),
+        body: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            children: [
+              // Ảnh đại diện
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(40),
+                    child: Container(
+                      width: 80,
+                      height: 80,
+                      color: AppColors.gray20, // nền xám
+                      child: SvgPicture.network(
+                        widget.user.avatar ??
+                            'https://www.svgrepo.com/show/170523/user-profile.svg',
+                        width: 80,
+                        height: 80,
+                        fit: BoxFit.cover,
+                        placeholderBuilder:
+                            (context) => const Center(
+                              child: Icon(
+                                Icons.person_outline,
+                                size: 40,
+                                color: AppColors.gray30,
+                              ),
+                            ),
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(width: 16),
+                  const CircleAvatar(
+                    radius: 40,
+                    backgroundColor: Color(0xFFEFEFEF),
+                    child: Icon(
+                      Icons.person_outline,
+                      size: 40,
+                      color: Colors.grey,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              GestureDetector(
+                onTap: () {
+                  // TODO: Chọn ảnh đại diện
+                },
+                child: const Text(
+                  "Đổi ảnh đại diện",
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.blue,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 24),
+
+              // Các trường thông tin
+              _buildTextField("Tên", nameController),
+              _buildTextField("Tên người dùng", usernameController),
+              _buildTextField("Danh xưng", pronounController),
+              _buildTextField("Tiểu sử", bioController),
+              const SizedBox(height: 8),
+              // _buildSectionTitle("Thêm liên kết"),
+              // _buildSectionTitle("Biểu ngữ"),
+              // const SizedBox(height: 8),
+              // _buildDropdownGender(),
+              // const SizedBox(height: 8),
+
+              // Nhạc
+              ListTile(
+                contentPadding: EdgeInsets.zero,
+                title: const Text("Nhạc"),
+                subtitle: const Text(
+                  "Thêm nhạc vào trang cá nhân của bạn",
+                  style: TextStyle(color: Colors.grey),
+                ),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () {},
+              ),
+
+              const SizedBox(height: 8),
+              const Divider(),
+
+              // Toggle
+              SwitchListTile(
+                title: const Text("Hiển thị biểu ngữ Threads"),
+                subtitle: const Text(
+                  "Khi bạn tắt, biểu tượng Instagram trên trang cá nhân Threads cũng sẽ biến mất.",
+                  style: TextStyle(color: Colors.grey),
+                ),
+                value: showThreads,
+                onChanged: (v) => setState(() => showThreads = v),
+                activeColor: Colors.blue,
+              ),
+            ],
+          ),
         ),
       ),
     );

@@ -86,12 +86,61 @@ class _ChatRoomState extends State<ChatRoom> {
                 context: context,
                 builder:
                     (context) => AlertDialog(
-                      title: const Text("Lỗi"),
-                      content: Text(state.statusMessage ?? 'Đã có lỗi xảy ra'),
+                      backgroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      title: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SvgPicture.asset(
+                            AppImages.icError,
+                            width: 86,
+                            height: 86,
+                          ),
+                          const SizedBox(width: 8),
+                          const Text(
+                            "Lỗi",
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const Divider(
+                            color: Colors.redAccent, // màu gạch ngang
+                            thickness: 2, // độ dày đường
+                            // indent: 40, // khoảng cách trái
+                            // endIndent: 40, // khoảng cách phải
+                          ),
+                        ],
+                      ),
+                      content: Text(
+                        state.statusMessage ?? 'Đã có lỗi xảy ra',
+                        textAlign: TextAlign.center,
+                        style: AppStyles.bodyRegular,
+                      ),
+                      actionsAlignment: MainAxisAlignment.center,
                       actions: [
                         TextButton(
+                          style: TextButton.styleFrom(
+                            backgroundColor: Colors.redAccent,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 24,
+                              vertical: 12,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
                           onPressed: () => Navigator.pop(context),
-                          child: const Text("OK"),
+                          child: const Text(
+                            "OK",
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                         ),
                       ],
                     ),

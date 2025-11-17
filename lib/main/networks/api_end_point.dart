@@ -51,11 +51,12 @@ class ApiEndPoints {
 
   static String get SIGNIN => "$DOMAIN/api/auth/login";
   static String get SIGNOUT => "$DOMAIN/api/auth/logout";
-  static String get PROFILE => "$DOMAIN/api/auth/me";
+  static String get PROFILE => "$DOMAIN/api/users/me";
+  static String get PROFILE1 => "$DOMAIN/api/users/me";
   static String get FOLLOW => "$DOMAIN/api/follow/2";
   static String get FOLLOWING => "$DOMAIN/api/follow/following";
   static String get FOLLOWERS => "$DOMAIN/api/follow/followers";
-  static String get FRIENDS => "$DOMAIN/api/users/me/contacts";
+  static String get FRIENDS => "$DOMAIN/api/users/me/suggestions";
   static String get FOLLOWSUGGESTION => "$DOMAIN/api/follow/suggestions";
 
   static String get CONVERATIONS => "$DOMAIN/api/conversations";

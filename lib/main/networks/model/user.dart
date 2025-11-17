@@ -46,8 +46,8 @@ class UserModel {
   String? avatar;
   String? status;
   String? createdAt;
+  String? gender;               // ⭐ Thêm gender
   List<ReelModel>? reels;
-  // RoleData? roleData;
 
   UserModel({
     required this.id,
@@ -57,9 +57,9 @@ class UserModel {
     this.bio,
     this.email,
     this.avatar,
-    // this.roleData,
     this.status,
     this.createdAt,
+    this.gender,                // ⭐ Thêm vào constructor
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
@@ -73,9 +73,7 @@ class UserModel {
       avatar: json['avatar_url'],
       status: json['status'],
       createdAt: json['created_at'],
-      // roleData: json['roleData'] != null
-      //     ? RoleData.fromJson(json['roleData'])
-      //     : null,
+      gender: json['gender'],   // ⭐ Parse gender từ API
     );
   }
 
@@ -85,9 +83,11 @@ class UserModel {
       'username': username,
       'email': email,
       'avatar_url': avatar,
+      'gender': gender,         // ⭐ Gửi gender lên API
     };
   }
 }
+
 
 class UserContact {
   final int contactId;

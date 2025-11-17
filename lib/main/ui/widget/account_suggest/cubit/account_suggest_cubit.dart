@@ -13,12 +13,14 @@ class AccountSuggestCubit extends Cubit<AccountSuggestState> {
   Future<void> loadRequest() async {
     try {
       emit(AccountSuggestLoading());
-      var url = ApiEndPoints.FRIENDS;
-      ApiResponse res = await ApiUtil.get(url, params: {'page': '1'});
+      var url = '${ApiEndPoints.USERS}/suggestions';
+      var params = {'page': '1', 'limit': '20'};
+
+      ApiResponse res = await ApiUtil.get(url, params: params);
       if (res.statusCode == 200) {
-        final List<ContactUser> contactList =
-            (res.body['data']['contacts'] as List)
-                .map((e) => ContactUser.fromJson(e))
+        final List<UserModel> contactList =
+            (res.body['data']['suggestions'] as List)
+                .map((e) => UserModel.fromJson(e))
                 .toList();
 
         emit(AccountSuggestSuccess(contactList: contactList));

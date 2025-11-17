@@ -6,9 +6,9 @@ abstract class AccountSuggestState {}
 class AccountSuggestLoading extends AccountSuggestState {}
 
 class AccountSuggestSuccess extends AccountSuggestState {
-  final List<ContactUser> contactList;
+  final List<UserModel> contactList;
   AccountSuggestSuccess({required this.contactList});
-  AccountSuggestSuccess copyWith({List<ContactUser>? contactList}) {
+  AccountSuggestSuccess copyWith({List<UserModel>? contactList}) {
     return AccountSuggestSuccess(contactList: contactList ?? this.contactList);
   }
 }

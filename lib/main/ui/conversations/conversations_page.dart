@@ -141,34 +141,7 @@ class _ChatPageState extends State<ChatPage> {
                         AccountSuggestWidget(
                           isHorirontal: false,
                           title: 'Tài khoản nên theo dõi',
-                          users: [
-                            UserModel(
-                              id: 999,
-                              username: 'hieu_pham',
-                              avatar: AppImages.imgAvatarDefault,
-                            ),
-                            UserModel(
-                              id: 999,
-                              username: 'tuan_anh',
-                              avatar: AppImages.imgAvatarDefault,
-                            ),
-                            UserModel(
-                              id: 999,
-                              username: 'nguyen_nguyen',
-                              avatar: AppImages.imgAvatarDefault,
-                            ),
-                            UserModel(
-                              id: 999,
-                              username: 'ngoc_hoang',
-                              avatar: AppImages.imgAvatarDefault,
-                            ),
-                            UserModel(
-                              id: 999,
-                              username: 'minh_hieu',
-                              avatar: AppImages.imgAvatarDefault,
-                            ),
-                          ],
-                        ),
+                     ),
                       ],
                     ),
                   ),

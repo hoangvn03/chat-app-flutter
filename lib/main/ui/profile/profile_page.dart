@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chat_app/main/helper/socket/socket_service.dart';
 import 'package:chat_app/main/networks/model/converation.dart';
+import 'package:chat_app/main/networks/model/profile_model.dart';
 import 'package:chat_app/main/ui/conversations/screens/createGroupChat/bloc/create_chat_bloc.dart';
 import 'package:chat_app/main/ui/conversations/screens/createGroupChat/bloc/create_chat_event.dart';
 import 'package:chat_app/main/ui/conversations/screens/createGroupChat/bloc/create_chat_state.dart';
@@ -42,7 +43,7 @@ class _ProfilePageState extends State<ProfilePage>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 2, vsync: this);
   }
 
   @override
@@ -305,7 +306,9 @@ class _ProfilePageState extends State<ProfilePage>
                                 icon: SvgPicture.asset(AppImages.icThreads),
                               ),
                               IconButton(
-                                onPressed: () {},
+                                onPressed: () {
+                                  context.goNamed(PathName.createPostPage);
+                                },
                                 icon: SvgPicture.asset(AppImages.icCreate),
                               ),
                               IconButton(
@@ -322,8 +325,10 @@ class _ProfilePageState extends State<ProfilePage>
                         SliverToBoxAdapter(
                           child: _buildProfileInfo(
                             state.user,
+                            state.stats,
                             isCurrientUser,
                             state.conversationId,
+                            state.posts?.length ?? 0,
                           ),
                         ),
 
@@ -359,12 +364,12 @@ class _ProfilePageState extends State<ProfilePage>
                                     color: AppColors.gray60,
                                   ),
                                 ),
-                                Tab(
-                                  icon: SvgPicture.asset(
-                                    AppImages.icTag,
-                                    color: AppColors.gray60,
-                                  ),
-                                ),
+                                // Tab(
+                                //   icon: SvgPicture.asset(
+                                //     AppImages.icTag,
+                                //     color: AppColors.gray60,
+                                //   ),
+                                // ),
                               ],
                             ),
                           ),
@@ -376,8 +381,19 @@ class _ProfilePageState extends State<ProfilePage>
                       (state.posts != null && state.posts!.isNotEmpty)
                           ? _buildListPost(state.posts ?? [], 0)
                           : _buildEmptyPost(0, isCurrientUser),
-                      _buildListPost(state.posts ?? [], 1),
-                      _buildListPost(state.posts ?? [], 2),
+                      () {
+                        final videoPosts =
+                            state.posts
+                                ?.where((post) => post.mediaType == 'video')
+                                .toList() ??
+                            [];
+                        return (videoPosts.isNotEmpty)
+                            ? _buildListPost(videoPosts, 1)
+                            : _buildEmptyPost(1, isCurrientUser);
+                      }(),
+                      // (state.posts != null && state.posts!.isNotEmpty)
+                      //     ? _buildListPost(state.posts ?? [], 2)
+                      //     : _buildEmptyPost(0, isCurrientUser),
                     ],
                   ),
                 );
@@ -593,7 +609,7 @@ class _ProfilePageState extends State<ProfilePage>
                           ],
                         ),
                       ],
-                  body: const Center(child: Text('Failed to load users')),
+                  body: Center(child: Text(state.erroMessage ?? '')),
                 );
               }
               return const Center(child: Text('Welcome to the Profile Page!'));
@@ -606,8 +622,10 @@ class _ProfilePageState extends State<ProfilePage>
 
   Widget _buildProfileInfo(
     UserModel user,
+    Stats? stats,
     bool isCurrientUser,
     int? converationId,
+    int numPost,
   ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -660,24 +678,38 @@ class _ProfilePageState extends State<ProfilePage>
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('151', style: AppStyles.title3Bold),
+                            Text('$numPost', style: AppStyles.title3Bold),
                             Text('bài viết', style: AppStyles.calloutRegular),
                           ],
                         ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('122K', style: AppStyles.title3Bold),
-                            Text(
-                              'người theo dõi',
-                              style: AppStyles.calloutRegular,
-                            ),
-                          ],
+                        InkWell(
+                          onTap: () {
+                            context.pushNamed(
+                              PathName.profileListFollowerPage,
+                              extra: [user,0],
+                            );
+                          },
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                '${stats != null ? stats.followers : 0}',
+                                style: AppStyles.title3Bold,
+                              ),
+                              Text(
+                                'người theo dõi',
+                                style: AppStyles.calloutRegular,
+                              ),
+                            ],
+                          ),
                         ),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('162', style: AppStyles.title3Bold),
+                            Text(
+                              '${stats != null ? stats.following : 0}',
+                              style: AppStyles.title3Bold,
+                            ),
                             Text(
                               'đang theo dõi',
                               style: AppStyles.calloutRegular,
@@ -722,7 +754,7 @@ class _ProfilePageState extends State<ProfilePage>
                 ),
               ]),
               const SizedBox(height: 8),
-              _totalUserFollow(),
+              !isCurrientUser ? const SizedBox() : _totalUserFollow(),
               const SizedBox(height: 8),
               _buttonActionProfile(isCurrientUser, converationId),
               if (user.reels != null)
@@ -735,38 +767,6 @@ class _ProfilePageState extends State<ProfilePage>
               AccountSuggestWidget(
                 isHorirontal: true,
                 title: 'Khám phá mọi người',
-                users: [
-                  UserModel(
-                    id: 999,
-
-                    username: 'hieu_pham',
-                    avatar: AppImages.imgAvatarDefault,
-                  ),
-                  UserModel(
-                    id: 999,
-
-                    username: 'tuan_anh',
-                    avatar: AppImages.imgAvatarDefault,
-                  ),
-                  UserModel(
-                    id: 999,
-
-                    username: 'nguyen_nguyen',
-                    avatar: AppImages.imgAvatarDefault,
-                  ),
-                  UserModel(
-                    id: 999,
-
-                    username: 'ngoc_hoang',
-                    avatar: AppImages.imgAvatarDefault,
-                  ),
-                  UserModel(
-                    id: 999,
-
-                    username: 'minh_hieu',
-                    avatar: AppImages.imgAvatarDefault,
-                  ),
-                ],
               ),
             ],
           ),
@@ -1133,7 +1133,7 @@ class _ProfilePageState extends State<ProfilePage>
                   'Thêm chút gì đó cho không gian này đi',
                   style: AppStyles.title2Regular,
                 ),
-                const SizedBox(height: 48),
+                const SizedBox(height: 32),
                 commonButton(
                   text: 'Tạo',
                   width: 100,
@@ -1160,7 +1160,7 @@ class _ProfilePageState extends State<ProfilePage>
         );
   }
 
-  Widget _buildListPost(List<PostModel> posts, int tabIndex) {
+  Widget _buildListPost(List<PostChild> posts, int tabIndex) {
     print('$tabIndex');
     return GridView.builder(
       physics:
@@ -1179,23 +1179,29 @@ class _ProfilePageState extends State<ProfilePage>
     );
   }
 
-  Widget _itemPost(PostModel post) {
+  Widget _itemPost(PostChild post) {
     return Stack(
       fit: StackFit.expand,
       children: [
-        Image.network(
-          post.media![0].mediaUrl ?? '',
+        CachedNetworkImage(
+          imageUrl: post.thumbnailUrl,
           fit: BoxFit.cover,
           width: double.infinity,
+          placeholder:
+              (context, url) =>
+                  const Center(child: CircularProgressIndicator()),
+          errorWidget:
+              (context, url, error) =>
+                  const Center(child: Icon(Icons.broken_image)),
         ),
-        if (post.media![0].mediaType != 'video')
+        if (post.mediaType != 'video')
           Positioned(
             right: 4,
             top: 4,
             child: SvgPicture.asset(
               width: 16,
               height: 16,
-              post.media![0].mediaType != 'image'
+              post.mediaType != 'image'
                   ? AppImages.icReelsActive
                   : AppImages.icGallery,
               color: AppColors.white,

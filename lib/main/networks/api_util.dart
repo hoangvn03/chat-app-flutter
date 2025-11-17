@@ -178,6 +178,16 @@ class ApiUtil {
     try {
       final uri = Uri.parse(url);
       final token = await AppStorage.getToken();
+
+      // 🔥 Log toàn bộ request
+      debugPrint("======== PUT REQUEST ========");
+      debugPrint("URL: $uri");
+      debugPrint(
+        "Headers: ${{"Authorization": 'Bearer $token', "Content-Type": "application/json"}}",
+      );
+      debugPrint("Body: ${jsonEncode(data)}");
+      debugPrint("================================");
+
       final response = await http.put(
         uri,
         headers: {
@@ -186,9 +196,13 @@ class ApiUtil {
         },
         body: json.encode(data),
       );
+      debugPrint('📥 RESPONSE');
+      debugPrint('Status Code: ${response.statusCode}');
+      debugPrint('Response Body: ${response.body}');
+      debugPrint('====================================');
       return await _handleResponse(response);
     } catch (e) {
-      debugPrint('PUT error: $e');
+      debugPrint('❌ PUT error: $e');
       rethrow;
     }
   }

@@ -135,3 +135,38 @@ class Media {
     };
   }
 }
+class PostChild {
+  final int postId;
+  final int userId;
+  final String thumbnailUrl;
+  final String mediaType;
+  final bool isVideo;
+
+  PostChild({
+    required this.postId,
+    required this.userId,
+    required this.thumbnailUrl,
+    required this.mediaType,
+    required this.isVideo,
+  });
+
+  factory PostChild.fromJson(Map<String, dynamic> json) {
+    return PostChild(
+      postId: json['post_id'],
+      userId: json['user_id'],
+      thumbnailUrl: json['thumbnail_url'],
+      mediaType: json['media_type'],
+      isVideo: json['is_video'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'post_id': postId,
+      'user_id': userId,
+      'thumbnail_url': thumbnailUrl,
+      'media_type': mediaType,
+      'is_video': isVideo,
+    };
+  }
+}
