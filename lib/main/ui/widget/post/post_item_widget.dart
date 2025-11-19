@@ -61,7 +61,7 @@ class PostWidget extends StatelessWidget {
                     ],
                   ),
                   // followButton(),
-                  interactionButton(type: InteractionType.follow),
+                  // interactionButton(type: InteractionType.follow),
                 ],
               ),
             ),

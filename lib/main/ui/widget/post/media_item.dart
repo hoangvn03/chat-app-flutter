@@ -1,19 +1,18 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:chat_app/main/networks/model/post.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
+import 'package:chat_app/main/networks/model/post.dart'; // import model Media của bạn
 
-// ignore: must_be_immutable
 class MediaItem extends StatefulWidget {
-  MediaItem({super.key, this.media});
-  List<Media>? media;
+  final List<Media>? media;
+  const MediaItem({super.key, this.media});
 
   @override
   State<MediaItem> createState() => _MediaItemState();
 }
 
 class _MediaItemState extends State<MediaItem> {
-  List<VideoPlayerController?> _videoControllers = [];
+  late final List<VideoPlayerController?> _videoControllers;
   bool _isDisposed = false;
 
   @override
@@ -32,12 +31,16 @@ class _MediaItemState extends State<MediaItem> {
     for (int i = 0; i < mediaList.length; i++) {
       final media = mediaList[i];
       if (media.mediaType == 'video' && media.mediaUrl != null) {
-        _videoControllers[i] = VideoPlayerController.network(media.mediaUrl!)
-          ..initialize().then((_) {
-            if (!_isDisposed && mounted) {
-              setState(() {});
-            }
-          });
+        final controller = VideoPlayerController.network(media.mediaUrl!);
+        _videoControllers[i] = controller;
+
+        controller.initialize().then((_) {
+          if (!_isDisposed && mounted) {
+            controller.setLooping(true);
+            controller.play();
+            setState(() {});
+          }
+        });
       }
     }
   }
@@ -53,25 +56,21 @@ class _MediaItemState extends State<MediaItem> {
 
   @override
   Widget build(BuildContext context) {
-    return _buildPostContent();
-  }
-
-  Widget _buildPostContent() {
     final mediaList = widget.media ?? [];
     if (mediaList.isEmpty) {
       return const SizedBox(
         height: 300,
-        child: Center(child: Text('Không có ảnh')),
+        child: Center(child: Text('Không có media')),
       );
     }
 
     return SizedBox(
-      height: 300,
+      height:
+          400, // bạn có thể thay đổi chiều cao hoặc dùng MediaQuery để responsive
       child: PageView.builder(
         itemCount: mediaList.length,
         itemBuilder: (context, index) {
           final media = mediaList[index];
-
           if (media.mediaType == 'video') {
             return _buildVideoPlayer(index);
           } else {
@@ -84,46 +83,86 @@ class _MediaItemState extends State<MediaItem> {
 
   Widget _buildVideoPlayer(int index) {
     final controller = _videoControllers[index];
-
     if (controller == null || !controller.value.isInitialized) {
       return const Center(child: CircularProgressIndicator());
     }
 
-    return Stack(
-      fit: StackFit.expand,
-      children: [
-        VideoPlayer(controller),
-        Positioned(
-          bottom: 10,
-          right: 10,
-          child: Icon(Icons.videocam, color: Colors.white, size: 24),
+    return GestureDetector(
+      onTap: () {
+        if (controller.value.isPlaying) {
+          controller.pause();
+        } else {
+          controller.play();
+        }
+        setState(() {}); // refresh icon
+      },
+      child: Container(
+        color: Colors.black, // nền đen
+
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            AspectRatio(
+              aspectRatio: controller.value.aspectRatio,
+              child: FittedBox(
+                fit: BoxFit.contain, // giữ tỉ lệ, không crop
+                alignment: Alignment.center,
+                child: SizedBox(
+                  width: controller.value.size.width,
+                  height: controller.value.size.height,
+                  child: VideoPlayer(controller),
+                ),
+              ),
+            ),
+            if (!controller.value.isPlaying)
+              Container(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.black26,
+                ),
+                child: const Icon(
+                  Icons.play_arrow,
+                  color: Colors.white,
+                  size: 60,
+                ),
+              ),
+            Positioned(
+              bottom: 10,
+              right: 10,
+              child: Icon(Icons.videocam, color: Colors.white, size: 24),
+            ),
+          ],
         ),
-      ],
+      ),
     );
   }
 
   Widget _buildImage(Media media) {
-    return Stack(
-      fit: StackFit.expand,
-      children: [
-        CachedNetworkImage(
-          imageUrl: media.mediaUrl ?? '',
-          fit: BoxFit.cover,
-          width: double.infinity,
-          placeholder:
-              (context, url) =>
-                  const Center(child: CircularProgressIndicator()),
-          errorWidget:
-              (context, url, error) =>
-                  const Center(child: Icon(Icons.broken_image)),
-        ),
-        if (media.mediaType == 'video')
-          Positioned(
-            bottom: 10,
-            right: 10,
-            child: Icon(Icons.videocam, color: Colors.white, size: 24),
+    return Container(
+      color: Colors.black, // nền đen
+
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          CachedNetworkImage(
+            imageUrl: media.mediaUrl ?? '',
+            fit: BoxFit.contain, // giữ tỉ lệ gốc
+            width: double.infinity,
+            placeholder:
+                (context, url) =>
+                    const Center(child: CircularProgressIndicator()),
+            errorWidget:
+                (context, url, error) =>
+                    const Center(child: Icon(Icons.broken_image)),
           ),
-      ],
+          if (media.mediaType == 'video')
+            Positioned(
+              bottom: 10,
+              right: 10,
+              child: Icon(Icons.videocam, color: Colors.white, size: 24),
+            ),
+        ],
+      ),
     );
   }
 }

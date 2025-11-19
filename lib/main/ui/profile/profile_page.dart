@@ -8,6 +8,7 @@ import 'package:chat_app/main/ui/conversations/screens/createGroupChat/bloc/crea
 import 'package:chat_app/main/ui/conversations/screens/message/bloc/chat_bloc.dart';
 import 'package:chat_app/main/ui/conversations/screens/message/bloc/chat_state.dart';
 import 'package:chat_app/main/ui/widget/account_suggest/account_suggest_widget.dart';
+import 'package:chat_app/main/ui/widget/post/media_item.dart';
 import 'package:chat_app/main/ui/widget/post/widgets/bloc/interaction_cubit.dart';
 import 'package:chat_app/main/ui/widget/post/widgets/interaction_button.dart';
 import 'package:chat_app/main/networks/model/common_item.dart';
@@ -686,7 +687,7 @@ class _ProfilePageState extends State<ProfilePage>
                           onTap: () {
                             context.pushNamed(
                               PathName.profileListFollowerPage,
-                              extra: [user,0],
+                              extra: [user, 0],
                             );
                           },
                           child: Column(
@@ -1180,20 +1181,11 @@ class _ProfilePageState extends State<ProfilePage>
   }
 
   Widget _itemPost(PostChild post) {
+    final media = Media(mediaType: post.mediaType, mediaUrl: post.thumbnailUrl);
     return Stack(
       fit: StackFit.expand,
       children: [
-        CachedNetworkImage(
-          imageUrl: post.thumbnailUrl,
-          fit: BoxFit.cover,
-          width: double.infinity,
-          placeholder:
-              (context, url) =>
-                  const Center(child: CircularProgressIndicator()),
-          errorWidget:
-              (context, url, error) =>
-                  const Center(child: Icon(Icons.broken_image)),
-        ),
+        MediaItem(media: [media]),
         if (post.mediaType != 'video')
           Positioned(
             right: 4,
