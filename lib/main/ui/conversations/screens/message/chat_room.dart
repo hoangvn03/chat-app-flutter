@@ -796,6 +796,7 @@ class _ChatRoomState extends State<ChatRoom> {
 
   Widget _itemMessage(MessageEntity msg) {
     final isMe = msg.senderId == widget.conversation.participants[0].id;
+    final widght = MediaQuery.of(context).size.width;
     return Column(
       children: [
         Padding(
@@ -847,31 +848,37 @@ class _ChatRoomState extends State<ChatRoom> {
                   mainAxisAlignment: MainAxisAlignment.end,
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    Container(
-                      margin: const EdgeInsets.symmetric(vertical: 4),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 8,
+                    ConstrainedBox(
+                      constraints: BoxConstraints(
+                        maxWidth: widght * 0.6, // container tối đa 60% width
                       ),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(32),
-                        gradient: LinearGradient(
-                          colors:
-                              isMe
-                                  ? [
-                                    AppColors.purple100,
-                                    AppColors.purple80,
-                                    AppColors.purple60,
-                                  ]
-                                  : [AppColors.gray30, AppColors.gray40],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
+                      child: Container(
+                        margin: const EdgeInsets.symmetric(vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 8,
                         ),
-                      ),
-                      child: Text(
-                        msg.content,
-                        style: AppStyles.bodyRegular.copyWith(
-                          color: isMe ? AppColors.white : AppColors.black,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(16),
+                          gradient: LinearGradient(
+                            colors:
+                                isMe
+                                    ? [
+                                      AppColors.purple100,
+                                      AppColors.purple80,
+                                      AppColors.purple60,
+                                    ]
+                                    : [AppColors.gray30, AppColors.gray40],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                        ),
+                        child: Text(
+                          msg.content,
+                          softWrap: true,
+                          style: AppStyles.bodyRegular.copyWith(
+                            color: isMe ? AppColors.white : AppColors.black,
+                          ),
                         ),
                       ),
                     ),

@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:chat_app/main/main_page.dart';
 import 'package:chat_app/main/networks/model/converation.dart';
 import 'package:chat_app/main/networks/model/message.dart';
@@ -171,12 +173,8 @@ class AppGoRouter {
                 name: PathName.uploadPostPage,
                 path: AppPath.uploadPostPage,
                 builder: (context, state) {
-                  final data = state.extra as List<dynamic>;
-                  final homeBloc = data[1] as HomeBloc;
-                  return BlocProvider.value(
-                    value: homeBloc,
-                    child: UploadPostPage(assetImage: data[0]),
-                  );
+                  final data = state.extra as List<Uint8List>;
+                  return UploadPostPage(assetImage: data);
                 },
               ),
             ],

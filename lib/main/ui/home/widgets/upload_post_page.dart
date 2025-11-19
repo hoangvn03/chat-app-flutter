@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:chat_app/main/router/router.dart';
 import 'package:chat_app/main/ui/home/bloc/home_bloc.dart';
 import 'package:chat_app/main/ui/home/bloc/home_event.dart';
@@ -15,7 +17,7 @@ import 'package:chat_app/res/app_styles.dart';
 import 'package:chat_app/main/ui/home/widgets/page_view_choose_media.dart';
 
 class UploadPostPage extends StatefulWidget {
-  final List<AssetEntity> assetImage;
+  final List<Uint8List> assetImage;
 
   const UploadPostPage({super.key, required this.assetImage});
 
@@ -26,13 +28,6 @@ class UploadPostPage extends StatefulWidget {
 class _UploadPostPageState extends State<UploadPostPage> {
   bool _aiTag = false;
   final TextEditingController _noteController = TextEditingController();
-  late HomeBloc homeBloc;
-
-  @override
-  void initState() {
-    super.initState();
-    homeBloc = context.read<HomeBloc>(); // Lưu lại bloc
-  }
 
   @override
   Widget build(BuildContext context) {

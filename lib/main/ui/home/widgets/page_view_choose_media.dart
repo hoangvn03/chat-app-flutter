@@ -1,9 +1,11 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:photo_manager_image_provider/photo_manager_image_provider.dart';
 
 class PageViewChooseMedia extends StatelessWidget {
-  final List<AssetEntity> assetImage;
+  final List<Uint8List> assetImage;
 
   const PageViewChooseMedia({super.key, required this.assetImage});
   @override
@@ -22,11 +24,11 @@ class PageViewChooseMedia extends StatelessWidget {
               borderRadius: BorderRadius.circular(16),
               child: Container(
                 color: Colors.black12,
-                child: AssetEntityImage(
+                child: Image.memory(
                   assetImage[index],
-                  isOriginal: false,
-                  thumbnailSize: const ThumbnailSize.square(250),
                   fit: BoxFit.cover,
+                  width: 250,
+                  height: 250,
                   errorBuilder: (context, error, stackTrace) {
                     return const Center(
                       child: Icon(Icons.error, color: Colors.red),

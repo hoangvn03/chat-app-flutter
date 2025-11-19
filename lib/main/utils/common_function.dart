@@ -1,8 +1,10 @@
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:chat_app/main/networks/model/reels.dart';
 import 'package:flutter/material.dart';
 
 import 'package:intl/intl.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:photo_manager/photo_manager.dart';
 
 String formatDateTime(String isoString) {
@@ -45,6 +47,21 @@ Future<List<File>> convertAssetEntitiesToFiles(List<AssetEntity> assets) async {
 
   return files;
 }
+
+Future<List<File>> uint8ListListToFileList(
+    List<Uint8List> bytesList, String fileNamePrefix) async {
+  final tempDir = await getTemporaryDirectory();
+  List<File> files = [];
+
+  for (int i = 0; i < bytesList.length; i++) {
+    final file = File('${tempDir.path}/$fileNamePrefix$i.jpg');
+    await file.writeAsBytes(bytesList[i], flush: true);
+    files.add(file);
+  }
+
+  return files;
+}
+
 String formatDuration(int milliseconds) {
   final seconds = (milliseconds / 1000).truncate();
   final minutes = (seconds ~/ 60).toString().padLeft(2, '0');

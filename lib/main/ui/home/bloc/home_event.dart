@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:chat_app/main/networks/enum.dart';
 import 'package:chat_app/main/networks/model/post.dart';
 import 'package:chat_app/main/networks/model/user.dart';
@@ -15,7 +17,7 @@ class GetNotificationCount extends HomeEvent {
 class CreatePost extends HomeEvent {
   final String caption;
   final String location;
-  final List<AssetEntity> assetImage;
+  final List<Uint8List> assetImage;
 
   CreatePost({
     required this.caption,

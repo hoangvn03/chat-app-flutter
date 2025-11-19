@@ -172,7 +172,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       print('Step 1: Create Post');
       final body = {"caption": event.caption, "location": event.location};
       emit(currentState.copyWith(isLoading: true));
-      final files = await convertAssetEntitiesToFiles(event.assetImage);
+      final files = await uint8ListListToFileList(event.assetImage,"edited_image");
       ApiResponse res = await ApiUtil.post(url: url, data: body);
       if (res.statusCode == 201) {
         final post = PostModel.fromJson(res.body);
