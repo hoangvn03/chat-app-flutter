@@ -414,7 +414,7 @@ Widget userNote({String? img, String? note, String? subTitle}) {
 }
 
 Widget commonTileItem({
-  String? imageLeading,
+  Widget? imageLeading,
   String? title,
   String? subtitle,
   TextStyle? titleStyle,
@@ -443,8 +443,8 @@ Widget commonTileItem({
                   size: sizeImage ?? 34,
                   hasReelsBorder: hasReelsBorder ?? true,
                   hasReels: hasReels ?? true,
-                  childWidget: Image.asset(
-                    imageLeading ?? AppImages.imgAvatarDefault, // ảnh PNG/JPG
+                  childWidget: imageLeading ?? Image.asset(
+                    AppImages.imgAvatarDefault, // ảnh PNG/JPG
                     fit: BoxFit.cover,
                   ),
                 ),

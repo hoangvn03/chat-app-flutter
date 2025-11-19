@@ -36,6 +36,10 @@ class PostWidget extends StatelessWidget {
           commonTileItem(
             title: post.author!.username ?? 'Unknown',
             subtitle: formatDateTimeV2(post.updatedAt),
+            imageLeading: SvgPicture.network(
+              post.author!.avatar ??
+                  'https://api.dicebear.com/7.x/avataaars/svg?seed=Alice',
+            ),
             titleWidget: GestureDetector(
               onTap: () {
                 context.pushNamed(PathName.profilePage, extra: post.author);
