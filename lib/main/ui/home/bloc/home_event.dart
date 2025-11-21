@@ -17,7 +17,7 @@ class GetNotificationCount extends HomeEvent {
 class CreatePost extends HomeEvent {
   final String caption;
   final String location;
-  final List<Uint8List> assetImage;
+  final List<String> assetImage;
 
   CreatePost({
     required this.caption,

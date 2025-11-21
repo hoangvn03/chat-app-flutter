@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:chat_app/main/router/router.dart';
@@ -17,7 +18,7 @@ import 'package:chat_app/res/app_styles.dart';
 import 'package:chat_app/main/ui/home/widgets/page_view_choose_media.dart';
 
 class UploadPostPage extends StatefulWidget {
-  final List<Uint8List> assetImage;
+  final List<String> assetImage;
 
   const UploadPostPage({super.key, required this.assetImage});
 

@@ -7,6 +7,7 @@ import 'package:chat_app/main/ui/reels/widgets/media_picked/bloc/media_picked_ev
 import 'package:chat_app/main/ui/reels/widgets/media_picked/bloc/media_picked_state.dart';
 import 'package:chat_app/main/ui/reels/widgets/media_picked/widget/media_option_header.dart';
 import 'package:chat_app/main/ui/reels/widgets/media_picked/widget/media_picked.dart';
+import 'package:chat_app/main/utils/common_function.dart';
 import 'package:chat_app/res/app_colors.dart';
 import 'package:chat_app/res/app_images.dart';
 import 'package:chat_app/res/app_styles.dart';
@@ -92,16 +93,24 @@ class _CreatePostPageState extends State<CreatePostPage> {
                         BlocBuilder<MediaPickedBloc, MediaPickedState>(
                           builder: (context, state) {
                             return GestureDetector(
-                              onTap: () {
+                              onTap: () async {
                                 if (state is MediaPickedSuccess) {
-                                  // Trong file main.dart hoặc nơi bạn muốn sử dụng
-                                  context.pushNamed(
-                                    PathName.imageEditorScreen,
-                                    extra: [
-                                      state.selectedAsset,
-                                      BlocProvider.of<HomeBloc>(context),
-                                    ],
+                                  final listFile = await convertAssetEntitiesToFiles(
+                                    state.selectedAsset!,
                                   );
+                                  state.selectedAsset![0].type ==
+                                          AssetType.video
+                                      ? context.pushNamed(
+                                        PathName.editVideoPage,
+                                        extra: listFile[0].path,
+                                      )
+                                      : context.pushNamed(
+                                        PathName.imageEditorScreen,
+                                        extra: [
+                                          state.selectedAsset,
+                                          BlocProvider.of<HomeBloc>(context),
+                                        ],
+                                      );
                                 }
                               },
                               child: Text(

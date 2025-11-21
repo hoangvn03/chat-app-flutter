@@ -587,7 +587,12 @@ class _ChatRoomState extends State<ChatRoom> {
                   onTap: () {
                     con.read<AudioBloc>().add(StartRecordEvent());
                   },
-                  child: const Icon(Icons.mic, color: Colors.black, size: 24),
+                  child: SvgPicture.asset(
+                    AppImages.icMic,
+                    width: 24,
+                    height: 24,
+                    color: AppColors.black,
+                  ),
                 ),
               ],
 

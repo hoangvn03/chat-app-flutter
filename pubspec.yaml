@@ -46,6 +46,7 @@ dependencies:
   flutter_launcher_icons: ^0.14.3
   cached_network_image: ^3.4.1
   video_player:
+  video_thumbnail: ^0.5.3
   shared_preferences: ^2.5.3
   path_provider: ^2.1.5
   permission_handler: ^12.0.0
@@ -61,6 +62,12 @@ dependencies:
   audioplayers: ^6.5.1
   record: ^6.1.2
   pro_image_editor: ^11.12.2
+  pro_video_editor: ^0.3.0
+  media_kit: ^1.1.11 # Primary package.
+  media_kit_video: ^1.2.5 # For video rendering.
+  media_kit_libs_video: ^1.0.5 # Native video dependencies.
+  google_fonts: ^6.3.2
+  flutter_colorpicker: ^1.1.0
   # photo_view: ^0.15.0
   # video_player: ^2.6.1
   # chewie: ^1.5.0

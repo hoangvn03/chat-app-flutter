@@ -47,6 +47,10 @@ Future<List<File>> convertAssetEntitiesToFiles(List<AssetEntity> assets) async {
 
   return files;
 }
+List<File> pathsToFiles(List<String> paths) {
+  return paths.map((p) => File(p)).toList();
+}
+
 
 Future<List<File>> uint8ListListToFileList(
     List<Uint8List> bytesList, String fileNamePrefix) async {

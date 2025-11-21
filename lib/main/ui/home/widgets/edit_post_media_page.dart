@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 import 'package:chat_app/main/router/router.dart';
+import 'package:chat_app/main/utils/common_function.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pro_image_editor/pro_image_editor.dart';
@@ -83,10 +84,11 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
             const SizedBox(height: 12),
             if (editedImage != null)
               ElevatedButton(
-                onPressed: () {
+                onPressed: () async{
+                  final files = await uint8ListListToFileList([editedImage!],"edited_image");
                   context.pushNamed(
                     PathName.uploadPostPage,
-                    extra: [editedImage!],
+                    extra: [files[0].path],
                   );
                 },
                 child: const Text("Tiếp tục với ảnh đã chỉnh sửa"),

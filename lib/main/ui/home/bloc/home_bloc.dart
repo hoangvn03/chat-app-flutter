@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:bloc/bloc.dart';
 import 'package:chat_app/main/helper/socket/socket_service.dart';
 import 'package:chat_app/main/networks/api_end_point.dart';
@@ -172,7 +173,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       print('Step 1: Create Post');
       final body = {"caption": event.caption, "location": event.location};
       emit(currentState.copyWith(isLoading: true));
-      final files = await uint8ListListToFileList(event.assetImage,"edited_image");
+      final files = pathsToFiles(event.assetImage);
       ApiResponse res = await ApiUtil.post(url: url, data: body);
       if (res.statusCode == 201) {
         final post = PostModel.fromJson(res.body);

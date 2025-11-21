@@ -4,6 +4,7 @@ import 'package:chat_app/main/router/router.dart';
 import 'package:chat_app/main/ui/search/bloc/search_bloc.dart';
 import 'package:chat_app/main/ui/search/bloc/search_event.dart';
 import 'package:chat_app/main/ui/search/bloc/search_state.dart';
+import 'package:chat_app/main/ui/widget/post/media_item.dart';
 import 'package:chat_app/main/utils/common_widget.dart';
 import 'package:chat_app/res/app_colors.dart';
 import 'package:chat_app/res/app_images.dart';
@@ -90,29 +91,7 @@ class SearchPage extends StatelessWidget {
       onTap: () {
         context.pushNamed(PathName.reelsPage);
       },
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          Image.network(
-            post.media![0].mediaUrl ?? '',
-            fit: BoxFit.cover,
-            width: double.infinity,
-          ),
-          if (post.media![0].mediaType != 'video')
-            Positioned(
-              right: 4,
-              top: 4,
-              child: SvgPicture.asset(
-                width: 16,
-                height: 16,
-                post.media![0].mediaType != 'image'
-                    ? AppImages.icReelsActive
-                    : AppImages.icGallery,
-                color: AppColors.white,
-              ),
-            ),
-        ],
-      ),
+      child: MediaItem(media: post.media),
     );
   }
 }

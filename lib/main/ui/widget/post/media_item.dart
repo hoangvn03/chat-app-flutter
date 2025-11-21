@@ -1,5 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:chat_app/res/app_colors.dart';
+import 'package:chat_app/res/app_images.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:video_player/video_player.dart';
 import 'package:chat_app/main/networks/model/post.dart'; // import model Media của bạn
 
@@ -159,7 +162,13 @@ class _MediaItemState extends State<MediaItem> {
             Positioned(
               bottom: 10,
               right: 10,
-              child: Icon(Icons.videocam, color: Colors.white, size: 24),
+              child: SvgPicture.asset(
+                width: 16,
+                height: 16,
+
+                AppImages.icGallery,
+                color: AppColors.white,
+              ),
             ),
         ],
       ),

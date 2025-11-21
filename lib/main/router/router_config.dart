@@ -17,6 +17,7 @@ import 'package:chat_app/main/ui/home/bloc/home_bloc.dart';
 import 'package:chat_app/main/ui/home/home_page.dart';
 import 'package:chat_app/main/ui/home/widgets/create_post_page.dart';
 import 'package:chat_app/main/ui/home/widgets/edit_post_media_page.dart';
+import 'package:chat_app/main/ui/home/widgets/edit_video/editor/pages/video_editor_basic_example_page.dart';
 import 'package:chat_app/main/ui/home/widgets/upload_post_page.dart';
 import 'package:chat_app/main/ui/notification/notification_page.dart';
 import 'package:chat_app/main/ui/personal/personal_page.dart';
@@ -166,6 +167,24 @@ class AppGoRouter {
         path: AppPath.createPostPage,
         routes: [
           GoRoute(
+            name: PathName.editVideoPage,
+            path: AppPath.editVideoPage,
+            routes: [
+              GoRoute(
+                name: PathName.uploadVideo,
+                path: AppPath.uploadVideo,
+                builder: (context, state) {
+                  final data = state.extra as List<String>;
+                  return UploadPostPage(assetImage: data);
+                },
+              ),
+            ],
+            builder: (context, state) {
+              final data = state.extra as String;
+              return VideoEditorBasicExamplePage(pathFileVideo: data);
+            },
+          ),
+          GoRoute(
             name: PathName.imageEditorScreen,
             path: AppPath.imageEditorScreen,
             routes: [
@@ -173,7 +192,7 @@ class AppGoRouter {
                 name: PathName.uploadPostPage,
                 path: AppPath.uploadPostPage,
                 builder: (context, state) {
-                  final data = state.extra as List<Uint8List>;
+                  final data = state.extra as List<String>;
                   return UploadPostPage(assetImage: data);
                 },
               ),
