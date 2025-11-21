@@ -29,13 +29,17 @@ class SettingBloc extends Bloc<SettingEvent, SettingState> {
       final token = await AppStorage.getToken();
       var url = ApiEndPoints.SIGNIN;
       var data = {'token': token};
-      final response = await ApiUtil.post(url: url, data: data);
-      if (response['message'] == 'Logout successful') {
-        final res = response['message'];
-        await AppStorage.clearUser();
+      ApiResponse res = await ApiUtil.post(url: url, data: data);
+      if (res.statusCode == 200) {
+      }else{
+        emit(
+          SettingFailure(erroMessage: 
+            'Error ${res.statusCode}: ${res.body?['message'] ?? 'Unknown'}',
+          ),
+        );
       }
     } catch (e) {
-      emit(SettingFailure());
+      emit(SettingFailure(erroMessage: e.toString()));
     }
   }
 

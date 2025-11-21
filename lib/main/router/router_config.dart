@@ -141,8 +141,8 @@ class AppGoRouter {
               ),
             ],
             pageBuilder: (context, state) {
-              final data = state.extra as Conversation;
-              return slidePage(ChatRoom(conversation: data));
+              final data = state.extra as List;
+              return slidePage(ChatRoom(conversation: data[0], userContact: data[1],));
             },
           ),
         ],

@@ -28,7 +28,6 @@ class ConversationsBloc extends Bloc<ConversationsEvent, ConversationsState> {
     try {
       var url = ApiEndPoints.CONVERATIONS;
       var params = {'page': '1', 'limit': '10'};
-      final currentUser = await AppStorage.getUser();
       print(url);
       ApiResponse res = await ApiUtil.get(url, params: params);
       if (res.statusCode == 200) {
@@ -36,7 +35,6 @@ class ConversationsBloc extends Bloc<ConversationsEvent, ConversationsState> {
         emit(
           ConversationsSuccess(
             data: data,
-            currentUser: currentUser as UserModel,
           ),
         );
       } else {

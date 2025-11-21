@@ -78,7 +78,7 @@ class _ProfilePageState extends State<ProfilePage>
                 print("Step XX: ${state.conversationId}");
                 context.pushNamed(
                   PathName.chatRoomPage,
-                  extra: state.conversation,
+                  extra: [state.conversation, widget.user],
                 );
               }
             },
@@ -88,7 +88,7 @@ class _ProfilePageState extends State<ProfilePage>
               if (state is CreateChatSuccess && state.isCreateSuccess) {
                 context.pushNamed(
                   PathName.chatRoomPage,
-                  extra: state.conversation,
+                  extra: [state.conversation, widget.user],
                 );
               } else if (state is CreateChatFailure) {
                 if (state.erorCode == 409) {

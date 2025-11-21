@@ -8,8 +8,7 @@ class ConversationsLoading extends ConversationsState {}
 
 class ConversationsSuccess extends ConversationsState {
   ConversationResponse? data;
-  UserModel currentUser;
-  ConversationsSuccess({this.data,required this.currentUser});
+  ConversationsSuccess({this.data});
 }
 
 class ConversationsFailure extends ConversationsState {

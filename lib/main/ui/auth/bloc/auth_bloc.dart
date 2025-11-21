@@ -28,6 +28,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   Future<void> _onSignIn(Login event, Emitter<AuthState> emit) async {
     emit(AuthLoading());
     try {
+      await AppStorage.clearUser();
       var data = {'email': event.username, 'password': event.password};
       var url = ApiEndPoints.SIGNIN;
       ApiResponse res = await ApiUtil.post(url: url, data: data);

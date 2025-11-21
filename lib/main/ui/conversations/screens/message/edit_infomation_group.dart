@@ -38,7 +38,6 @@ class EditInfomationGroup extends StatelessWidget {
         actions: [
           GestureDetector(
             onTap: () {
-              // TODO: Gửi sự kiện cập nhật tên nhóm ở đây
               debugPrint('Tên nhóm mới: ${_groupNameController.text}');
             },
             child: Padding(

@@ -5,6 +5,7 @@ import 'package:chat_app/main/helper/socket/socket_service.dart';
 import 'package:chat_app/main/networks/api_end_point.dart';
 import 'package:chat_app/main/networks/model/converation.dart';
 import 'package:chat_app/main/networks/model/message.dart';
+import 'package:chat_app/main/networks/model/post.dart';
 import 'package:chat_app/main/networks/model/user.dart';
 import 'package:chat_app/main/router/router.dart';
 import 'package:chat_app/main/ui/conversations/screens/message/audio_chat/audio_item.dart';
@@ -18,6 +19,7 @@ import 'package:chat_app/main/ui/reels/widgets/media_picked/bloc/media_picked_st
 import 'package:chat_app/main/ui/reels/widgets/media_picked/widget/media_option_header.dart';
 import 'package:chat_app/main/ui/reels/widgets/media_picked/widget/media_picked.dart';
 import 'package:chat_app/main/ui/reels/widgets/media_picked/widget/all_album_media.dart';
+import 'package:chat_app/main/ui/widget/post/media_item.dart';
 import 'package:chat_app/main/utils/common_function.dart';
 import 'package:chat_app/main/utils/common_widget.dart';
 import 'package:chat_app/main/utils/shared_preference.dart';
@@ -33,8 +35,9 @@ import 'package:photo_manager/photo_manager.dart';
 
 // ignore: must_be_immutable
 class ChatRoom extends StatefulWidget {
-  ChatRoom({super.key, required this.conversation});
+  ChatRoom({super.key, required this.conversation, required this.userContact});
   final Conversation conversation;
+  final UserModel userContact;
   @override
   State<ChatRoom> createState() => _ChatRoomState();
 }
@@ -42,7 +45,6 @@ class ChatRoom extends StatefulWidget {
 class _ChatRoomState extends State<ChatRoom> {
   final TextEditingController _messageController = TextEditingController();
   final PageController _pageController = PageController();
-
   @override
   void dispose() {
     _messageController.dispose();
@@ -55,11 +57,6 @@ class _ChatRoomState extends State<ChatRoom> {
       widget.conversation.participants[0].avatar ?? AppImages.icStickers,
       widget.conversation.participants[1].avatar ?? AppImages.icStickers,
     ];
-    if (!widget.conversation.isGroup) {
-      listImage = [
-        widget.conversation.participants[1].avatar ?? AppImages.icStickers,
-      ];
-    }
     return MultiBlocProvider(
       providers: [
         BlocProvider(
@@ -159,15 +156,21 @@ class _ChatRoomState extends State<ChatRoom> {
               child: ListTile(
                 contentPadding: EdgeInsets.zero,
                 dense: true,
-                leading: groupUserAvatar(
-                  images: listImage,
-                  avatarSize: widget.conversation.isGroup ? 42 : 42,
-                ),
+                leading:
+                    widget.conversation.isGroup
+                        ? groupUserAvatar(
+                          images: listImage,
+                          avatarSize: widget.conversation.isGroup ? 42 : 42,
+                        )
+                        : SvgPicture.network(
+                          widget.userContact.avatar ?? AppImages.icStickers,
+                          width: 42,
+                          height: 42,
+                        ),
                 title: Text(
                   widget.conversation.isGroup
                       ? widget.conversation.conversationName ?? 'Unknown'
-                      : widget.conversation.participants[1].username ??
-                          'Unknown',
+                      : widget.userContact.username ?? 'Unknown',
                   style: AppStyles.title2Bold,
                 ),
 
@@ -293,18 +296,23 @@ class _ChatRoomState extends State<ChatRoom> {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Image.asset(
-          AppImages.imgAvatarDefault,
-          width: 86,
-          height: 86,
-          fit: BoxFit.fill,
+        Container(
+          decoration: BoxDecoration(
+            border: Border.all(width: 1, color: AppColors.gray30),
+            shape: BoxShape.circle,
+          ),
+          child: SvgPicture.network(
+            widget.userContact.avatar ?? AppImages.icStickers,
+            width: 86,
+            height: 86,
+          ),
         ),
         const SizedBox(height: 16),
 
         Text(
           widget.conversation.isGroup
               ? widget.conversation.conversationName ?? 'Unknown'
-              : widget.conversation.participants[1].username ?? 'Unknown',
+              : widget.userContact.username ?? 'Unknown',
           style: AppStyles.title2Bold,
         ),
         RichText(
@@ -679,7 +687,12 @@ class _ChatRoomState extends State<ChatRoom> {
                                                 widget
                                                     .conversation
                                                     .conversationId,
-                                                'Đã gửi 1 ảnh',
+                                                mediaState
+                                                            .selectedAsset![0]
+                                                            .type ==
+                                                        AssetType.video
+                                                    ? 'Đã gửi 1 video'
+                                                    : 'Đã gửi 1 ảnh',
                                                 mediaFiles:
                                                     mediaState.selectedAsset,
                                               ),
@@ -800,7 +813,7 @@ class _ChatRoomState extends State<ChatRoom> {
   }
 
   Widget _itemMessage(MessageEntity msg) {
-    final isMe = msg.senderId == widget.conversation.participants[0].id;
+    final isMe = msg.senderId != widget.userContact.id;
     final widght = MediaQuery.of(context).size.width;
     return Column(
       children: [
@@ -823,8 +836,9 @@ class _ChatRoomState extends State<ChatRoom> {
                 ),
             const SizedBox(width: 8),
             (msg.attachments != null &&
-                    msg.attachments!.isNotEmpty &&
-                    msg.content == 'Đã gửi 1 ảnh')
+                        msg.attachments!.isNotEmpty &&
+                        msg.content == 'Đã gửi 1 ảnh' ||
+                    msg.content == 'Đã gửi 1 video')
                 ? _itemFile(msg.attachments![0])
                 : (msg.content == 'Đã gửi 1 đoạn giọng nói' &&
                     msg.attachments!.isNotEmpty &&
@@ -908,6 +922,10 @@ class _ChatRoomState extends State<ChatRoom> {
   }
 
   Widget _itemFile(Attachment attachment) {
+    final media = Media(
+      mediaType: attachment.fileType,
+      mediaUrl: attachment.fileUrl,
+    );
     switch (attachment.fileType) {
       case 'image':
         // print('${ApiEndPoints.DOMAIN}${attachment.fileUrl}');
@@ -919,24 +937,7 @@ class _ChatRoomState extends State<ChatRoom> {
               ),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(12),
-            child: CachedNetworkImage(
-              imageUrl: '${ApiEndPoints.DOMAIN}${attachment.fileUrl}',
-              width: 168,
-              height: 256,
-              placeholder:
-                  (context, url) => const Center(
-                    child: SizedBox(
-                      width: 24,
-                      height: 24,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    ),
-                  ),
-              errorWidget: (context, url, error) {
-                print('Image load error: $error');
-                return const Icon(Icons.broken_image, color: Colors.red);
-              },
-              fit: BoxFit.cover,
-            ),
+            child: MediaItem(media: [media]),
           ),
         );
       default:

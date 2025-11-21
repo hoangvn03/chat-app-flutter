@@ -141,7 +141,7 @@ class _ChatPageState extends State<ChatPage> {
                         AccountSuggestWidget(
                           isHorirontal: false,
                           title: 'Tài khoản nên theo dõi',
-                     ),
+                        ),
                       ],
                     ),
                   ),
@@ -205,28 +205,40 @@ class _ChatPageState extends State<ChatPage> {
       conversation.participants[0].avatar ?? AppImages.icStickers,
       conversation.participants[1].avatar ?? AppImages.icStickers,
     ];
+    late UserModel userContact;
     if (!conversation.isGroup) {
-      listImage = [conversation.participants[1].avatar ?? AppImages.icStickers];
+      listImage = [conversation.participants[0].avatar ?? AppImages.icStickers];
+    }
+    for (var item in conversation.participants) {
+      if (item.id != widget.currentUser.id) {
+        userContact = item;
+        break;
+      }
     }
     return commonTileItemV2(
       onTap: () {
-        con.pushNamed(PathName.chatRoomPage, extra: conversation);
+        if (conversation.isGroup) {
+          con.pushNamed(
+            PathName.chatRoomPage,
+            extra: [conversation, widget.currentUser],
+          );
+        } else {
+          con.pushNamed(PathName.chatRoomPage, extra: [conversation, userContact]);
+        }
       },
       leadingWidget: groupUserAvatar(
-        images: listImage,
+        images: conversation.isGroup ? listImage : [userContact.avatar ?? AppImages.icStickers],
         avatarSize: conversation.isGroup ? 48 : 64,
       ),
       trallingWidget: SvgPicture.asset(AppImages.icCamera),
       title:
           conversation.isGroup
               ? conversation.conversationName ?? 'Unknown'
-              : conversation.participants[1].username,
+              : userContact.username ?? 'Unknown',
       subtitle:
-          conversation.isGroup
-              ? conversation.lastMessage?.content ??
-                  'Hãy gửi tin nhắn đầu tiên!'
-              : conversation.lastMessage?.content ??
+              conversation.lastMessage?.content ??
                   'Hãy gửi tin nhắn đầu tiên!',
+
       margin: EdgeInsets.symmetric(vertical: 12),
     );
   }

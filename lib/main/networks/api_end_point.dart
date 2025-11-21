@@ -3,7 +3,7 @@ import 'package:chat_app/main/utils/shared_preference.dart';
 enum ENV { test, preprod, prod }
 
 class ApiEndPoints {
-  static ENV env = ENV.prod;
+  static ENV env = ENV.preprod;
   static String? _customDomain;
 
   static Future<void> init() async {

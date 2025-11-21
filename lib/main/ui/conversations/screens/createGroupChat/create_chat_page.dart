@@ -59,7 +59,7 @@ class _CreateChatPageState extends State<CreateChatPage> {
         if (state is CreateChatSuccess && state.isCreateSuccess) {
           context.pushReplacementNamed(
             PathName.chatRoomPage,
-            extra: state.conversation,
+            extra: [state.conversation, state.conversation!.participants[0]],
           );
         } else if (state is CreateChatFailure) {
           ScaffoldMessenger.of(
@@ -97,7 +97,7 @@ class _CreateChatPageState extends State<CreateChatPage> {
                     children: [
                       // Ô nhập tên nhóm
                       commonTextFieldV2(
-                        hintText: 'Tên nhóm (không bắt buộc)',
+                        hintText: 'Tên nhóm...',
                         controller: _groupNameController,
                         color: AppColors.white,
                         border: Border.all(width: 1, color: AppColors.gray30),
