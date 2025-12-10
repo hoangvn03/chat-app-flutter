@@ -4,8 +4,10 @@ import 'package:bloc/bloc.dart';
 import 'package:chat_app/main/networks/api_end_point.dart';
 import 'package:chat_app/main/networks/api_util.dart';
 import 'package:chat_app/main/networks/model/contact_user.dart';
+import 'package:chat_app/main/networks/model/phone_contact.dart';
 import 'package:chat_app/main/networks/model/user.dart';
 import 'package:chat_app/main/ui/widget/account_suggest/cubit/account_suggest_state.dart';
+import 'package:flutter_contacts/flutter_contacts.dart';
 
 class AccountSuggestCubit extends Cubit<AccountSuggestState> {
   AccountSuggestCubit() : super(AccountSuggestLoading());
@@ -13,25 +15,71 @@ class AccountSuggestCubit extends Cubit<AccountSuggestState> {
   Future<void> loadRequest() async {
     try {
       emit(AccountSuggestLoading());
-      var url = '${ApiEndPoints.USERS}/suggestions';
-      var params = {'page': '1', 'limit': '20'};
-
-      ApiResponse res = await ApiUtil.get(url, params: params);
+      if (!await FlutterContacts.requestPermission()) {
+        // emit(AccountSuggestFailure('User denied permission'));
+      }
+      final contacts = await FlutterContacts.getContacts(withProperties: true);
+      List<String> numbers = [];
+      for (var c in contacts) {
+        for (var p in c.phones) {
+          numbers.add(p.number);
+        }
+      }
+      final data = {'phone_numbers': numbers};
+      var url = '${ApiEndPoints.USERS}/suggestions/contacts';
+      ApiResponse res = await ApiUtil.post(url: url, data: data);
       if (res.statusCode == 200) {
-        final List<UserModel> contactList =
-            (res.body['data']['suggestions'] as List)
-                .map((e) => UserModel.fromJson(e))
+        final phoneContacts =
+            (res.body['data'] as List)
+                .map((e) => PhoneContact.fromJson(e))
                 .toList();
 
-        emit(AccountSuggestSuccess(contactList: contactList));
+        emit(AccountSuggestSuccess(contactList: phoneContacts));
       } else {
         emit(
           AccountSuggestFailure(
-            'Error ${res.statusCode}: ${res.body?['message'] ?? 'Unknown'}',
+            'Error ${res.statusCode}: ${res.body?['error']['message'] ?? 'Unknown'}',
           ),
         );
       }
     } catch (e) {
+      print('eerrr $e');
+      emit(AccountSuggestFailure(e.toString()));
+    }
+  }
+
+    Future<void> follow() async {
+    try {
+      emit(AccountSuggestLoading());
+      if (!await FlutterContacts.requestPermission()) {
+        // emit(AccountSuggestFailure('User denied permission'));
+      }
+      final contacts = await FlutterContacts.getContacts(withProperties: true);
+      List<String> numbers = [];
+      for (var c in contacts) {
+        for (var p in c.phones) {
+          numbers.add(p.number);
+        }
+      }
+      final data = {'phone_numbers': numbers};
+      var url = '${ApiEndPoints.USERS}/suggestions/contacts';
+      ApiResponse res = await ApiUtil.post(url: url, data: data);
+      if (res.statusCode == 200) {
+        final phoneContacts =
+            (res.body['data'] as List)
+                .map((e) => PhoneContact.fromJson(e))
+                .toList();
+
+        emit(AccountSuggestSuccess(contactList: phoneContacts));
+      } else {
+        emit(
+          AccountSuggestFailure(
+            'Error ${res.statusCode}: ${res.body?['error']['message'] ?? 'Unknown'}',
+          ),
+        );
+      }
+    } catch (e) {
+      print('eerrr $e');
       emit(AccountSuggestFailure(e.toString()));
     }
   }

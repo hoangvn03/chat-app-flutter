@@ -24,6 +24,14 @@ class InteractionCubit extends Cubit<InteractionState> {
     emit(state.copyWith(isFollowed: !state.isFollowed));
   }
 
+  Future<void> toggleFollow1(int id) async {
+    final url = '${ApiEndPoints.PROFILE}/contacts/${id}';
+    ApiResponse res = await ApiUtil.post(url: url);
+    if (res.statusCode == 200) {
+      emit(state.copyWith(isFollowed: res.body['liked'],count: res.body['likeCount']));
+    }
+  }
+
   void toggleReadMore() {
     emit(state.copyWith(isReadMore: !state.isReadMore));
   }

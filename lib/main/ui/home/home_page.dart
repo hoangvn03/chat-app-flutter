@@ -178,7 +178,6 @@ class _HomePageState extends State<HomePage> {
                                     : false,
                           ),
                         ),
-                        const SizedBox(width: 16),
                       ],
                     ),
 
@@ -188,7 +187,7 @@ class _HomePageState extends State<HomePage> {
                     ),
 
                     // List posts
-                    SliverToBoxAdapter(child: _buildListPost(state)), 
+                    SliverToBoxAdapter(child: _buildListPost(state)),
                   ],
                 );
               } else if (state is HomeFailure) {
@@ -243,65 +242,74 @@ class _HomePageState extends State<HomePage> {
     // tạo 1 list mới, thêm Your Story vào đầu
     final allReels = [null, ...reels]; // null đại diện cho "Your Story"
 
-    return Container(
-      height: 100,
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        itemCount: allReels.length,
-        itemBuilder: (context, index) {
-          if (index == 0) {
-            // item đầu tiên là "Your Story"
-            return GestureDetector(
-              onTap: () {
-                context.pushNamed(PathName.mediaPickedPage);
-              },
-              child: Padding(
-                padding: const EdgeInsets.only(right: 12),
-                child: Column(
-                  children: [
-                    Stack(
-                      clipBehavior: Clip.none,
+    return BlocBuilder<HomeBloc, HomeState>(
+      builder: (context, state) {
+        return Container(
+          height: 100,
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            itemCount: allReels.length,
+            itemBuilder: (context, index) {
+              if (index == 0) {
+                // item đầu tiên là "Your Story"
+                return GestureDetector(
+                  onTap: () {
+                    context.pushNamed(PathName.mediaPickedPage);
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.only(right: 12),
+                    child: Column(
                       children: [
-                        Container(
-                          decoration: const BoxDecoration(
-                            shape: BoxShape.circle,
-                          ),
-                          child: Center(
-                            child: ClipOval(
-                              child: Image.asset(
-                                AppImages.imgAvatarDefault,
-                                fit: BoxFit.cover,
-                                width: 78,
-                                height: 78,
+                        Stack(
+                          clipBehavior: Clip.none,
+                          children: [
+                            Container(
+                              decoration: const BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: AppColors.gray30,
+                              ),
+                              child: Center(
+                                child: ClipOval(
+                                  child: SvgPicture.network(
+                                    state is HomeSuccess &&
+                                            state.user != null &&
+                                            state.user!.avatar != null
+                                        ? state.user!.avatar!
+                                        : 'https://api.dicebear.com/7.x/avataaars/svg?seed=Alice',
+                                    width: 72,
+                                    height: 72,
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
                               ),
                             ),
-                          ),
+                            Positioned(
+                              left: 50,
+                              top: 50,
+                              child: SvgPicture.asset(AppImages.icRoundAdd),
+                            ),
+                          ],
                         ),
-                        Positioned(
-                          left: 55,
-                          top: 55,
-                          child: SvgPicture.asset(AppImages.icRoundAdd),
+                        const SizedBox(height: 4),
+                        Text(
+                          "Your Story",
+                          style: AppStyles.footnoteRegular.copyWith(
+                            color: AppColors.gray60,
+                          ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      "Your Story",
-                      style: AppStyles.footnoteRegular.copyWith(
-                        color: AppColors.gray60,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          } else {
-            // các item còn lại
-            return _buildItemReel(allReels[index]!);
-          }
-        },
-      ),
+                  ),
+                );
+              } else {
+                // các item còn lại
+                return _buildItemReel(allReels[index]!);
+              }
+            },
+          ),
+        );
+      },
     );
   }
 
@@ -311,6 +319,7 @@ class _HomePageState extends State<HomePage> {
       child: Column(
         children: [
           cricleColorImage(
+            size: 72,
             childWidget: Image.asset(
               AppImages.imgAvatarDefault, // ảnh PNG/JPG
               fit: BoxFit.cover,

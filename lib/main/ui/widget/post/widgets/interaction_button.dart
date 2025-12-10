@@ -20,6 +20,7 @@ Widget interactionButton({
   Color? colorBorder,
   TextStyle? textStyle,
   InteractionType? type,
+  bool hasFollow = false,
   dynamic data
 }) {
   return BlocProvider(
@@ -29,7 +30,7 @@ Widget interactionButton({
         final cubit = context.read<InteractionCubit>();
         switch (type) {
           case InteractionType.follow:
-            return state.isFollowed
+            return state.isFollowed || hasFollow
                 ? commonButton(
                   hasHeight: true,
                   height: 28,
@@ -42,7 +43,8 @@ Widget interactionButton({
                   colorBorder: colorBorder,
                   text: 'Đang theo dõi',
                   onTap: () {
-                    cubit.toggleFollow();
+                    cubit.toggleFollow1(data 
+                    as int);
                   },
                   radius: 6,
                 )

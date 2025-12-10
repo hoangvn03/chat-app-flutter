@@ -7,9 +7,37 @@ abstract class ConversationsState {}
 class ConversationsLoading extends ConversationsState {}
 
 class ConversationsSuccess extends ConversationsState {
-  ConversationResponse? data;
-  ConversationsSuccess({this.data});
+  final ConversationResponse? data;
+  final UserModel? userModel;
+  final String? message;
+
+  /// id của conversation đang được chọn
+  final int? selectedConversationId;
+
+  ConversationsSuccess({
+    this.data,
+    this.userModel,
+    this.message,
+    this.selectedConversationId,
+  });
+
+  ConversationsSuccess copyWith({
+    ConversationResponse? data,
+    UserModel? userModel,
+    String? message,
+    int? selectedConversationId,
+  }) {
+    return ConversationsSuccess(
+      data: data ?? this.data,
+      userModel: userModel ?? this.userModel,
+      message: message ?? this.message,
+      selectedConversationId:
+          selectedConversationId ?? this.selectedConversationId,
+    );
+  }
 }
+
+
 
 class ConversationsFailure extends ConversationsState {
   String errorMessage;

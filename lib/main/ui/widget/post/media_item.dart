@@ -8,7 +8,8 @@ import 'package:chat_app/main/networks/model/post.dart'; // import model Media c
 
 class MediaItem extends StatefulWidget {
   final List<Media>? media;
-  const MediaItem({super.key, this.media});
+  final double? radius;
+  const MediaItem({super.key, this.media, this.radius = 0});
 
   @override
   State<MediaItem> createState() => _MediaItemState();
@@ -69,12 +70,13 @@ class _MediaItemState extends State<MediaItem> {
 
     return SizedBox(
       height:
-          400, // bạn có thể thay đổi chiều cao hoặc dùng MediaQuery để responsive
+          400,
       child: PageView.builder(
         itemCount: mediaList.length,
         itemBuilder: (context, index) {
           final media = mediaList[index];
           if (media.mediaType == 'video') {
+            print('MediaItem - Hiển thị video: ${media.mediaUrl}');
             return _buildVideoPlayer(index);
           } else {
             return _buildImage(media);
@@ -97,44 +99,42 @@ class _MediaItemState extends State<MediaItem> {
         } else {
           controller.play();
         }
-        setState(() {}); // refresh icon
+        setState(() {});
       },
-      child: Container(
-        color: Colors.black, // nền đen
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(
+          widget.radius ?? 0,
+        ),
+        child: Container(
+          color: Colors.black,
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              AspectRatio(
+                aspectRatio: controller.value.aspectRatio,
+                child: VideoPlayer(controller),
+              ),
 
-        child: Stack(
-          alignment: Alignment.center,
-          children: [
-            AspectRatio(
-              aspectRatio: controller.value.aspectRatio,
-              child: FittedBox(
-                fit: BoxFit.contain, // giữ tỉ lệ, không crop
-                alignment: Alignment.center,
-                child: SizedBox(
-                  width: controller.value.size.width,
-                  height: controller.value.size.height,
-                  child: VideoPlayer(controller),
+              if (!controller.value.isPlaying)
+                Container(
+                  decoration: const BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.black26,
+                  ),
+                  child: const Icon(
+                    Icons.play_arrow,
+                    color: Colors.white,
+                    size: 60,
+                  ),
                 ),
+
+              Positioned(
+                bottom: 10,
+                right: 10,
+                child: Icon(Icons.videocam, color: Colors.white, size: 24),
               ),
-            ),
-            if (!controller.value.isPlaying)
-              Container(
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.black26,
-                ),
-                child: const Icon(
-                  Icons.play_arrow,
-                  color: Colors.white,
-                  size: 60,
-                ),
-              ),
-            Positioned(
-              bottom: 10,
-              right: 10,
-              child: Icon(Icons.videocam, color: Colors.white, size: 24),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

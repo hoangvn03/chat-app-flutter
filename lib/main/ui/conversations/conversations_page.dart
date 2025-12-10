@@ -188,19 +188,33 @@ class _ChatPageState extends State<ChatPage> {
             ),
           ],
         ),
-        ListView.builder(
-          shrinkWrap: true, // 👈 cho phép ListView co chiều cao theo item
-          physics: NeverScrollableScrollPhysics(),
-          itemCount: messages.length,
-          itemBuilder: (context, index) {
-            return _itemMessage(messages[index], con);
-          },
-        ),
+        messages.isEmpty
+            ? const SizedBox(height: 12)
+            : ListView.builder(
+              shrinkWrap: true, // 👈 cho phép ListView co chiều cao theo item
+              physics: NeverScrollableScrollPhysics(),
+              itemCount: messages.length,
+              itemBuilder: (context, index) {
+                return _itemMessage(messages[index], con);
+              },
+            ),
       ],
     );
   }
 
   Widget _itemMessage(Conversation conversation, BuildContext con) {
+    final participants = conversation.participants;
+
+    // Nếu participants rỗng hoặc ít hơn 2, tránh crash
+    if (participants.isEmpty || participants.length < 2) {
+      return SizedBox(
+        // height: 50,
+        // child: Text(
+        //   "Không có thông tin người tham gia",
+        //   style: TextStyle(color: Colors.grey),
+        // ),
+      );
+    }
     var listImage = [
       conversation.participants[0].avatar ?? AppImages.icStickers,
       conversation.participants[1].avatar ?? AppImages.icStickers,
@@ -223,11 +237,17 @@ class _ChatPageState extends State<ChatPage> {
             extra: [conversation, widget.currentUser],
           );
         } else {
-          con.pushNamed(PathName.chatRoomPage, extra: [conversation, userContact]);
+          con.pushNamed(
+            PathName.chatRoomPage,
+            extra: [conversation, userContact],
+          );
         }
       },
       leadingWidget: groupUserAvatar(
-        images: conversation.isGroup ? listImage : [userContact.avatar ?? AppImages.icStickers],
+        images:
+            conversation.isGroup
+                ? listImage
+                : [userContact.avatar ?? AppImages.icStickers],
         avatarSize: conversation.isGroup ? 48 : 64,
       ),
       trallingWidget: SvgPicture.asset(AppImages.icCamera),
@@ -236,8 +256,7 @@ class _ChatPageState extends State<ChatPage> {
               ? conversation.conversationName ?? 'Unknown'
               : userContact.username ?? 'Unknown',
       subtitle:
-              conversation.lastMessage?.content ??
-                  'Hãy gửi tin nhắn đầu tiên!',
+          conversation.lastMessage?.content ?? 'Hãy gửi tin nhắn đầu tiên!',
 
       margin: EdgeInsets.symmetric(vertical: 12),
     );

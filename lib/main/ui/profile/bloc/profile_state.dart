@@ -16,6 +16,7 @@ class ProfileSuccess extends ProfileState {
   final List<UserModel>? userFollowing;
   final int? conversationId;
   final Conversation? conversation;
+  final bool hasFollow;
 
   ProfileSuccess({
     required this.user,
@@ -27,6 +28,7 @@ class ProfileSuccess extends ProfileState {
     this.usersContatct,
     this.conversationId,
     this.conversation,
+    this.hasFollow = false
   });
 
   ProfileSuccess copyWith({
@@ -39,6 +41,7 @@ class ProfileSuccess extends ProfileState {
     List<UserModel>? userFollowing,
     int? conversationId,
     Conversation? conversation,
+    bool? hasFollow
   }) {
     return ProfileSuccess(
       user: user ?? this.user,
@@ -50,6 +53,7 @@ class ProfileSuccess extends ProfileState {
       userFollowing: userFollowing ?? this.userFollowing,
       conversationId: conversationId ?? this.conversationId,
       conversation: conversation ?? this.conversation,
+      hasFollow: hasFollow ?? this.hasFollow,
     );
   }
 }

@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:media_kit/media_kit.dart';
 import 'bloc/locale/locale_cubit.dart';
-import 'l10n/app_localizations.dart';
 import 'main/router/router_config.dart';
 
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -49,12 +48,10 @@ class _MyAppState extends State<MyApp> {
       builder: (context, locale) {
         return MaterialApp.router(
           localizationsDelegates: [
-            AppLocalizations.delegate, // Add this line
             GlobalMaterialLocalizations.delegate,
             GlobalWidgetsLocalizations.delegate,
             GlobalCupertinoLocalizations.delegate,
           ],
-          supportedLocales: AppLocalizations.supportedLocales,
           locale: locale,
           routerConfig: AppGoRouter.router,
           debugShowCheckedModeBanner: false,

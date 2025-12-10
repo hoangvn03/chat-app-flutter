@@ -330,6 +330,7 @@ class _ProfilePageState extends State<ProfilePage>
                             isCurrientUser,
                             state.conversationId,
                             state.posts?.length ?? 0,
+                            state.hasFollow,
                           ),
                         ),
 
@@ -627,7 +628,9 @@ class _ProfilePageState extends State<ProfilePage>
     bool isCurrientUser,
     int? converationId,
     int numPost,
+    bool hasFollow,
   ) {
+    print('object: $hasFollow');
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -757,7 +760,12 @@ class _ProfilePageState extends State<ProfilePage>
               const SizedBox(height: 8),
               !isCurrientUser ? const SizedBox() : _totalUserFollow(),
               const SizedBox(height: 8),
-              _buttonActionProfile(isCurrientUser, converationId),
+              _buttonActionProfile(
+                isCurrientUser,
+                converationId,
+                hasFollow,
+                user.id,
+              ),
               if (user.reels != null)
                 _buildGalleryProfile([
                   ReelModel(user: UserModel(id: 999, username: "Hoang")),
@@ -964,7 +972,12 @@ class _ProfilePageState extends State<ProfilePage>
     // );
   }
 
-  Widget _buttonActionProfile(bool isCurrientUser, int? converationId) {
+  Widget _buttonActionProfile(
+    bool isCurrientUser,
+    int? converationId,
+    bool hasFollow,
+    int id,
+  ) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 12),
       child: Row(
@@ -972,11 +985,31 @@ class _ProfilePageState extends State<ProfilePage>
         children: [
           if (isCurrientUser) ...[
             Expanded(
-              child: interactionButton(
-                type: InteractionType.follow,
-                backgroundColor: AppColors.blue40,
-                colorBorder: AppColors.blue40,
-                textStyle: AppStyles.bodyBold.copyWith(color: AppColors.white),
+              child: BlocBuilder<ProfileBloc, ProfileState>(
+                builder: (context, state) {
+                  final chatBloc = context.read<ProfileBloc>();
+                  final isFollow =
+                      (state is ProfileSuccess &&
+                          (state.hasFollow || hasFollow));
+                  return commonButton(
+                    hasHeight: true,
+                    height: 28,
+                    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 0),
+                    margin: EdgeInsets.zero,
+                    textStyle: AppStyles.bodyBold.copyWith(
+                      color: AppColors.white,
+                    ),
+
+                    color: !isFollow ? AppColors.blue60 : AppColors.gray40,
+                    colorBorder:
+                        !isFollow ? AppColors.blue60 : AppColors.gray40,
+                    text: isFollow ? 'Đang theo dõi' : 'Theo dõi',
+                    onTap: () {
+                      chatBloc.add(FollowUser(id, isFollow));
+                    },
+                    radius: 6,
+                  );
+                },
               ),
             ),
             (converationId != null)

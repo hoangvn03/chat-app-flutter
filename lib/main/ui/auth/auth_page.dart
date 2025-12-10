@@ -29,6 +29,10 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController ipController = TextEditingController();
+  final TextEditingController _resPhoneController = TextEditingController();
+  final TextEditingController _resNameController = TextEditingController();
+  final TextEditingController _resFullNameController = TextEditingController();
+  final TextEditingController _resPasswordController = TextEditingController();
   final PageController _pageController = PageController();
 
   @override
@@ -124,7 +128,13 @@ class _LoginPageState extends State<LoginPage> {
                 left: 0,
                 right: 0,
                 bottom: 24,
-                child: _buildCreateNewAccount(),
+                child: Builder(
+                  builder: (innerContext) {
+                    return _buildCreateNewAccount(
+                      innerContext,
+                    ); // dùng context đúng
+                  },
+                ),
               ),
             ],
           ),
@@ -189,7 +199,7 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Widget _buildCreateNewAccount() {
+  Widget _buildCreateNewAccount(BuildContext context) {
     return Column(
       children: [
         commonButton(
@@ -198,14 +208,22 @@ class _LoginPageState extends State<LoginPage> {
           textColor: AppColors.blue60,
           colorBorder: AppColors.blue60,
           onTap: () {
+            final authBloc = context.read<AuthBloc>();
+
             showModalBottomSheet(
               context: context,
               useSafeArea: true,
               isScrollControlled: true,
+              backgroundColor: Colors.transparent,
               shape: const RoundedRectangleBorder(
                 borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
               ),
-              builder: (context) => _buildBottomSheetCreateAccount(context),
+              builder: (context) {
+                return BlocProvider.value(
+                  value: authBloc, // 👈 truyền lại bloc
+                  child: _buildBottomSheetCreateAccount(context),
+                );
+              },
             );
           },
         ),
@@ -405,136 +423,99 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Widget _buildBottomSheetCreateAccount(BuildContext context) {
-    return Container(
-      height: double.infinity,
-      padding: EdgeInsets.symmetric(horizontal: 12),
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(16),
-          topRight: Radius.circular(16),
-        ),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          InkWell(
-            onTap: () {
-              context.pop();
-            },
-            child: Container(
-              margin: EdgeInsets.only(top: 7),
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(15),
-                color: AppColors.gray30,
-              ),
-              height: 4,
-              width: 32,
+    final height = MediaQuery.of(context).size.height;
+    return BlocBuilder<AuthBloc, AuthState>(
+      builder: (context, state) {
+        return Container(
+          height: height * 0.75,
+          padding: EdgeInsets.symmetric(horizontal: 12),
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(32),
+              topRight: Radius.circular(32),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 16),
-            child: Row(
-              children: [
-                Container(
-                  alignment: Alignment.centerRight,
-                  child: InkWell(
-                    child: Transform.flip(
-                      flipX: true,
-                      child: SvgPicture.asset(AppImages.icNextRight),
-                    ),
-                    onTap: () {
-                      context.pop();
-                    },
-                  ),
-                ),
-                const SizedBox(width: 32),
-              ],
-            ),
-          ),
-          Align(
-            alignment: Alignment.centerLeft,
-            child: Text(
-              "Gỡ trang cá nhân khỏi thiết bị này",
-              style: AppStyles.title3Regular,
-            ),
-          ),
-          const SizedBox(width: 32),
-          Container(
-            width: double.infinity,
-            margin: EdgeInsets.symmetric(vertical: 24),
-            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-            decoration: BoxDecoration(
-              borderRadius: const BorderRadius.all(Radius.circular(16)),
-              border: Border.all(color: AppColors.gray30, width: 1),
-            ),
-            child: Row(
-              children: [
-                CircleAvatar(
-                  radius: 38,
-                  child: Image.asset(
-                    AppImages.imgAvatarDefault,
-                    fit: BoxFit.cover,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Text('hoangvn03', style: AppStyles.title3Bold),
-                const Spacer(), // đẩy Container ra cuối hàng
-                Container(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              InkWell(
+                onTap: () {
+                  context.pop();
+                },
+                child: Container(
+                  margin: EdgeInsets.only(top: 7),
+                  alignment: Alignment.center,
                   decoration: BoxDecoration(
-                    borderRadius: const BorderRadius.all(Radius.circular(16)),
-                    border: Border.all(color: AppColors.gray30, width: 1),
+                    borderRadius: BorderRadius.circular(15),
+                    color: AppColors.gray30,
                   ),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 4,
+                  height: 4,
+                  width: 32,
+                ),
+              ),
+              const SizedBox(height: 32),
+              Text("Tạo tài khoản mới", style: AppStyles.title1Bold),
+              const SizedBox(height: 24),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  commonTextField(
+                    labelText: "Tên email/số di động",
+                    controller: _resPhoneController,
                   ),
-                  child: InkWell(
-                    child: Text('Gỡ/Xóa', style: AppStyles.title3Regular),
+                  const SizedBox(height: 16),
+                  commonTextField(
+                    labelText: "Tên người dùng",
+                    controller: _resNameController,
+                  ),
+                  const SizedBox(height: 16),
+                  commonTextField(
+                    labelText: "Tên đầy đủ",
+                    controller: _resFullNameController,
+                  ),
+                  const SizedBox(height: 16),
+                  commonTextField(
+                    labelText: "Mật khẩu",
+                    controller: _resPasswordController,
+                    obscureText: true,
+                  ),
+                  commonButton(
+                    text: "Đăng ký",
+                    margin: EdgeInsets.symmetric(vertical: 16),
                     onTap: () {
-                      showModalBottomSheet(
-                        context: context,
-                        useSafeArea: true,
-                        isScrollControlled: true,
-                        shape: const RoundedRectangleBorder(
-                          borderRadius: BorderRadius.vertical(
-                            top: Radius.circular(16),
-                          ),
-                        ),
-                        builder:
-                            (context) => _buildBottomSheetDeleteOption(context),
+                      final username = _resNameController.text;
+                      final fullName = _resFullNameController.text;
+                      final password = _resPasswordController.text;
+                      final phoneNumber = _resPhoneController.text;
+                      context.read<AuthBloc>().add(
+                        Register(username, password, fullName, phoneNumber),
                       );
                     },
                   ),
+                ],
+              ),
+              RichText(
+                textAlign: TextAlign.center,
+                text: TextSpan(
+                  style: TextStyle(color: Colors.grey[500], fontSize: 12),
+                  children: const [
+                    TextSpan(text: "Bằng cách đăng ký, bạn đồng ý với "),
+                    TextSpan(
+                      text: "Điều khoản",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black54,
+                      ),
+                    ),
+                    TextSpan(text: " của chúng tôi."),
+                  ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-          Text.rich(
-            TextSpan(
-              children: [
-                TextSpan(
-                  text: 'Tìm hiểu thêm ',
-                  style: AppStyles.title3Bold.copyWith(color: AppColors.blue60),
-                  recognizer:
-                      TapGestureRecognizer()
-                        ..onTap = () {
-                          print('Tap ');
-                        }, // hàm khi click
-                ),
-                TextSpan(
-                  text:
-                      'về lý do bạn nhìn thấy các trang cá nhân ở đây và ý nghĩa của việc gỡ các trang cá nhân.',
-                  style: AppStyles.title3Regular.copyWith(
-                    color: AppColors.gray40,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 

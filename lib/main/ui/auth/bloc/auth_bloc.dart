@@ -3,7 +3,7 @@ import 'package:bloc/bloc.dart';
 import 'package:chat_app/main/helper/socket/socket_service.dart';
 import 'package:chat_app/main/networks/api_end_point.dart';
 import 'package:chat_app/main/networks/enum.dart';
-import 'package:chat_app/main/networks/model/login_in.dart';
+import 'package:chat_app/main/networks/model/auth.dart';
 import 'package:chat_app/main/networks/model/user.dart';
 import 'package:chat_app/main/ui/auth/bloc/auth_event.dart';
 import 'package:chat_app/main/ui/auth/bloc/auth_state.dart';
@@ -23,14 +23,22 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<Logout>(_signOut);
     on<CheckUser>(_checkRecentUser);
     on<UpdateStatusUsers>(_updateStatusUser);
+    on<Register>(_onRegister);
   }
 
   Future<void> _onSignIn(Login event, Emitter<AuthState> emit) async {
     emit(AuthLoading());
     try {
       await AppStorage.clearUser();
-      var data = {'email': event.username, 'password': event.password};
-      var url = ApiEndPoints.SIGNIN;
+      final isPhone = RegExp(r'^(0|\+84)[0-9]{8,10}$').hasMatch(event.username);
+
+      final url = isPhone ? ApiEndPoints.SIGNINPHONE : ApiEndPoints.SIGNIN;
+
+      final data =
+          isPhone
+              ? {'phone_number': event.username, 'password': event.password}
+              : {'email': event.username, 'password': event.password};
+
       ApiResponse res = await ApiUtil.post(url: url, data: data);
       if (res.statusCode == 200) {
         final data = LoginInModel.fromJson(res.body['data']);
@@ -42,7 +50,44 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           await AppStorage.saveUser(curUser);
           await AppStorage.saveIsLogin(true);
           final tokeSave = await AppStorage.getToken();
+          socketService.initSocket();
+
           print('TokenSave: $tokeSave');
+          emit(AuthSuccess(user: curUser, message: res.body['message']));
+        } else {
+          emit(AuthFailure(res.body['error']['message']));
+        }
+      } else {
+        emit(AuthInit(erroMessage: res.body['error']['message']));
+      }
+    } catch (e) {
+      emit(AuthFailure(e.toString()));
+    }
+  }
+
+  Future<void> _onRegister(Register event, Emitter<AuthState> emit) async {
+    emit(AuthLoading());
+    try {
+      await AppStorage.clearUser();
+      var data = {
+        "phone_number": event.phoneNumber,
+        "password": event.password,
+        "full_name": event.fullName,
+      };
+      var url = ApiEndPoints.REGISTER;
+      ApiResponse res = await ApiUtil.post(url: url, data: data);
+      if (res.statusCode == 201) {
+        final data = RegisterData.fromJson(res.body['data']);
+        final curUser = data.user;
+        if (data.token != null) {
+          await AppStorage.saveToken(data.token ?? '');
+        }
+        if (curUser != null) {
+          await AppStorage.saveUser(curUser);
+          await AppStorage.saveIsLogin(true);
+          final tokeSave = await AppStorage.getToken();
+          print('TokenSave: $tokeSave');
+          socketService.initSocket();
           emit(AuthSuccess(user: curUser, message: res.body['message']));
         } else {
           emit(AuthFailure(res.body['error']['message']));

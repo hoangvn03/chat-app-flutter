@@ -25,6 +25,11 @@ class UpdateUser extends ProfileEvent {
   final UserModel user;
   UpdateUser(this.user);
 }
+class FollowUser extends ProfileEvent {
+  final int id;
+  bool isFollowing;
+  FollowUser(this.id,this.isFollowing);
+}
 class LoadListUserProfile extends ProfileEvent {
   final UserModel user;
   final int index;

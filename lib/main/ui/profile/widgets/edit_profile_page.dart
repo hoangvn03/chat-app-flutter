@@ -1,4 +1,5 @@
 import 'package:chat_app/main/networks/model/user.dart';
+import 'package:chat_app/main/router/router.dart';
 import 'package:chat_app/main/ui/profile/bloc/profile_bloc.dart';
 import 'package:chat_app/main/ui/profile/bloc/profile_event.dart';
 import 'package:chat_app/main/ui/profile/bloc/profile_state.dart';
@@ -8,6 +9,7 @@ import 'package:chat_app/res/app_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:go_router/go_router.dart';
 
 class EditProfilePage extends StatefulWidget {
   const EditProfilePage({super.key, required this.user});
@@ -93,105 +95,116 @@ class _EditProfilePageState extends State<EditProfilePage> {
             style: AppStyles.title1Bold,
           ),
         ),
-        body: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            children: [
-              // Ảnh đại diện
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(40),
-                    child: Container(
-                      width: 80,
-                      height: 80,
-                      color: AppColors.gray20, // nền xám
-                      child: SvgPicture.network(
-                        widget.user.avatar ??
-                            'https://www.svgrepo.com/show/170523/user-profile.svg',
+        body: BlocListener<ProfileBloc, ProfileState>(
+          listener: (context, state) {
+            if (state is ProfileSuccess) {
+              context.pushReplacementNamed(PathName.personalPage);
+            } else if (state is ProfileFailure) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Lỗi: ${state.erroMessage}')),
+              );
+            }
+          },
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              children: [
+                // Ảnh đại diện
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(40),
+                      child: Container(
                         width: 80,
                         height: 80,
-                        fit: BoxFit.cover,
-                        placeholderBuilder:
-                            (context) => const Center(
-                              child: Icon(
-                                Icons.person_outline,
-                                size: 40,
-                                color: AppColors.gray30,
+                        color: AppColors.gray20, // nền xám
+                        child: SvgPicture.network(
+                          widget.user.avatar ??
+                              'https://www.svgrepo.com/show/170523/user-profile.svg',
+                          width: 80,
+                          height: 80,
+                          fit: BoxFit.cover,
+                          placeholderBuilder:
+                              (context) => const Center(
+                                child: Icon(
+                                  Icons.person_outline,
+                                  size: 40,
+                                  color: AppColors.gray30,
+                                ),
                               ),
-                            ),
+                        ),
                       ),
                     ),
-                  ),
 
-                  const SizedBox(width: 16),
-                  const CircleAvatar(
-                    radius: 40,
-                    backgroundColor: Color(0xFFEFEFEF),
-                    child: Icon(
-                      Icons.person_outline,
-                      size: 40,
-                      color: Colors.grey,
+                    const SizedBox(width: 16),
+                    const CircleAvatar(
+                      radius: 40,
+                      backgroundColor: Color(0xFFEFEFEF),
+                      child: Icon(
+                        Icons.person_outline,
+                        size: 40,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                GestureDetector(
+                  onTap: () {
+                    // TODO: Chọn ảnh đại diện
+                  },
+                  child: const Text(
+                    "Đổi ảnh đại diện",
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.blue,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              GestureDetector(
-                onTap: () {
-                  // TODO: Chọn ảnh đại diện
-                },
-                child: const Text(
-                  "Đổi ảnh đại diện",
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.blue,
-                    fontWeight: FontWeight.w500,
+                ),
+                const SizedBox(height: 24),
+
+                // Các trường thông tin
+                _buildTextField("Tên", nameController),
+                _buildTextField("Tên người dùng", usernameController),
+                _buildTextField("Danh xưng", pronounController),
+                _buildTextField("Tiểu sử", bioController),
+                const SizedBox(height: 8),
+                // _buildSectionTitle("Thêm liên kết"),
+                // _buildSectionTitle("Biểu ngữ"),
+                // const SizedBox(height: 8),
+                // _buildDropdownGender(),
+                // const SizedBox(height: 8),
+
+                // Nhạc
+                ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  title: const Text("Nhạc"),
+                  subtitle: const Text(
+                    "Thêm nhạc vào trang cá nhân của bạn",
+                    style: TextStyle(color: Colors.grey),
                   ),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () {},
                 ),
-              ),
-              const SizedBox(height: 24),
 
-              // Các trường thông tin
-              _buildTextField("Tên", nameController),
-              _buildTextField("Tên người dùng", usernameController),
-              _buildTextField("Danh xưng", pronounController),
-              _buildTextField("Tiểu sử", bioController),
-              const SizedBox(height: 8),
-              // _buildSectionTitle("Thêm liên kết"),
-              // _buildSectionTitle("Biểu ngữ"),
-              // const SizedBox(height: 8),
-              // _buildDropdownGender(),
-              // const SizedBox(height: 8),
+                const SizedBox(height: 8),
+                const Divider(),
 
-              // Nhạc
-              ListTile(
-                contentPadding: EdgeInsets.zero,
-                title: const Text("Nhạc"),
-                subtitle: const Text(
-                  "Thêm nhạc vào trang cá nhân của bạn",
-                  style: TextStyle(color: Colors.grey),
+                // Toggle
+                SwitchListTile(
+                  title: const Text("Hiển thị biểu ngữ Threads"),
+                  subtitle: const Text(
+                    "Khi bạn tắt, biểu tượng Instagram trên trang cá nhân Threads cũng sẽ biến mất.",
+                    style: TextStyle(color: Colors.grey),
+                  ),
+                  value: showThreads,
+                  onChanged: (v) => setState(() => showThreads = v),
+                  activeColor: Colors.blue,
                 ),
-                trailing: const Icon(Icons.chevron_right),
-                onTap: () {},
-              ),
-
-              const SizedBox(height: 8),
-              const Divider(),
-
-              // Toggle
-              SwitchListTile(
-                title: const Text("Hiển thị biểu ngữ Threads"),
-                subtitle: const Text(
-                  "Khi bạn tắt, biểu tượng Instagram trên trang cá nhân Threads cũng sẽ biến mất.",
-                  style: TextStyle(color: Colors.grey),
-                ),
-                value: showThreads,
-                onChanged: (v) => setState(() => showThreads = v),
-                activeColor: Colors.blue,
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

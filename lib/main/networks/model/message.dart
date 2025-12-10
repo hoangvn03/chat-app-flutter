@@ -1,4 +1,6 @@
+import 'package:chat_app/main/networks/api_end_point.dart';
 import 'package:chat_app/main/networks/model/converation.dart';
+import 'package:chat_app/main/networks/model/post.dart';
 import 'package:chat_app/main/networks/model/user.dart';
 
 class MessageResponse {
@@ -148,6 +150,7 @@ class Attachment {
       uploadedAt: DateTime.parse(json['uploaded_at'] as String),
     );
   }
+
 
   Map<String, dynamic> toJson() {
     return {

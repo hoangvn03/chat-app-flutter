@@ -211,6 +211,13 @@ class ApiUtil {
     try {
       final uri = Uri.parse(url);
       final token = await AppStorage.getToken();
+
+      // ------------ IN (REQUEST) ------------
+      debugPrint('=== DELETE REQUEST ===');
+      debugPrint('URL: $url');
+      debugPrint('Authorization: Bearer $token');
+      debugPrint('--------------------------------');
+
       final response = await http.delete(
         uri,
         headers: {
@@ -218,6 +225,13 @@ class ApiUtil {
           "Content-Type": 'application/json',
         },
       );
+
+      // ------------ OUT (RESPONSE) ------------
+      debugPrint('=== DELETE RESPONSE ===');
+      debugPrint('Status: ${response.statusCode}');
+      debugPrint('Body: ${response.body}');
+      debugPrint('--------------------------------');
+
       return await _handleResponse(response);
     } catch (e) {
       debugPrint('DELETE error: $e');

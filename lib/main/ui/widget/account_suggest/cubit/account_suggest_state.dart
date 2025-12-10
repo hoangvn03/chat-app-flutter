@@ -1,4 +1,5 @@
 import 'package:chat_app/main/networks/model/contact_user.dart';
+import 'package:chat_app/main/networks/model/phone_contact.dart';
 import 'package:chat_app/main/networks/model/user.dart';
 
 abstract class AccountSuggestState {}
@@ -6,9 +7,9 @@ abstract class AccountSuggestState {}
 class AccountSuggestLoading extends AccountSuggestState {}
 
 class AccountSuggestSuccess extends AccountSuggestState {
-  final List<UserModel> contactList;
+  final List<PhoneContact> contactList;
   AccountSuggestSuccess({required this.contactList});
-  AccountSuggestSuccess copyWith({List<UserModel>? contactList}) {
+  AccountSuggestSuccess copyWith({List<PhoneContact>? contactList}) {
     return AccountSuggestSuccess(contactList: contactList ?? this.contactList);
   }
 }

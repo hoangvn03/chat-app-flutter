@@ -28,47 +28,60 @@ class AccountSuggestWidget extends StatelessWidget {
           } else if (state is AccountSuggestSuccess &&
               state.contactList.isNotEmpty) {
             final data = state.contactList;
-            return Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            return data[0].user != null
+                ? Column(
                   children: [
-                    Text(title ?? '', style: AppStyles.title2Bold),
-                    Text(
-                      'Xem tất cả',
-                      style: AppStyles.title2Bold.copyWith(
-                        color: AppColors.blue60,
-                      ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(title ?? '', style: AppStyles.title2Bold),
+                        Text(
+                          'Xem tất cả',
+                          style: AppStyles.title2Bold.copyWith(
+                            color: AppColors.blue60,
+                          ),
+                        ),
+                      ],
                     ),
+                    const SizedBox(height: 12),
+
+                    isHorirontal
+                        ? SizedBox(
+                          height:
+                              157, // or whatever height fits your horizontal item
+                          child: ListView.separated(
+                            scrollDirection: Axis.horizontal,
+                            separatorBuilder:
+                                (context, index) => const SizedBox(width: 4),
+                            itemCount: data.length,
+                            itemBuilder: (context, index) {
+                              return data[index].user != null
+                                  ? _itemUserSuggestV2(
+                                    data[index].user!,
+                                    context,
+                                  )
+                                  : const SizedBox.shrink();
+                            },
+                          ),
+                        )
+                        : ListView.builder(
+                          shrinkWrap: true,
+                          physics: NeverScrollableScrollPhysics(),
+                          itemCount: data.length,
+                          itemBuilder:
+                              (context, index) =>
+                                  data[index].user != null
+                                      ? _itemUserSuggestV1(
+                                        data[index].user!,
+                                        context,
+                                      )
+                                      : const SizedBox.shrink(),
+                        ),
                   ],
-                ),
-                const SizedBox(height: 12),
-                isHorirontal
-                    ? SizedBox(
-                      height:
-                          185, // or whatever height fits your horizontal item
-                      child: ListView.separated(
-                        scrollDirection: Axis.horizontal,
-                        separatorBuilder:
-                            (context, index) => const SizedBox(width: 4),
-                        itemCount: data.length,
-                        itemBuilder: (context, index) {
-                          return _itemUserSuggestV2(data[index], context);
-                        },
-                      ),
-                    )
-                    : ListView.builder(
-                      shrinkWrap: true,
-                      physics: NeverScrollableScrollPhysics(),
-                      itemCount: data.length,
-                      itemBuilder:
-                          (context, index) =>
-                              _itemUserSuggestV1(data[index], context),
-                    ),
-              ],
-            );
+                )
+                : const SizedBox.shrink();
           } else if (state is AccountSuggestFailure) {
-            return const Center(child: Text('Failed to load users'));
+            return Center(child: Text(state.errorMessage));
           }
           return const Center(
             child: Text('Không có tài khoản nào được gợi ý!'),
@@ -95,15 +108,15 @@ class AccountSuggestWidget extends StatelessWidget {
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            child: interactionButton(
-              type: InteractionType.follow,
-              backgroundColor: AppColors.blue40,
-              colorBorder: AppColors.blue40,
-              textStyle: AppStyles.bodyBold.copyWith(color: AppColors.white),
-            ),
-          ),
+          // Padding(
+          //   padding: const EdgeInsets.symmetric(horizontal: 12),
+          //   child: interactionButton(
+          //     type: InteractionType.follow,
+          //     backgroundColor: AppColors.blue40,
+          //     colorBorder: AppColors.blue40,
+          //     textStyle: AppStyles.bodyBold.copyWith(color: AppColors.white),
+          //   ),
+          // ),
           GestureDetector(
             onTap: () {},
             child: SvgPicture.asset(AppImages.icClose, width: 16, height: 16),
@@ -157,16 +170,16 @@ class AccountSuggestWidget extends StatelessWidget {
             const SizedBox(height: 2),
             Text('Gợi ý cho bạn', style: AppStyles.calloutRegular),
             const SizedBox(height: 16),
-            commonButton(
-              hasHeight: true,
-              margin: EdgeInsets.zero,
-              height: 28,
-              padding: EdgeInsets.zero,
-              textStyle: AppStyles.bodyBold.copyWith(color: AppColors.white),
-              text: 'Theo dõi',
-              onTap: () {},
-              radius: 6,
-            ),
+            // commonButton(
+            //   hasHeight: true,
+            //   margin: EdgeInsets.zero,
+            //   height: 28,
+            //   padding: EdgeInsets.zero,
+            //   textStyle: AppStyles.bodyBold.copyWith(color: AppColors.white),
+            //   text: 'Theo dõi',
+            //   onTap: () {},
+            //   radius: 6,
+            // ),
           ],
         ),
       ),

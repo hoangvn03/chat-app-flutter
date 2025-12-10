@@ -7,6 +7,14 @@ class Login extends AuthEvent {
 
   Login( this.username, this.password);
 }
+class Register extends AuthEvent {
+  final String password;
+  final String username;
+  final String fullName;
+  final String phoneNumber;
+  Register( this.username, this.password, this.fullName, this.phoneNumber );
+
+}
 class UpdateStatusUsers extends AuthEvent {
   final String status;
   final bool isInit;

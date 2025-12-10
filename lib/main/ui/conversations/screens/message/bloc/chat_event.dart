@@ -94,6 +94,7 @@ class UpdateStatusMessage extends ChatEvent {
     final int receiverId;
   UpdateStatusMessage({required this.messageId, required this.receiverId});
 }
+class ClearStatusMessageEvent extends ChatEvent {}
 
 class UploadFileMessage extends ChatEvent {
   List<dynamic> file;
@@ -105,3 +106,5 @@ class UploadFileMessage extends ChatEvent {
     required this.messageId,
   });
 }
+// Thêm class này vào file chat_event.dart
+class ClearAlertMessage extends ChatEvent {}

@@ -22,6 +22,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     on<EditProfile>(_editProfile);
     on<LoadListUserProfile>(_loadListUserProfile);
     on<PageChange>(_pageChange);
+    on<FollowUser>(_toggleFollow1);
   }
   bool isCurrientUser = true;
 
@@ -55,8 +56,8 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
         final response = ProfileResponse.fromJson(res.body);
         var url1 = '${ApiEndPoints.LOADPOST}/user/${response.user.id}';
         var params = {'page': '1', 'limit': '24'};
-        ApiResponse res1 = await ApiUtil.get(url1, params: params);
 
+        ApiResponse res1 = await ApiUtil.get(url1, params: params);
         if (res1.statusCode == 200) {
           final posts =
               (res1.body['data']['posts'] as List)
@@ -68,6 +69,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
               posts: posts,
               user: response.user,
               stats: response.stats,
+              hasFollow: response.isFollowing,
             ),
           );
         }
@@ -77,6 +79,31 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
       emit(ProfileFailure(erroMessage: e.toString()));
     }
     return;
+  }
+
+  Future<void> _toggleFollow1(
+    FollowUser event,
+    Emitter<ProfileState> emit,
+  ) async {
+    final currentState = state as ProfileSuccess;
+    print('IsFollow: ${event.isFollowing}');
+    if (event.isFollowing) {
+      final url = '${ApiEndPoints.PROFILE}/contacts/${event.id}';
+      ApiResponse res = await ApiUtil.delete(url);
+      if (res.statusCode == 200) {
+        emit(currentState.copyWith(hasFollow: false));
+      } else {
+        emit(currentState.copyWith(hasFollow: true));
+      }
+    } else {
+      final url = '${ApiEndPoints.PROFILE}/contacts/${event.id}';
+      ApiResponse res = await ApiUtil.post(url: url);
+      if (res.statusCode == 201) {
+        emit(currentState.copyWith(hasFollow: true));
+      } else {
+        emit(currentState.copyWith(hasFollow: false));
+      }
+    }
   }
 
   Future<void> _loadProfileUserContact(
@@ -89,6 +116,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
       if (res.statusCode == 200) {
         final user = UserModel.fromJson(res.body['data']['user']);
         final converationId = res.body['data']['conversation_id'];
+        final isFollowing = res.body['data']['is_following'];
         var url1 = '${ApiEndPoints.LOADPOST}/user/${user.id}';
         var params = {'page': '1', 'limit': '24'};
         ApiResponse res1 = await ApiUtil.get(url1, params: params);
@@ -103,6 +131,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
               user: user,
               conversationId: converationId,
               posts: posts,
+              hasFollow: isFollowing,
             ),
           );
         }
@@ -203,10 +232,13 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
       print(params);
       ApiResponse res = await ApiUtil.put(url, params);
       if (res.statusCode == 200) {
-        final user = UserModel.fromJson(res.body);
+        final user = UserModel.fromJson(res.body['data']);
+        await AppStorage.clearUser();
+        await AppStorage.saveUser(user);
         emit(ProfileSuccess(user: user));
       }
     } catch (e) {
+      print(e.toString());
       emit(ProfileFailure());
     }
     return;

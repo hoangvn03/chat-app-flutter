@@ -3,7 +3,7 @@ import 'package:chat_app/main/utils/shared_preference.dart';
 enum ENV { test, preprod, prod }
 
 class ApiEndPoints {
-  static ENV env = ENV.preprod;
+  static ENV env = ENV.test;
   static String? _customDomain;
 
   static Future<void> init() async {
@@ -20,7 +20,7 @@ class ApiEndPoints {
           _customDomain = "http://10.0.2.2:8080";
           break;
         case ENV.preprod:
-          _customDomain = "http://10.0.2.2:8080";
+          _customDomain = "http://192.168.1.77:8080";
           break;
         case ENV.prod:
           _customDomain = "https://main-api-deploy.onrender.com";
@@ -50,6 +50,8 @@ class ApiEndPoints {
   }
 
   static String get SIGNIN => "$DOMAIN/api/auth/login";
+  static String get SIGNINPHONE => "$DOMAIN/api/auth/login-phone";
+  static String get REGISTER => "$DOMAIN/api/auth/register-phone";
   static String get SIGNOUT => "$DOMAIN/api/auth/logout";
   static String get PROFILE => "$DOMAIN/api/users/me";
   static String get PROFILE1 => "$DOMAIN/api/users/me";

@@ -9,11 +9,14 @@ class AuthSuccess extends AuthState {
   final String? message;
   final bool hasLocalUser;
   final String? statusUser;
+    final List<String> phoneNumbers;
+
   AuthSuccess({
     this.user,
     this.message,
     this.hasLocalUser = false,
     this.statusUser,
+    this.phoneNumbers = const [],
   });
 
   AuthSuccess copyWith({

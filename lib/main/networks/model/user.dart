@@ -1,5 +1,6 @@
 import 'package:chat_app/main/networks/model/converation.dart';
 import 'package:chat_app/main/networks/model/reels.dart';
+
 class UserResponse {
   final List<UserModel> users;
   final Pagination pagination;
@@ -8,14 +9,12 @@ class UserResponse {
 
   factory UserResponse.fromJson(Map<String, dynamic> json) {
     return UserResponse(
-      users:
-          (json['users'] as List)
-              .map((x) => UserModel.fromJson(x))
-              .toList(),
+      users: (json['users'] as List).map((x) => UserModel.fromJson(x)).toList(),
       pagination: Pagination.fromJson(json['pagination']),
     );
   }
 }
+
 class RoleData {
   int? id;
   String? code;
@@ -46,7 +45,7 @@ class UserModel {
   String? avatar;
   String? status;
   String? createdAt;
-  String? gender;               // ⭐ Thêm gender
+  String? gender; // ⭐ Thêm gender
   List<ReelModel>? reels;
 
   UserModel({
@@ -59,7 +58,7 @@ class UserModel {
     this.avatar,
     this.status,
     this.createdAt,
-    this.gender,                // ⭐ Thêm vào constructor
+    this.gender, // ⭐ Thêm vào constructor
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
@@ -70,10 +69,12 @@ class UserModel {
       isPrivate: json['is_private'],
       bio: json['bio'],
       email: json['email'],
-      avatar: json['avatar_url'],
+      avatar:
+          json['avatar_url'] ??
+          "https://api.dicebear.com/7.x/avataaars/svg?seed=Alice",
       status: json['status'],
       createdAt: json['created_at'],
-      gender: json['gender'],   // ⭐ Parse gender từ API
+      gender: json['gender'], // ⭐ Parse gender từ API
     );
   }
 
@@ -83,11 +84,10 @@ class UserModel {
       'username': username,
       'email': email,
       'avatar_url': avatar,
-      'gender': gender,         // ⭐ Gửi gender lên API
+      'gender': gender, // ⭐ Gửi gender lên API
     };
   }
 }
-
 
 class UserContact {
   final int contactId;
