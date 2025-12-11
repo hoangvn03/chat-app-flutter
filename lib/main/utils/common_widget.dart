@@ -3,6 +3,7 @@ import 'package:chat_app/main/networks/model/user.dart';
 import 'package:chat_app/res/app_colors.dart';
 import 'package:chat_app/res/app_images.dart';
 import 'package:chat_app/res/app_styles.dart';
+import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
@@ -443,10 +444,12 @@ Widget commonTileItem({
                   size: sizeImage ?? 34,
                   hasReelsBorder: hasReelsBorder ?? true,
                   hasReels: hasReels ?? true,
-                  childWidget: imageLeading ?? Image.asset(
-                    AppImages.imgAvatarDefault, // ảnh PNG/JPG
-                    fit: BoxFit.cover,
-                  ),
+                  childWidget:
+                      imageLeading ??
+                      Image.asset(
+                        AppImages.imgAvatarDefault, // ảnh PNG/JPG
+                        fit: BoxFit.cover,
+                      ),
                 ),
               ),
           Expanded(
@@ -554,7 +557,11 @@ Widget commonTileItemV2({
   );
 }
 
-Widget groupUserAvatar({required List<String> images, double avatarSize = 48,double overlap = 32}) {
+Widget groupUserAvatar({
+  required List<String> images,
+  double avatarSize = 48,
+  double overlap = 32,
+}) {
   return SizedBox(
     height: avatarSize + (images.length - 1) * (avatarSize - overlap),
     width: avatarSize + (images.length - 1) * (avatarSize - overlap),
@@ -804,5 +811,88 @@ void showImageNetWork(BuildContext context, {required String imageUrl}) {
         ),
       );
     },
+  );
+}
+
+Widget resultDialog({
+  required BuildContext context,
+  required String message,
+  required VoidCallback onTap,
+  required bool isSuccess,
+  String? urlImage,
+  Color? svgColor,
+  bool isHideExit = false,
+  String? title,
+  String? textButton,
+}) {
+  return Dialog(
+    backgroundColor: AppColors.white,
+    insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+    child: Stack(
+      children: [
+        Container(
+          constraints: BoxConstraints(minHeight: 300, maxHeight: 300),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const SizedBox(height: 30),
+              urlImage == null
+                  ? SvgPicture.asset(
+                    isSuccess ? AppImages.icStickers : AppImages.icWarning,
+                    color: svgColor, // Thêm màu cho SVG mặc định
+                  )
+                  : SvgPicture.asset(
+                    urlImage,
+                    color: svgColor, // Thêm màu cho SVG custom
+                  ),
+              const SizedBox(height: 24),
+              Text(
+                isSuccess ? title ?? "Success" : title ?? "Sorry",
+                style:
+                    isSuccess
+                        ? AppStyles.title2Regular
+                        : AppStyles.title2Regular.copyWith(
+                          color: AppColors.red80,
+                        ),
+              ),
+              const SizedBox(height: 16),
+              const DottedLine(
+                dashColor: Color(0xFFE3EAF2),
+                dashGapLength: 3,
+                dashLength: 4,
+              ),
+              const SizedBox(height: 16),
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 32,
+                ),
+                child: Text(
+                  message,
+                  style: AppStyles.title2Regular,
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              Spacer(),
+              commonButton(
+                text: textButton ?? "Close",
+                onTap: onTap,
+                margin: const EdgeInsets.only(bottom: 24, left: 24, right: 24),
+              ),
+            ],
+          ),
+        ),
+        if (!isHideExit)
+          Positioned(
+            top: 10,
+            right: 10,
+            child: GestureDetector(
+              onTap: onTap,
+              child: const Icon(Icons.close, color: Colors.grey, size: 24),
+            ),
+          ),
+      ],
+    ),
   );
 }

@@ -87,31 +87,17 @@ class _ChatRoomState extends State<ChatRoom> {
             showDialog(
               context: context,
               barrierDismissible: false, // Bắt buộc user bấm OK
-              builder:
-                  (dialogContext) => AlertDialog(
-                    // Đổi tên biến context thành dialogContext để tránh nhầm
-                    backgroundColor: Colors.white,
-                    // ... (giữ nguyên code giao diện dialog của bạn) ...
-                    content: Text(
-                      state.statusMessage ?? 'Đã có lỗi xảy ra',
-                      textAlign: TextAlign.center,
-                      style: AppStyles.bodyRegular,
-                    ),
-                    actions: [
-                      TextButton(
-                        // ... style ...
-                        onPressed: () {
-                          // 1. Đóng Dialog
-                          Navigator.pop(dialogContext);
-
-                          // 2. Gửi sự kiện xóa lỗi để StatusMessage về null
-                          // Dùng context (của ChatRoom) chứ không phải dialogContext
-                          context.read<ChatBloc>().add(ClearAlertMessage());
-                        },
-                        child: const Text("OK"),
-                      ),
-                    ],
-                  ),
+              builder: (dialogContext) {
+                return resultDialog(
+                  context: context,
+                  message: "${state.statusMessage}",
+                  title: "Error",
+                  urlImage: AppImages.icWarning,
+                  isHideExit: true,
+                  onTap: () => context.pop(),
+                  isSuccess: false,
+                );
+              },
             );
           }
         },
