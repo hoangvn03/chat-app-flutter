@@ -1,10 +1,10 @@
 import 'dart:async';
 import 'package:bloc/bloc.dart';
-import 'package:chat_app/main/helper/socket/socket_service.dart';
 import 'package:chat_app/main/networks/api_end_point.dart';
 import 'package:chat_app/main/networks/enum.dart';
 import 'package:chat_app/main/networks/model/auth.dart';
 import 'package:chat_app/main/networks/model/user.dart';
+import 'package:chat_app/main/router/router.dart';
 import 'package:chat_app/main/ui/auth/bloc/auth_event.dart';
 import 'package:chat_app/main/ui/auth/bloc/auth_state.dart';
 import 'package:chat_app/main/utils/shared_preference.dart';
@@ -13,12 +13,9 @@ import 'dart:convert';
 
 import '../../../networks/api_util.dart';
 
-//alice@example.com
-//password123
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
-  final SocketService socketService;
 
-  AuthBloc(this.socketService) : super(AuthLoading()) {
+  AuthBloc() : super(AuthLoading()) {
     on<Login>(_onSignIn);
     on<Logout>(_signOut);
     on<CheckUser>(_checkRecentUser);
@@ -50,8 +47,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           await AppStorage.saveUser(curUser);
           await AppStorage.saveIsLogin(true);
           final tokeSave = await AppStorage.getToken();
-          socketService.initSocket();
-
           print('TokenSave: $tokeSave');
           emit(AuthSuccess(user: curUser, message: res.body['message']));
         } else {
@@ -87,7 +82,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           await AppStorage.saveIsLogin(true);
           final tokeSave = await AppStorage.getToken();
           print('TokenSave: $tokeSave');
-          socketService.initSocket();
           emit(AuthSuccess(user: curUser, message: res.body['message']));
         } else {
           emit(AuthFailure(res.body['error']['message']));
@@ -148,7 +142,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     final currentState = state as AuthSuccess;
     try {
       if (event.isInit) {
-        socketService.updateUserStatus(StatusUser.online.name);
       } else {
         emit(currentState.copyWith(statusUser: event.status));
       }

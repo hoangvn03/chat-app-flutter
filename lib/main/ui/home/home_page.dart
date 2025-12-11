@@ -37,7 +37,7 @@ class _HomePageState extends State<HomePage> {
         BlocProvider<HomeBloc>(
           create:
               (_) =>
-                  HomeBloc(context.read<SocketService>())..add(LoadRequest()),
+                  HomeBloc()..add(LoadRequest()),
         ),
       ],
       child: BlocListener<HomeBloc, HomeState>(

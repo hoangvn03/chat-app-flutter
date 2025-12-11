@@ -45,7 +45,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
                       LoadRequest(requestType: RequestType.common, maxCount: 5),
                     ),
           ),
-          BlocProvider(create: (_) => HomeBloc(context.read<SocketService>())),
+          BlocProvider(create: (_) => HomeBloc()),
         ],
         child: Scaffold(
           backgroundColor: AppColors.black,

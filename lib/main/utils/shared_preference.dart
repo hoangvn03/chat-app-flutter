@@ -69,4 +69,24 @@ class AppStorage {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString('custom_ip');
   }
+
+  static Future<void> clearAll() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.clear();
+  }
+  static Future<void> clearExceptUser() async {
+  final prefs = await SharedPreferences.getInstance();
+
+  // 1. Lấy data user trước khi xóa
+  final userJson = prefs.getString("USER_DATA");
+
+  // 2. Xóa toàn bộ
+  await prefs.clear();
+
+  // 3. Lưu lại user (nếu có)
+  if (userJson != null) {
+    await prefs.setString("USER_DATA", userJson);
+  }
+}
+
 }

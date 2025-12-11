@@ -1,5 +1,4 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:chat_app/main/helper/socket/socket_service.dart';
 import 'package:chat_app/main/networks/model/converation.dart';
 import 'package:chat_app/main/networks/model/profile_model.dart';
 import 'package:chat_app/main/ui/conversations/screens/createGroupChat/bloc/create_chat_bloc.dart';
@@ -63,7 +62,7 @@ class _ProfilePageState extends State<ProfilePage>
                         ..add(LoadProfileUserContact(widget.user!.id)),
             ),
         BlocProvider(create: (_) => CreateChatBloc()),
-        BlocProvider(create: (_) => ChatBloc(context.read<SocketService>())),
+        BlocProvider(create: (_) => ChatBloc()),
       ],
       child: MultiBlocListener(
         listeners: [

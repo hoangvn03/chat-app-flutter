@@ -9,7 +9,7 @@ class AuthSuccess extends AuthState {
   final String? message;
   final bool hasLocalUser;
   final String? statusUser;
-    final List<String> phoneNumbers;
+  final List<String> phoneNumbers;
 
   AuthSuccess({
     this.user,

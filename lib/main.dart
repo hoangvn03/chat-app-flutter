@@ -17,19 +17,11 @@ void main() async {
   cameras = await availableCameras();
   MediaKit.ensureInitialized();
   await ApiEndPoints.init();
-  final socketService = SocketService();
-  await socketService.initSocket();
+  // final socketService = SocketService();
   runApp(
-    MultiRepositoryProvider(
-      providers: [
-        RepositoryProvider<SocketService>.value(
-          value: socketService, // 👈 inject SocketService toàn cục
-        ),
-      ],
-      child: MultiBlocProvider(
-        providers: [BlocProvider(create: (_) => LocaleCubit())],
-        child: const MyApp(),
-      ),
+    MultiBlocProvider(
+      providers: [BlocProvider(create: (_) => LocaleCubit())],
+      child: const MyApp(),
     ),
   );
 }

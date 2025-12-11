@@ -59,8 +59,8 @@ class _MainPageState extends State<MainPage> {
         onTap: (index) async {
           if (index == 2) {
             context.pushNamed(PathName.cameraPage);
-          }else {
-            widget.navigationShell.goBranch(index, initialLocation: true);
+          } else {
+            widget.navigationShell.goBranch(index, initialLocation: false);
           }
         },
 

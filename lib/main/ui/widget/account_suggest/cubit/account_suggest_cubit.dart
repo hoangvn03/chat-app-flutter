@@ -48,7 +48,7 @@ class AccountSuggestCubit extends Cubit<AccountSuggestState> {
     }
   }
 
-    Future<void> follow() async {
+  Future<void> follow() async {
     try {
       emit(AccountSuggestLoading());
       if (!await FlutterContacts.requestPermission()) {

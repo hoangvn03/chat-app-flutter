@@ -68,7 +68,7 @@ class _ChatPageState extends State<ChatPage> {
           ),
           leading: IconButton(
             onPressed: () {
-              context.pop();
+              context.goNamed(  PathName.homePage);
             },
             icon: Transform.flip(
               flipX: true,

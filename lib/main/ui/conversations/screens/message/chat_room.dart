@@ -67,10 +67,7 @@ class _ChatRoomState extends State<ChatRoom> {
     return MultiBlocProvider(
       providers: [
         BlocProvider(
-          create:
-              (_) =>
-                  ChatBloc(context.read<SocketService>())
-                    ..add(LoadMessage(widget.conversation)),
+          create: (_) => ChatBloc()..add(LoadMessage(widget.conversation)),
         ),
         BlocProvider(create: (_) => AudioBloc()),
         BlocProvider(
@@ -408,6 +405,10 @@ class _ChatRoomState extends State<ChatRoom> {
                     msg.content.contains('Đã gửi 1 video')))
               Row(
                 children: [
+                  if (!isMe) ...[
+                    _itemFile(msg.attachments![0]),
+                    const SizedBox(width: 8),
+                  ],
                   IconButton.filledTonal(
                     onPressed: () {
                       showModalBottomSheet(
@@ -437,7 +438,9 @@ class _ChatRoomState extends State<ChatRoom> {
                     ),
                   ),
                   const SizedBox(width: 8),
-                  _itemFile(msg.attachments![0]),
+                  isMe
+                      ? _itemFile(msg.attachments![0])
+                      : const SizedBox.shrink(),
                 ],
               )
             else if (msg.content == 'Đã gửi 1 đoạn giọng nói' &&

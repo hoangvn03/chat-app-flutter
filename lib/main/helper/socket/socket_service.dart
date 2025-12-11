@@ -11,89 +11,33 @@ import 'package:chat_app/main/utils/shared_preference.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 class SocketService {
-  static final SocketService _instance = SocketService._internal();
-  factory SocketService() => _instance;
   late IO.Socket _socket;
-
-
-
-  SocketService._internal() {
-    initSocket();
-  }
 
   bool get isConnected => _socket.connected;
 
   Future<void> initSocket() async {
     final token = await AppStorage.getToken();
-    _socket = IO.io(
-      ApiEndPoints.DOMAIN,
-      IO.OptionBuilder()
-          .setTransports(['websocket'])
-          .disableAutoConnect()
-          .setExtraHeaders({"Authorization": "Bearer $token"})
-          .setAuth({'token': token})
-          .build(),
-    );
+    print('Socket Token: $token');
 
-    // _setupSocketListeners();
-    _socket.connect();
+    // 1. Tạo options map bằng Builder
+    Map<String, dynamic> options =
+        IO.OptionBuilder()
+            .setTransports(['websocket'])
+            .disableAutoConnect()
+            .setExtraHeaders({"Authorization": "Bearer $token"})
+            .setAuth({'token': token})
+            .build();
+
+    // 2. Thêm thủ công tùy chọn forceNew vào Map
+    options['forceNew'] = true;
+
+    // 3. Truyền options đã sửa vào IO.io
+    _socket = IO.io(ApiEndPoints.DOMAIN, options);
+
+    _socket!.connect();
   }
 
   IO.Socket get socket => _socket;
-
-  // void _setupSocketListeners() {
-  //   _socket.onConnect((_) {
-  //     log('✅ Connected to Socket.IO server : ${_socket.id}');
-  //     _connectionController.add(true);
-  //   });
-  //   _socket.onDisconnect((reason) {
-  //     log('❌ Socket Disconnected: $reason');
-  //     _connectionController.add(false);
-  //   });
-  //   _socket.onError((error) {
-  //     log('⚠️ Socket error: $error');
-  //   });
-  //   _socket.onConnectError((error) {
-  //     log('⚠️ Connection error: $error');
-  //   });
-  //   // Tin nhắn mới
-  //   _socket.on('new_message', (data) {
-  //     log('💬 New message: $data');
-  //     _messageController.add(Map<String, dynamic>.from(data));
-  //   });
-  //   // User typing
-  //   _socket.on('user_typing', (data) {
-  //     log('⌨️ User typing: $data');
-  //     _typingController.add(Map<String, dynamic>.from(data));
-  //   });
-  //   _socket.on('user_stop_typing', (data) {
-  //     log('⏹️ User stop typing: $data');
-  //     _typingController.add({
-  //       ...Map<String, dynamic>.from(data),
-  //       'is_typing': false,
-  //     });
-  //   });
-  //   // User status changed
-  //   _socket.on('user_status_changed', (data) {
-  //     log('👤 User status changed: $data');
-  //     _userStatusController.add(Map<String, dynamic>.from(data));
-  //   });
-  //   // Message read
-  //   _socket.on('message_read', (data) {
-  //     log('📖 Message read: $data');
-  //     _messageReadController.add(Map<String, dynamic>.from(data));
-  //   });
-  //   // Notifications
-  //   _socket.on('unread_notifications_count', (data) {
-  //     log('🔔 Unread notifications: $data');
-  //     _notificationController.add(Map<String, dynamic>.from(data));
-  //   });
-  //   // New notification
-  //   _socket.on('new_notification', (data) {
-  //     log('🔔 New notification: $data');
-  //     _notificationController.add(Map<String, dynamic>.from(data));
-  //   });
-  // }
 
   /// Gửi tin nhắn
   void sendMessage(dynamic params) {
@@ -161,27 +105,30 @@ class SocketService {
   void updateUserStatus(String status) {
     _socket.emit('update_status', {'status': status});
   }
+
   /// Lấy trạng thái online của users
   void getUsersOnine(int conversationId) {
     log('⚠️ get_online_users : ');
     _socket.emit('get_online_users', {'conversation_id': conversationId});
   }
-  
 
   /// Ngắt kết nối
   void disconnect() {
     _socket.disconnect();
+    _socket.emit('disconnect');
+
     // _connectionController.add(false);
     log('🔌 Socket disconnected manually');
   }
 
-  // Cleanup
-  void dispose() {
-    // _messageController.close();
-    // _typingController.close();
-    // _userStatusController.close();
-    // _messageReadController.close();
-    // _notificationController.close();
-    // _connectionController.close();
+  Future<void> dispose() async {
+    log("🧹 Disposing old socket...");
+    _socket.clearListeners();
+    try {
+      _socket.disconnect();
+      _socket.close();
+      log("🧹 Disposing old socket...2");
+    } catch (_) {}
+    log("🧹 Socket cleared!");
   }
 }

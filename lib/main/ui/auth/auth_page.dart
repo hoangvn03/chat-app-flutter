@@ -39,7 +39,7 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
     return BlocProvider(
-      create: (_) => AuthBloc(context.read<SocketService>())..add(CheckUser()),
+      create: (_) => AuthBloc()..add(CheckUser()),
       child: BlocListener<AuthBloc, AuthState>(
         listener: (context, state) {
           if (state is AuthSuccess && state.hasLocalUser == false) {

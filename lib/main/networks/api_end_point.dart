@@ -53,6 +53,7 @@ class ApiEndPoints {
   static String get SIGNINPHONE => "$DOMAIN/api/auth/login-phone";
   static String get REGISTER => "$DOMAIN/api/auth/register-phone";
   static String get SIGNOUT => "$DOMAIN/api/auth/logout";
+  static String get RESFRESH => "$DOMAIN/api/auth/refresh";
   static String get PROFILE => "$DOMAIN/api/users/me";
   static String get PROFILE1 => "$DOMAIN/api/users/me";
   static String get FOLLOW => "$DOMAIN/api/follow/2";

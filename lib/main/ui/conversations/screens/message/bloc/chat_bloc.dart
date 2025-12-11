@@ -23,14 +23,13 @@ class UploadResult {
 }
 
 class ChatBloc extends Bloc<ChatEvent, ChatState> {
-  final SocketService socketService;
-
+  final SocketService socketService = SocketService();
   // Giữ lại các biến tạm thời này để xử lý logic gửi file đính kèm
   // Tuy nhiên, lý tưởng nhất là đưa logic này vào một UseCase riêng hoặc xử lý stateless
   final List<AssetEntity> _tempFilesSend = [];
   final List<File> _tempFilesPath = [];
 
-  ChatBloc(this.socketService) : super(ChatLoading()) {
+  ChatBloc() : super(ChatLoading()) {
     on<LoadMessage>(_onLoadListMessage);
     on<ReceiveMessage>(_onReceiveMessage);
     on<SendMessage>(_onSendMessage);
@@ -61,6 +60,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     Emitter<ChatState> emit,
   ) async {
     try {
+      await socketService.initSocket();
       final url =
           '${ApiEndPoints.GETMESSAGE}/${event.conversation.conversationId}';
       final res = await ApiUtil.get(url);
@@ -92,6 +92,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
 
     socketService.socket.on('user_typing', (data) {
       final user = UserModel(id: data['user_id'], username: data['username']);
+      print("user typing: ${user.username}");
       add(UpdateTypingEvent(user, false));
     });
 
@@ -156,8 +157,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
 
       // Logic upload file đính kèm nếu có
       if (_tempFilesSend.isNotEmpty || _tempFilesPath.isNotEmpty) {
-        final conversationId =
-            int.tryParse("${msg['conversation_id']}") ?? 0;
+        final conversationId = int.tryParse("${msg['conversation_id']}") ?? 0;
         final messageId = int.tryParse("${msg['message_id']}") ?? 0;
 
         final uploadResult = await _uploadFileMessage(
@@ -322,12 +322,14 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   }
 
   @override
-  Future<void> close() {
+  Future<void> close() async {
     socketService.socket.off('new_message');
     socketService.socket.off('user_typing');
     socketService.socket.off('user_stopped_typing');
     socketService.socket.off('message_status_updated');
     socketService.socket.off('online_users');
+    // socketService.disconnect();
+    await socketService.dispose();
     return super.close();
   }
 }
