@@ -68,7 +68,7 @@ class _ChatPageState extends State<ChatPage> {
           ),
           leading: IconButton(
             onPressed: () {
-              context.goNamed(  PathName.homePage);
+              context.goNamed(PathName.homePage);
             },
             icon: Transform.flip(
               flipX: true,
@@ -229,6 +229,14 @@ class _ChatPageState extends State<ChatPage> {
         break;
       }
     }
+    String? contentMedia;
+    if (conversation.lastMessage != null) {
+      final firstPart = conversation.lastMessage!.content.split("|")[0].trim();
+      if (firstPart.isNotEmpty) {
+        contentMedia = firstPart;
+      }
+    }
+
     return commonTileItemV2(
       onTap: () {
         if (conversation.isGroup) {
@@ -255,8 +263,7 @@ class _ChatPageState extends State<ChatPage> {
           conversation.isGroup
               ? conversation.conversationName ?? 'Unknown'
               : userContact.username ?? 'Unknown',
-      subtitle:
-          conversation.lastMessage?.content ?? 'Hãy gửi tin nhắn đầu tiên!',
+      subtitle: contentMedia ?? 'Hãy gửi tin nhắn đầu tiên!',
 
       margin: EdgeInsets.symmetric(vertical: 12),
     );

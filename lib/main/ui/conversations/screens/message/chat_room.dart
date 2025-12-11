@@ -375,6 +375,15 @@ class _ChatRoomState extends State<ChatRoom> {
     if (widget.conversation.isGroup) {
       isMe = msg.senderId == widget.userContact.id;
     }
+    String? contentMedia;
+    final firstPart = msg.content.split("|")[0].trim();
+
+    if (firstPart.isNotEmpty &&
+        firstPart != "Đã gửi 1 ảnh" &&
+        firstPart != "Đã gửi 1 video") {
+      contentMedia = firstPart;
+    }
+
     final width = MediaQuery.of(context).size.width;
     return Column(
       children: [
@@ -406,7 +415,7 @@ class _ChatRoomState extends State<ChatRoom> {
               Row(
                 children: [
                   if (!isMe) ...[
-                    _itemFile(msg.attachments![0]),
+                    _itemFile(msg.attachments![0], contentMedia),
                     const SizedBox(width: 8),
                   ],
                   IconButton.filledTonal(
@@ -439,7 +448,7 @@ class _ChatRoomState extends State<ChatRoom> {
                   ),
                   const SizedBox(width: 8),
                   isMe
-                      ? _itemFile(msg.attachments![0])
+                      ? _itemFile(msg.attachments![0], contentMedia)
                       : const SizedBox.shrink(),
                 ],
               )
@@ -521,7 +530,7 @@ class _ChatRoomState extends State<ChatRoom> {
     );
   }
 
-  Widget _itemFile(Attachment attachment) {
+  Widget _itemFile(Attachment attachment, String? contentMedia) {
     final media = Media(
       mediaType: attachment.fileType,
       mediaUrl: '${ApiEndPoints.DOMAIN}${attachment.fileUrl}',
@@ -551,7 +560,23 @@ class _ChatRoomState extends State<ChatRoom> {
         decoration: BoxDecoration(borderRadius: BorderRadius.circular(12)),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(12),
-          child: content,
+          child: Column(
+            children: [
+              Expanded(child: content),
+              if (contentMedia != null)
+                Container(
+                  width: double.infinity,
+                  alignment: Alignment.center,
+                  padding: const EdgeInsets.all(8),
+                  color: AppColors.gray20,
+                  child: Text(
+                    contentMedia,
+                    style: AppStyles.bodyRegular,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+            ],
+          ),
         ),
       ),
     );
