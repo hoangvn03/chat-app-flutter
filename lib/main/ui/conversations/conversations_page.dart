@@ -47,7 +47,23 @@ class _ChatPageState extends State<ChatPage> {
           backgroundColor: AppColors.white,
           surfaceTintColor: AppColors.white,
           title: GestureDetector(
-            onTap: () {},
+            onTap: () {
+              showDialog(
+                context: context,
+                barrierDismissible: false, // Bắt buộc user bấm OK
+                builder: (dialogContext) {
+                  return resultDialog(
+                    context: context,
+                    message: "Chức năng đang được phát triển",
+                    title: "Error",
+                    urlImage: AppImages.icWarning,
+                    isHideExit: true,
+                    onTap: () => context.pop(),
+                    isSuccess: false,
+                  );
+                },
+              );
+            },
             child: Row(
               children: [
                 Text(
@@ -77,7 +93,23 @@ class _ChatPageState extends State<ChatPage> {
           ),
           actions: [
             IconButton(
-              onPressed: () {},
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  barrierDismissible: false, // Bắt buộc user bấm OK
+                  builder: (dialogContext) {
+                    return resultDialog(
+                      context: context,
+                      message: "Chức năng đang được phát triển",
+                      title: "Error",
+                      urlImage: AppImages.icWarning,
+                      isHideExit: true,
+                      onTap: () => context.pop(),
+                      isSuccess: false,
+                    );
+                  },
+                );
+              },
               icon: SvgPicture.asset(AppImages.icSearch),
             ),
             BlocBuilder<ConversationsBloc, ConversationsState>(
@@ -128,12 +160,31 @@ class _ChatPageState extends State<ChatPage> {
                       children: [
                         _buildSearchBar(),
                         const SizedBox(height: 60),
-                        userNote(
-                          img:
-                              widget.currentUser.avatar ??
-                              'https://api.dicebear.com/7.x/avataaars/svg?seed=Bob',
-                          note: 'Bạn có gì mới vậy?',
-                          subTitle: 'Ghi chú của bạn',
+                        GestureDetector(
+                          onTap: () {
+                            showDialog(
+                              context: context,
+                              barrierDismissible: false, // Bắt buộc user bấm OK
+                              builder: (dialogContext) {
+                                return resultDialog(
+                                  context: context,
+                                  message: "Chức năng đang được phát triển",
+                                  title: "Error",
+                                  urlImage: AppImages.icWarning,
+                                  isHideExit: true,
+                                  onTap: () => context.pop(),
+                                  isSuccess: false,
+                                );
+                              },
+                            );
+                          },
+                          child: userNote(
+                            img:
+                                widget.currentUser.avatar ??
+                                'https://api.dicebear.com/7.x/avataaars/svg?seed=Bob',
+                            note: 'Bạn có gì mới vậy?',
+                            subTitle: 'Ghi chú của bạn',
+                          ),
                         ),
                         const SizedBox(height: 16),
                         _buildListMessage(state.data!.conversations, context),
@@ -158,19 +209,38 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   Widget _buildSearchBar() {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-      decoration: BoxDecoration(
-        color: AppColors.gray20,
-        borderRadius: const BorderRadius.all(Radius.circular(32)),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          SvgPicture.asset(AppImages.icAddHighlight),
-          const SizedBox(width: 16),
-          Text('Hỏi Meta AI hoặc tìm kiếm', style: AppStyles.title3Regular),
-        ],
+    return GestureDetector(
+      onTap: () {
+        showDialog(
+          context: context,
+          barrierDismissible: false, // Bắt buộc user bấm OK
+          builder: (dialogContext) {
+            return resultDialog(
+              context: context,
+              message: "Chức năng đang được phát triển",
+              title: "Error",
+              urlImage: AppImages.icWarning,
+              isHideExit: true,
+              onTap: () => context.pop(),
+              isSuccess: false,
+            );
+          },
+        );
+      },
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        decoration: BoxDecoration(
+          color: AppColors.gray20,
+          borderRadius: const BorderRadius.all(Radius.circular(32)),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            SvgPicture.asset(AppImages.icAddHighlight),
+            const SizedBox(width: 16),
+            Text('Hỏi Meta AI hoặc tìm kiếm', style: AppStyles.title3Regular),
+          ],
+        ),
       ),
     );
   }
@@ -182,9 +252,28 @@ class _ChatPageState extends State<ChatPage> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text('Tin nhắn', style: AppStyles.title2Bold),
-            Text(
-              'Tin nhắn đang chờ',
-              style: AppStyles.title2Bold.copyWith(color: AppColors.blue60),
+            GestureDetector(
+              onTap: () {
+                showDialog(
+                  context: context,
+                  barrierDismissible: false, // Bắt buộc user bấm OK
+                  builder: (dialogContext) {
+                    return resultDialog(
+                      context: context,
+                      message: "Chức năng đang được phát triển",
+                      title: "Error",
+                      urlImage: AppImages.icWarning,
+                      isHideExit: true,
+                      onTap: () => context.pop(),
+                      isSuccess: false,
+                    );
+                  },
+                );
+              },
+              child: Text(
+                'Tin nhắn đang chờ',
+                style: AppStyles.title2Bold.copyWith(color: AppColors.blue60),
+              ),
             ),
           ],
         ),

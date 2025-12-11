@@ -38,6 +38,21 @@ class EditInfomationGroup extends StatelessWidget {
         actions: [
           GestureDetector(
             onTap: () {
+              showDialog(
+                context: context,
+                barrierDismissible: false, // Bắt buộc user bấm OK
+                builder: (dialogContext) {
+                  return resultDialog(
+                    context: context,
+                    message: "Chức năng đang được phát triển",
+                    title: "Error",
+                    urlImage: AppImages.icWarning,
+                    isHideExit: true,
+                    onTap: () => context.pop(),
+                    isSuccess: false,
+                  );
+                },
+              );
               debugPrint('Tên nhóm mới: ${_groupNameController.text}');
             },
             child: Padding(

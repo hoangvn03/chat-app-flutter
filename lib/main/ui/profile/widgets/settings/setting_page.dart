@@ -81,7 +81,7 @@ class SettingPage extends StatelessWidget {
                         hintText: 'Tìm kiếm...',
                         enabled: true,
                       ),
-                      _buildLicenceMeta(),
+                      _buildLicenceMeta(context),
                       _buildHowToUseApp(),
                       _buildAuthAction(),
                     ],
@@ -135,7 +135,7 @@ class SettingPage extends StatelessWidget {
     );
   }
 
-  Widget _buildLicenceMeta() {
+  Widget _buildLicenceMeta(BuildContext context) {
     return _buildFunctionAccount(
       headerText: 'Tài khoản của bạn',
       isHideActionHeader: true,
@@ -166,6 +166,21 @@ class SettingPage extends StatelessWidget {
                   recognizer:
                       TapGestureRecognizer()
                         ..onTap = () {
+                          showDialog(
+                            context: context,
+                            barrierDismissible: false, // Bắt buộc user bấm OK
+                            builder: (dialogContext) {
+                              return resultDialog(
+                                context: context,
+                                message: "Chức năng đang được phát triển",
+                                title: "Error",
+                                urlImage: AppImages.icWarning,
+                                isHideExit: true,
+                                onTap: () => context.pop(),
+                                isSuccess: false,
+                              );
+                            },
+                          );
                           print('Người dùng đã bấm Tìm hiểu thêm');
                         },
                 ),
@@ -221,7 +236,23 @@ class SettingPage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               GestureDetector(
-                onTap: () {},
+                onTap: () {
+                  showDialog(
+                    context: context,
+                    barrierDismissible: false, // Bắt buộc user bấm OK
+                    builder: (dialogContext) {
+                      return resultDialog(
+                        context: context,
+                        message: "Chức năng đang được phát triển",
+                        title: "Error",
+                        urlImage: AppImages.icWarning,
+                        isHideExit: true,
+                        onTap: () => context.pop(),
+                        isSuccess: false,
+                      );
+                    },
+                  );
+                },
                 child: Text(
                   'Thêm tài khoản',
                   style: AppStyles.title2Regular.copyWith(
@@ -297,7 +328,23 @@ class SettingPage extends StatelessWidget {
               ),
               const SizedBox(height: 24),
               GestureDetector(
-                onTap: () {},
+                onTap: () {
+                  showDialog(
+                    context: context,
+                    barrierDismissible: false, // Bắt buộc user bấm OK
+                    builder: (dialogContext) {
+                      return resultDialog(
+                        context: context,
+                        message: "Chức năng đang được phát triển",
+                        title: "Error",
+                        urlImage: AppImages.icWarning,
+                        isHideExit: true,
+                        onTap: () => context.pop(),
+                        isSuccess: false,
+                      );
+                    },
+                  );
+                },
                 child: Text(
                   'Đăng xuất khỏi thiết bị',
                   style: AppStyles.title2Regular.copyWith(

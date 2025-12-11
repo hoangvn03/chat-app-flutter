@@ -130,17 +130,17 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   ) async {
     if (state is! ChatSuccess) return;
     try {
-      if (event.mediaFiles != null) {
-        _tempFilesSend.addAll(event.mediaFiles!);
-      } else if (event.files != null) {
-        _tempFilesPath.addAll(event.files!);
-      }
+      // Lưu file tạm để upload
+      if (event.mediaFiles != null) _tempFilesSend.addAll(event.mediaFiles!);
+      if (event.files != null) _tempFilesPath.addAll(event.files!);
 
       final params = {
         'conversation_id': event.conversationId,
         'content': event.message,
       };
       socketService.sendMessage(params);
+
+      // ❌ Không append message local, chờ server emit
     } catch (e) {
       emit(ChatFailure(e.toString()));
     }
@@ -157,11 +157,9 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
       final msg = event.message['message'] ?? event.message;
       List<Attachment> attachments = [];
 
-      // Logic upload file đính kèm nếu có
+      final conversationId = int.tryParse("${msg['conversation_id']}") ?? 0;
+      final messageId = int.tryParse("${msg['message_id']}") ?? 0;
       if (_tempFilesSend.isNotEmpty || _tempFilesPath.isNotEmpty) {
-        final conversationId = int.tryParse("${msg['conversation_id']}") ?? 0;
-        final messageId = int.tryParse("${msg['message_id']}") ?? 0;
-
         final uploadResult = await _uploadFileMessage(
           conversationId: conversationId,
           messageId: messageId,
@@ -172,11 +170,23 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
           emit(currentState.copyWith(statusMessage: uploadResult.errorMessage));
           return;
         }
+
         attachments = uploadResult.attachments ?? [];
+        await notifyFileUploaded(messageId, attachments);
         _clearTempFiles();
       }
-
-      // Parse MessageEntity
+      if (msg['attachments'] == null &&
+          (msg['content'] == "Đã gửi 1 ảnh" ||
+              msg['content'] == "Đã gửi 1 video" ||
+              msg['content'] == "Đã gửi 1 đoạn giọng nói")) {
+        return;
+      }
+      if (msg['attachments'] != null) {
+        final List rawAttachments = msg['attachments'] as List;
+        attachments =
+            rawAttachments.map((e) => Attachment.fromJson(e)).toList();
+      }
+      // Parse MessageEntity khi nhận từ server
       final message = MessageEntity(
         messageId: int.tryParse("${msg['message_id']}") ?? 0,
         conversationId: int.tryParse("${msg['conversation_id']}") ?? 0,
@@ -195,13 +205,62 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
         attachments: attachments,
       );
 
-      // Add to list strictly ensuring immutability
       final newMessages = List<MessageEntity>.from(currentState.messages)
         ..add(message);
       emit(currentState.copyWith(messages: newMessages, statusMessage: null));
     } catch (e) {
       emit(ChatFailure(e.toString()));
     }
+  }
+
+  Future<UploadResult> _uploadFileMessage({
+    required int conversationId,
+    required int messageId,
+  }) async {
+    try {
+      List<File> filesToUpload = [];
+
+      if (_tempFilesSend.isNotEmpty) {
+        // Convert AssetEntity to File
+        for (var asset in _tempFilesSend) {
+          final file = await asset.file;
+          if (file != null) filesToUpload.add(file);
+        }
+      } else if (_tempFilesPath.isNotEmpty) {
+        filesToUpload = _tempFilesPath;
+      }
+
+      if (filesToUpload.isEmpty) {
+        return UploadResult(attachments: []);
+      }
+
+      final url = '${ApiEndPoints.SENDFILE}/$messageId';
+      final res = await ApiUtil.postFiles(url: url, files: filesToUpload);
+
+      if (res.statusCode == 201) {
+        final data =
+            (res.body['data'] as List)
+                .map((e) => Attachment.fromJson(e))
+                .toList();
+        return UploadResult(attachments: data);
+      } else {
+        return UploadResult(
+          errorMessage: res.body['error']['message'] ?? 'Upload file failed',
+        );
+      }
+    } catch (e) {
+      return UploadResult(errorMessage: e.toString());
+    }
+  }
+
+  Future<void> notifyFileUploaded(
+    int messageId,
+    List<Attachment> attachments,
+  ) async {
+    socketService.socket.emit('file_uploaded', {
+      'message_id': messageId,
+      'attachments': attachments.map((a) => a.toJson()).toList(),
+    });
   }
 
   void _clearTempFiles() {
@@ -281,46 +340,6 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
         }).toList();
 
     emit(currentState.copyWith(messages: updatedMessages));
-  }
-
-  Future<UploadResult> _uploadFileMessage({
-    required int conversationId,
-    required int messageId,
-  }) async {
-    try {
-      List<File> filesToUpload = [];
-
-      if (_tempFilesSend.isNotEmpty) {
-        // Convert AssetEntity to File
-        for (var asset in _tempFilesSend) {
-          final file = await asset.file;
-          if (file != null) filesToUpload.add(file);
-        }
-      } else if (_tempFilesPath.isNotEmpty) {
-        filesToUpload = _tempFilesPath;
-      }
-
-      if (filesToUpload.isEmpty) {
-        return UploadResult(attachments: []);
-      }
-
-      final url = '${ApiEndPoints.SENDFILE}/$messageId';
-      final res = await ApiUtil.postFiles(url: url, files: filesToUpload);
-
-      if (res.statusCode == 201) {
-        final data =
-            (res.body['data'] as List)
-                .map((e) => Attachment.fromJson(e))
-                .toList();
-        return UploadResult(attachments: data);
-      } else {
-        return UploadResult(
-          errorMessage: res.body['error']['message'] ?? 'Upload file failed',
-        );
-      }
-    } catch (e) {
-      return UploadResult(errorMessage: e.toString());
-    }
   }
 
   @override

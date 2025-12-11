@@ -29,8 +29,7 @@ class SendMessage extends ChatEvent {
 
 class ReceiveMessage extends ChatEvent {
   final Map<String, dynamic> message;
-  List<AssetEntity>? files;
-  ReceiveMessage(this.message, {this.files});
+  ReceiveMessage(this.message);
 }
 
 class SendFilesMessage extends ChatEvent {

@@ -87,7 +87,25 @@ class _HomePageState extends State<HomePage> {
                         itemBuilder:
                             (context) => [
                               PopupMenuItem(
-                                onTap: () {},
+                                onTap: () {
+                                  showDialog(
+                                    context: context,
+                                    barrierDismissible:
+                                        false, // Bắt buộc user bấm OK
+                                    builder: (dialogContext) {
+                                      return resultDialog(
+                                        context: context,
+                                        message:
+                                            "Chức năng đang được phát triển",
+                                        title: "Error",
+                                        urlImage: AppImages.icWarning,
+                                        isHideExit: true,
+                                        onTap: () => context.pop(),
+                                        isSuccess: false,
+                                      );
+                                    },
+                                  );
+                                },
                                 child: Row(
                                   children: [
                                     SvgPicture.asset(AppImages.icPeople),
@@ -97,7 +115,25 @@ class _HomePageState extends State<HomePage> {
                                 ),
                               ),
                               PopupMenuItem(
-                                onTap: () {},
+                                onTap: () {
+                                                showDialog(
+                                    context: context,
+                                    barrierDismissible:
+                                        false, // Bắt buộc user bấm OK
+                                    builder: (dialogContext) {
+                                      return resultDialog(
+                                        context: context,
+                                        message:
+                                            "Chức năng đang được phát triển",
+                                        title: "Error",
+                                        urlImage: AppImages.icWarning,
+                                        isHideExit: true,
+                                        onTap: () => context.pop(),
+                                        isSuccess: false,
+                                      );
+                                    },
+                                  );
+                                },
                                 child: Row(
                                   children: [
                                     SvgPicture.asset(AppImages.icLike),
@@ -107,7 +143,25 @@ class _HomePageState extends State<HomePage> {
                                 ),
                               ),
                               PopupMenuItem(
-                                onTap: () {},
+                                onTap: () {
+                                                showDialog(
+                                    context: context,
+                                    barrierDismissible:
+                                        false, // Bắt buộc user bấm OK
+                                    builder: (dialogContext) {
+                                      return resultDialog(
+                                        context: context,
+                                        message:
+                                            "Chức năng đang được phát triển",
+                                        title: "Error",
+                                        urlImage: AppImages.icWarning,
+                                        isHideExit: true,
+                                        onTap: () => context.pop(),
+                                        isSuccess: false,
+                                      );
+                                    },
+                                  );
+                                },
                                 child: Row(
                                   children: [
                                     Expanded(

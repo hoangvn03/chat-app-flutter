@@ -80,7 +80,23 @@ class _UploadPostPageState extends State<UploadPostPage> {
 
               margin: const EdgeInsets.symmetric(vertical: 12),
               leadingWidget: const Icon(Icons.music_note, color: Colors.white),
-              onTap: () {},
+              onTap: () {              showDialog(
+                                    context: context,
+                                    barrierDismissible:
+                                        false, // Bắt buộc user bấm OK
+                                    builder: (dialogContext) {
+                                      return resultDialog(
+                                        context: context,
+                                        message:
+                                            "Chức năng đang được phát triển",
+                                        title: "Error",
+                                        urlImage: AppImages.icWarning,
+                                        isHideExit: true,
+                                        onTap: () => context.pop(),
+                                        isSuccess: false,
+                                      );
+                                    },
+                                  );},
             ),
             commonTileItemV2(
               title: 'Gắn thẻ người khác',
@@ -93,7 +109,23 @@ class _UploadPostPageState extends State<UploadPostPage> {
                 Icons.person_outline,
                 color: Colors.white,
               ),
-              onTap: () {},
+              onTap: () {              showDialog(
+                                    context: context,
+                                    barrierDismissible:
+                                        false, // Bắt buộc user bấm OK
+                                    builder: (dialogContext) {
+                                      return resultDialog(
+                                        context: context,
+                                        message:
+                                            "Chức năng đang được phát triển",
+                                        title: "Error",
+                                        urlImage: AppImages.icWarning,
+                                        isHideExit: true,
+                                        onTap: () => context.pop(),
+                                        isSuccess: false,
+                                      );
+                                    },
+                                  );},
             ),
             commonTileItemV2(
               title: 'Thêm vị trí',
@@ -106,7 +138,23 @@ class _UploadPostPageState extends State<UploadPostPage> {
                 Icons.location_on_outlined,
                 color: Colors.white,
               ),
-              onTap: () {},
+              onTap: () {              showDialog(
+                                    context: context,
+                                    barrierDismissible:
+                                        false, // Bắt buộc user bấm OK
+                                    builder: (dialogContext) {
+                                      return resultDialog(
+                                        context: context,
+                                        message:
+                                            "Chức năng đang được phát triển",
+                                        title: "Error",
+                                        urlImage: AppImages.icWarning,
+                                        isHideExit: true,
+                                        onTap: () => context.pop(),
+                                        isSuccess: false,
+                                      );
+                                    },
+                                  );},
             ),
 
             // 🔹 Mục có switch
@@ -147,7 +195,23 @@ class _UploadPostPageState extends State<UploadPostPage> {
                 'Người theo dõi',
                 style: AppStyles.bodyRegular.copyWith(color: Colors.grey),
               ),
-              onTap: () {},
+              onTap: () {              showDialog(
+                                    context: context,
+                                    barrierDismissible:
+                                        false, // Bắt buộc user bấm OK
+                                    builder: (dialogContext) {
+                                      return resultDialog(
+                                        context: context,
+                                        message:
+                                            "Chức năng đang được phát triển",
+                                        title: "Error",
+                                        urlImage: AppImages.icWarning,
+                                        isHideExit: true,
+                                        onTap: () => context.pop(),
+                                        isSuccess: false,
+                                      );
+                                    },
+                                  );},
             ),
             commonTileItemV2(
               title: 'Cũng chia sẻ trên...',
@@ -164,7 +228,23 @@ class _UploadPostPageState extends State<UploadPostPage> {
                 'Tắt  Mới',
                 style: AppStyles.bodyRegular.copyWith(color: Colors.grey),
               ),
-              onTap: () {},
+              onTap: () {              showDialog(
+                                    context: context,
+                                    barrierDismissible:
+                                        false, // Bắt buộc user bấm OK
+                                    builder: (dialogContext) {
+                                      return resultDialog(
+                                        context: context,
+                                        message:
+                                            "Chức năng đang được phát triển",
+                                        title: "Error",
+                                        urlImage: AppImages.icWarning,
+                                        isHideExit: true,
+                                        onTap: () => context.pop(),
+                                        isSuccess: false,
+                                      );
+                                    },
+                                  );},
             ),
             commonTileItemV2(
               title: 'Lựa chọn khác',
@@ -173,7 +253,23 @@ class _UploadPostPageState extends State<UploadPostPage> {
                 color: AppColors.white,
               ),
               leadingWidget: const Icon(Icons.more_horiz, color: Colors.white),
-              onTap: () {},
+              onTap: () {              showDialog(
+                                    context: context,
+                                    barrierDismissible:
+                                        false, // Bắt buộc user bấm OK
+                                    builder: (dialogContext) {
+                                      return resultDialog(
+                                        context: context,
+                                        message:
+                                            "Chức năng đang được phát triển",
+                                        title: "Error",
+                                        urlImage: AppImages.icWarning,
+                                        isHideExit: true,
+                                        onTap: () => context.pop(),
+                                        isSuccess: false,
+                                      );
+                                    },
+                                  );},
             ),
 
             // commonButton(text: 'Chia sẻ', onTap: () {},margin: EdgeInsets.zero),

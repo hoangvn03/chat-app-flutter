@@ -183,7 +183,25 @@ class _ProfilePageState extends State<ProfilePage>
                                         ),
                                       ),
                                       PopupMenuItem(
-                                        onTap: () {},
+                                        onTap: () {
+                                          showDialog(
+                                            context: context,
+                                            barrierDismissible:
+                                                false, // Bắt buộc user bấm OK
+                                            builder: (dialogContext) {
+                                              return resultDialog(
+                                                context: context,
+                                                message:
+                                                    "Chức năng đang được phát triển",
+                                                title: "Error",
+                                                urlImage: AppImages.icWarning,
+                                                isHideExit: true,
+                                                onTap: () => context.pop(),
+                                                isSuccess: false,
+                                              );
+                                            },
+                                          );
+                                        },
                                         child: ListTile(
                                           dense: true,
                                           leading: SvgPicture.asset(
@@ -203,7 +221,25 @@ class _ProfilePageState extends State<ProfilePage>
                                         ),
                                       ),
                                       PopupMenuItem(
-                                        onTap: () {},
+                                        onTap: () {
+                                          showDialog(
+                                            context: context,
+                                            barrierDismissible:
+                                                false, // Bắt buộc user bấm OK
+                                            builder: (dialogContext) {
+                                              return resultDialog(
+                                                context: context,
+                                                message:
+                                                    "Chức năng đang được phát triển",
+                                                title: "Error",
+                                                urlImage: AppImages.icWarning,
+                                                isHideExit: true,
+                                                onTap: () => context.pop(),
+                                                isSuccess: false,
+                                              );
+                                            },
+                                          );
+                                        },
                                         child: ListTile(
                                           dense: true,
                                           leading: SvgPicture.asset(
@@ -223,7 +259,25 @@ class _ProfilePageState extends State<ProfilePage>
                                         ),
                                       ),
                                       PopupMenuItem(
-                                        onTap: () {},
+                                        onTap: () {
+                                          showDialog(
+                                            context: context,
+                                            barrierDismissible:
+                                                false, // Bắt buộc user bấm OK
+                                            builder: (dialogContext) {
+                                              return resultDialog(
+                                                context: context,
+                                                message:
+                                                    "Chức năng đang được phát triển",
+                                                title: "Error",
+                                                urlImage: AppImages.icWarning,
+                                                isHideExit: true,
+                                                onTap: () => context.pop(),
+                                                isSuccess: false,
+                                              );
+                                            },
+                                          );
+                                        },
                                         child: ListTile(
                                           dense: true,
 
@@ -244,7 +298,25 @@ class _ProfilePageState extends State<ProfilePage>
                                         ),
                                       ),
                                       PopupMenuItem(
-                                        onTap: () {},
+                                        onTap: () {
+                                          showDialog(
+                                            context: context,
+                                            barrierDismissible:
+                                                false, // Bắt buộc user bấm OK
+                                            builder: (dialogContext) {
+                                              return resultDialog(
+                                                context: context,
+                                                message:
+                                                    "Chức năng đang được phát triển",
+                                                title: "Error",
+                                                urlImage: AppImages.icWarning,
+                                                isHideExit: true,
+                                                onTap: () => context.pop(),
+                                                isSuccess: false,
+                                              );
+                                            },
+                                          );
+                                        },
                                         child: ListTile(
                                           dense: true,
 
@@ -475,7 +547,25 @@ class _ProfilePageState extends State<ProfilePage>
                                         ),
                                       ),
                                       PopupMenuItem(
-                                        onTap: () {},
+                                        onTap: () {
+                                          showDialog(
+                                            context: context,
+                                            barrierDismissible:
+                                                false, // Bắt buộc user bấm OK
+                                            builder: (dialogContext) {
+                                              return resultDialog(
+                                                context: context,
+                                                message:
+                                                    "Chức năng đang được phát triển",
+                                                title: "Error",
+                                                urlImage: AppImages.icWarning,
+                                                isHideExit: true,
+                                                onTap: () => context.pop(),
+                                                isSuccess: false,
+                                              );
+                                            },
+                                          );
+                                        },
                                         child: ListTile(
                                           dense: true,
                                           leading: SvgPicture.asset(
@@ -495,7 +585,25 @@ class _ProfilePageState extends State<ProfilePage>
                                         ),
                                       ),
                                       PopupMenuItem(
-                                        onTap: () {},
+                                        onTap: () {
+                                          showDialog(
+                                            context: context,
+                                            barrierDismissible:
+                                                false, // Bắt buộc user bấm OK
+                                            builder: (dialogContext) {
+                                              return resultDialog(
+                                                context: context,
+                                                message:
+                                                    "Chức năng đang được phát triển",
+                                                title: "Error",
+                                                urlImage: AppImages.icWarning,
+                                                isHideExit: true,
+                                                onTap: () => context.pop(),
+                                                isSuccess: false,
+                                              );
+                                            },
+                                          );
+                                        },
                                         child: ListTile(
                                           dense: true,
                                           leading: SvgPicture.asset(
@@ -515,7 +623,25 @@ class _ProfilePageState extends State<ProfilePage>
                                         ),
                                       ),
                                       PopupMenuItem(
-                                        onTap: () {},
+                                        onTap: () {
+                                          showDialog(
+                                            context: context,
+                                            barrierDismissible:
+                                                false, // Bắt buộc user bấm OK
+                                            builder: (dialogContext) {
+                                              return resultDialog(
+                                                context: context,
+                                                message:
+                                                    "Chức năng đang được phát triển",
+                                                title: "Error",
+                                                urlImage: AppImages.icWarning,
+                                                isHideExit: true,
+                                                onTap: () => context.pop(),
+                                                isSuccess: false,
+                                              );
+                                            },
+                                          );
+                                        },
                                         child: ListTile(
                                           dense: true,
 
@@ -536,7 +662,25 @@ class _ProfilePageState extends State<ProfilePage>
                                         ),
                                       ),
                                       PopupMenuItem(
-                                        onTap: () {},
+                                        onTap: () {
+                                          showDialog(
+                                            context: context,
+                                            barrierDismissible:
+                                                false, // Bắt buộc user bấm OK
+                                            builder: (dialogContext) {
+                                              return resultDialog(
+                                                context: context,
+                                                message:
+                                                    "Chức năng đang được phát triển",
+                                                title: "Error",
+                                                urlImage: AppImages.icWarning,
+                                                isHideExit: true,
+                                                onTap: () => context.pop(),
+                                                isSuccess: false,
+                                              );
+                                            },
+                                          );
+                                        },
                                         child: ListTile(
                                           dense: true,
 
@@ -1107,13 +1251,45 @@ class _ProfilePageState extends State<ProfilePage>
                 text: 'Chia sẻ trang cá nhân',
                 maxLine: 1,
                 textStyle: AppStyles.bodyBold,
-                onTap: () {},
+                onTap: () {
+                  showDialog(
+                    context: context,
+                    barrierDismissible: false, // Bắt buộc user bấm OK
+                    builder: (dialogContext) {
+                      return resultDialog(
+                        context: context,
+                        message: "Chức năng đang được phát triển",
+                        title: "Error",
+                        urlImage: AppImages.icWarning,
+                        isHideExit: true,
+                        onTap: () => context.pop(),
+                        isSuccess: false,
+                      );
+                    },
+                  );
+                },
                 radius: 6,
                 color: AppColors.gray20,
               ),
             ),
             GestureDetector(
-              onTap: () {},
+              onTap: () {
+                showDialog(
+                  context: context,
+                  barrierDismissible: false, // Bắt buộc user bấm OK
+                  builder: (dialogContext) {
+                    return resultDialog(
+                      context: context,
+                      message: "Chức năng đang được phát triển",
+                      title: "Error",
+                      urlImage: AppImages.icWarning,
+                      isHideExit: true,
+                      onTap: () => context.pop(),
+                      isSuccess: false,
+                    );
+                  },
+                );
+              },
               child: Container(
                 margin: const EdgeInsets.only(left: 6),
                 padding: EdgeInsets.all(4),
@@ -1163,7 +1339,23 @@ class _ProfilePageState extends State<ProfilePage>
   Widget _buildEmptyPost(int page, bool isCurrientUser) {
     return !isCurrientUser
         ? GestureDetector(
-          onTap: () {},
+          onTap: () {
+            showDialog(
+              context: context,
+              barrierDismissible: false, // Bắt buộc user bấm OK
+              builder: (dialogContext) {
+                return resultDialog(
+                  context: context,
+                  message: "Chức năng đang được phát triển",
+                  title: "Error",
+                  urlImage: AppImages.icWarning,
+                  isHideExit: true,
+                  onTap: () => context.pop(),
+                  isSuccess: false,
+                );
+              },
+            );
+          },
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 64),
             child: Column(
@@ -1437,7 +1629,23 @@ class _ProfilePageState extends State<ProfilePage>
           ),
           const SizedBox(height: 24),
           GestureDetector(
-            onTap: () {},
+            onTap: () {
+              showDialog(
+                context: context,
+                barrierDismissible: false, // Bắt buộc user bấm OK
+                builder: (dialogContext) {
+                  return resultDialog(
+                    context: context,
+                    message: "Chức năng đang được phát triển",
+                    title: "Error",
+                    urlImage: AppImages.icWarning,
+                    isHideExit: true,
+                    onTap: () => context.pop(),
+                    isSuccess: false,
+                  );
+                },
+              );
+            },
             child: Padding(
               padding: const EdgeInsets.only(bottom: 24),
               child: Text(
@@ -1449,7 +1657,23 @@ class _ProfilePageState extends State<ProfilePage>
             ),
           ),
           GestureDetector(
-            onTap: () {},
+            onTap: () {
+              showDialog(
+                context: context,
+                barrierDismissible: false, // Bắt buộc user bấm OK
+                builder: (dialogContext) {
+                  return resultDialog(
+                    context: context,
+                    message: "Chức năng đang được phát triển",
+                    title: "Error",
+                    urlImage: AppImages.icWarning,
+                    isHideExit: true,
+                    onTap: () => context.pop(),
+                    isSuccess: false,
+                  );
+                },
+              );
+            },
             child: Padding(
               padding: const EdgeInsets.only(bottom: 24),
               child: Text(
@@ -1461,7 +1685,23 @@ class _ProfilePageState extends State<ProfilePage>
             ),
           ),
           GestureDetector(
-            onTap: () {},
+            onTap: () {
+              showDialog(
+                context: context,
+                barrierDismissible: false, // Bắt buộc user bấm OK
+                builder: (dialogContext) {
+                  return resultDialog(
+                    context: context,
+                    message: "Chức năng đang được phát triển",
+                    title: "Error",
+                    urlImage: AppImages.icWarning,
+                    isHideExit: true,
+                    onTap: () => context.pop(),
+                    isSuccess: false,
+                  );
+                },
+              );
+            },
             child: Padding(
               padding: const EdgeInsets.only(bottom: 24),
               child: Text(
@@ -1473,7 +1713,23 @@ class _ProfilePageState extends State<ProfilePage>
             ),
           ),
           GestureDetector(
-            onTap: () {},
+            onTap: () {
+              showDialog(
+                context: context,
+                barrierDismissible: false, // Bắt buộc user bấm OK
+                builder: (dialogContext) {
+                  return resultDialog(
+                    context: context,
+                    message: "Chức năng đang được phát triển",
+                    title: "Error",
+                    urlImage: AppImages.icWarning,
+                    isHideExit: true,
+                    onTap: () => context.pop(),
+                    isSuccess: false,
+                  );
+                },
+              );
+            },
             child: Padding(
               padding: const EdgeInsets.only(bottom: 24),
               child: Text(
@@ -1483,7 +1739,23 @@ class _ProfilePageState extends State<ProfilePage>
             ),
           ),
           GestureDetector(
-            onTap: () {},
+            onTap: () {
+              showDialog(
+                context: context,
+                barrierDismissible: false, // Bắt buộc user bấm OK
+                builder: (dialogContext) {
+                  return resultDialog(
+                    context: context,
+                    message: "Chức năng đang được phát triển",
+                    title: "Error",
+                    urlImage: AppImages.icWarning,
+                    isHideExit: true,
+                    onTap: () => context.pop(),
+                    isSuccess: false,
+                  );
+                },
+              );
+            },
             child: Padding(
               padding: const EdgeInsets.only(bottom: 24),
               child: Text(
@@ -1493,7 +1765,23 @@ class _ProfilePageState extends State<ProfilePage>
             ),
           ),
           GestureDetector(
-            onTap: () {},
+            onTap: () {
+              showDialog(
+                context: context,
+                barrierDismissible: false, // Bắt buộc user bấm OK
+                builder: (dialogContext) {
+                  return resultDialog(
+                    context: context,
+                    message: "Chức năng đang được phát triển",
+                    title: "Error",
+                    urlImage: AppImages.icWarning,
+                    isHideExit: true,
+                    onTap: () => context.pop(),
+                    isSuccess: false,
+                  );
+                },
+              );
+            },
             child: Padding(
               padding: const EdgeInsets.only(bottom: 24),
               child: Text(
@@ -1503,7 +1791,23 @@ class _ProfilePageState extends State<ProfilePage>
             ),
           ),
           GestureDetector(
-            onTap: () {},
+            onTap: () {
+              showDialog(
+                context: context,
+                barrierDismissible: false, // Bắt buộc user bấm OK
+                builder: (dialogContext) {
+                  return resultDialog(
+                    context: context,
+                    message: "Chức năng đang được phát triển",
+                    title: "Error",
+                    urlImage: AppImages.icWarning,
+                    isHideExit: true,
+                    onTap: () => context.pop(),
+                    isSuccess: false,
+                  );
+                },
+              );
+            },
             child: Padding(
               padding: const EdgeInsets.only(bottom: 24),
               child: Text(
@@ -1513,7 +1817,23 @@ class _ProfilePageState extends State<ProfilePage>
             ),
           ),
           GestureDetector(
-            onTap: () {},
+            onTap: () {
+              showDialog(
+                context: context,
+                barrierDismissible: false, // Bắt buộc user bấm OK
+                builder: (dialogContext) {
+                  return resultDialog(
+                    context: context,
+                    message: "Chức năng đang được phát triển",
+                    title: "Error",
+                    urlImage: AppImages.icWarning,
+                    isHideExit: true,
+                    onTap: () => context.pop(),
+                    isSuccess: false,
+                  );
+                },
+              );
+            },
             child: Padding(
               padding: const EdgeInsets.only(bottom: 24),
               child: Text(
@@ -1523,7 +1843,23 @@ class _ProfilePageState extends State<ProfilePage>
             ),
           ),
           GestureDetector(
-            onTap: () {},
+            onTap: () {
+              showDialog(
+                context: context,
+                barrierDismissible: false, // Bắt buộc user bấm OK
+                builder: (dialogContext) {
+                  return resultDialog(
+                    context: context,
+                    message: "Chức năng đang được phát triển",
+                    title: "Error",
+                    urlImage: AppImages.icWarning,
+                    isHideExit: true,
+                    onTap: () => context.pop(),
+                    isSuccess: false,
+                  );
+                },
+              );
+            },
             child: Padding(
               padding: const EdgeInsets.only(bottom: 24),
               child: Text(

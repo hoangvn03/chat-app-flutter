@@ -48,24 +48,6 @@ Future<void> initSocket() async {
     _socket.emit('send_message', params);
   }
 
-  /// Gửi tin nhắn file
-  void sendFileMessage(
-    int conversationId,
-    String fileUrl,
-    String fileName, {
-    String? type = 'file',
-  }) {
-    if (!isConnected) return;
-
-    _socket.emit('send_message', {
-      'conversation_id': conversationId,
-      'file_url': fileUrl,
-      'file_name': fileName,
-      'type': type,
-      'content': 'Đã gửi một file',
-    });
-  }
-
   /// Khi user bắt đầu gõ
   void startTyping(int conversationId) {
     log('⚠️ user_typing : ');

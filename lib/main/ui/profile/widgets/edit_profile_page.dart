@@ -193,7 +193,21 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     const SizedBox(height: 12),
                     GestureDetector(
                       onTap: () {
-                        // TODO: Chọn ảnh đại diện
+                        showDialog(
+                          context: context,
+                          barrierDismissible: false, // Bắt buộc user bấm OK
+                          builder: (dialogContext) {
+                            return resultDialog(
+                              context: context,
+                              message: "Chức năng đang được phát triển",
+                              title: "Error",
+                              urlImage: AppImages.icWarning,
+                              isHideExit: true,
+                              onTap: () => context.pop(),
+                              isSuccess: false,
+                            );
+                          },
+                        );
                       },
                       child: const Text(
                         "Đổi ảnh đại diện",
@@ -227,7 +241,23 @@ class _EditProfilePageState extends State<EditProfilePage> {
                         style: TextStyle(color: Colors.grey),
                       ),
                       trailing: const Icon(Icons.chevron_right),
-                      onTap: () {},
+                      onTap: () {
+                        showDialog(
+                          context: context,
+                          barrierDismissible: false, // Bắt buộc user bấm OK
+                          builder: (dialogContext) {
+                            return resultDialog(
+                              context: context,
+                              message: "Chức năng đang được phát triển",
+                              title: "Error",
+                              urlImage: AppImages.icWarning,
+                              isHideExit: true,
+                              onTap: () => context.pop(),
+                              isSuccess: false,
+                            );
+                          },
+                        );
+                      },
                     ),
 
                     const SizedBox(height: 8),
@@ -367,12 +397,73 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   },
                 ),
 
-                _item(Icons.facebook, "Nhập từ Facebook", onTap: () {}),
-                _item(Icons.camera_alt, "Chụp ảnh", onTap: () {}),
+                _item(
+                  Icons.facebook,
+                  "Nhập từ Facebook",
+                  onTap: () {
+                    showDialog(
+                      context: context,
+                      barrierDismissible: false, // Bắt buộc user bấm OK
+                      builder: (dialogContext) {
+                        return resultDialog(
+                          context: context,
+                          message: "Chức năng đang được phát triển",
+                          title: "Error",
+                          urlImage: AppImages.icWarning,
+                          isHideExit: true,
+                          onTap: () => context.pop(),
+                          isSuccess: false,
+                        );
+                      },
+                    );
+                  },
+                ),
+                _item(
+                  Icons.camera_alt,
+                  "Chụp ảnh",
+                  onTap: () {
+                    showDialog(
+                      context: context,
+                      barrierDismissible: false, // Bắt buộc user bấm OK
+                      builder: (dialogContext) {
+                        return resultDialog(
+                          context: context,
+                          message: "Chức năng đang được phát triển",
+                          title: "Error",
+                          urlImage: AppImages.icWarning,
+                          isHideExit: true,
+                          onTap: () => context.pop(),
+                          isSuccess: false,
+                        );
+                      },
+                    );
+                  },
+                ),
 
                 const SizedBox(height: 4),
 
-                _item(Icons.delete, "Xóa", color: Colors.red, onTap: () {}),
+                _item(
+                  Icons.delete,
+                  "Xóa",
+                  color: Colors.red,
+                  onTap: () {
+                    showDialog(
+                      context: context,
+                      barrierDismissible: false, // Bắt buộc user bấm OK
+                      builder: (dialogContext) {
+                        return resultDialog(
+                          context: context,
+                          message: "Chức năng đang được phát triển",
+                          title: "Error",
+                          urlImage: AppImages.icWarning,
+                          isHideExit: true,
+                          onTap: () => context.pop(),
+                          isSuccess: false,
+                        );
+                      },
+                    );
+                  },
+                ),
 
                 const SizedBox(height: 16),
 

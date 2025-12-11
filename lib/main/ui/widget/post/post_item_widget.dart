@@ -263,32 +263,47 @@ class PostWidget extends StatelessWidget {
                 ),
               ),
               SizedBox(width: 4),
-              Text(
-                '$shareCount',
-                style: AppStyles.calloutBold,
-              ), // Sửa thành comments count
+              // Text(
+              //   '$shareCount',
+              //   style: AppStyles.calloutBold,
+              // ), // Sửa thành comments count
               Spacer(),
               interactionButton(
                 type: InteractionType.save,
                 onTapState1: () {
-                  showModalBottomSheet(
+                  showDialog(
                     context: con,
-                    useSafeArea: true,
-                    useRootNavigator: true,
-                    isScrollControlled: true,
-                    shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.vertical(
-                        top: Radius.circular(16),
-                      ),
-                    ),
-                    builder: (context) {
-                      return CommentWidget(
-                        textController: _commetController,
-                        postId: post.postId ?? -1,
-                        postModel: post,
+                    barrierDismissible: false, // Bắt buộc user bấm OK
+                    builder: (dialogContext) {
+                      return resultDialog(
+                        context: con,
+                        message: "Chức năng đang được phát triển",
+                        title: "Error",
+                        urlImage: AppImages.icWarning,
+                        isHideExit: true,
+                        onTap: () => con.pop(),
+                        isSuccess: false,
                       );
                     },
                   );
+                  // showModalBottomSheet(
+                  //   context: con,
+                  //   useSafeArea: true,
+                  //   useRootNavigator: true,
+                  //   isScrollControlled: true,
+                  //   shape: const RoundedRectangleBorder(
+                  //     borderRadius: BorderRadius.vertical(
+                  //       top: Radius.circular(16),
+                  //     ),
+                  //   ),
+                  //   builder: (context) {
+                  //     return CommentWidget(
+                  //       textController: _commetController,
+                  //       postId: post.postId ?? -1,
+                  //       postModel: post,
+                  //     );
+                  //   },
+                  // );
                 },
               ),
 
@@ -433,7 +448,23 @@ class PostWidget extends StatelessWidget {
           ),
           const SizedBox(height: 24),
           GestureDetector(
-            onTap: () {},
+            onTap: () {
+              showDialog(
+                context: context,
+                barrierDismissible: false, // Bắt buộc user bấm OK
+                builder: (dialogContext) {
+                  return resultDialog(
+                    context: context,
+                    message: "Chức năng đang được phát triển",
+                    title: "Error",
+                    urlImage: AppImages.icWarning,
+                    isHideExit: true,
+                    onTap: () => context.pop(),
+                    isSuccess: false,
+                  );
+                },
+              );
+            },
             child: Padding(
               padding: const EdgeInsets.only(bottom: 24),
               child: Text(
@@ -445,7 +476,23 @@ class PostWidget extends StatelessWidget {
             ),
           ),
           GestureDetector(
-            onTap: () {},
+            onTap: () {
+              showDialog(
+                context: context,
+                barrierDismissible: false, // Bắt buộc user bấm OK
+                builder: (dialogContext) {
+                  return resultDialog(
+                    context: context,
+                    message: "Chức năng đang được phát triển",
+                    title: "Error",
+                    urlImage: AppImages.icWarning,
+                    isHideExit: true,
+                    onTap: () => context.pop(),
+                    isSuccess: false,
+                  );
+                },
+              );
+            },
             child: Padding(
               padding: const EdgeInsets.only(bottom: 24),
               child: Text(
@@ -457,7 +504,23 @@ class PostWidget extends StatelessWidget {
             ),
           ),
           GestureDetector(
-            onTap: () {},
+            onTap: () {
+              showDialog(
+                context: context,
+                barrierDismissible: false, // Bắt buộc user bấm OK
+                builder: (dialogContext) {
+                  return resultDialog(
+                    context: context,
+                    message: "Chức năng đang được phát triển",
+                    title: "Error",
+                    urlImage: AppImages.icWarning,
+                    isHideExit: true,
+                    onTap: () => context.pop(),
+                    isSuccess: false,
+                  );
+                },
+              );
+            },
             child: Padding(
               padding: const EdgeInsets.only(bottom: 24),
               child: Text(
@@ -469,7 +532,23 @@ class PostWidget extends StatelessWidget {
             ),
           ),
           GestureDetector(
-            onTap: () {},
+            onTap: () {
+              showDialog(
+                context: context,
+                barrierDismissible: false, // Bắt buộc user bấm OK
+                builder: (dialogContext) {
+                  return resultDialog(
+                    context: context,
+                    message: "Chức năng đang được phát triển",
+                    title: "Error",
+                    urlImage: AppImages.icWarning,
+                    isHideExit: true,
+                    onTap: () => context.pop(),
+                    isSuccess: false,
+                  );
+                },
+              );
+            },
             child: Padding(
               padding: const EdgeInsets.only(bottom: 24),
               child: Text(
@@ -479,7 +558,23 @@ class PostWidget extends StatelessWidget {
             ),
           ),
           GestureDetector(
-            onTap: () {},
+            onTap: () {
+              showDialog(
+                context: context,
+                barrierDismissible: false, // Bắt buộc user bấm OK
+                builder: (dialogContext) {
+                  return resultDialog(
+                    context: context,
+                    message: "Chức năng đang được phát triển",
+                    title: "Error",
+                    urlImage: AppImages.icWarning,
+                    isHideExit: true,
+                    onTap: () => context.pop(),
+                    isSuccess: false,
+                  );
+                },
+              );
+            },
             child: Padding(
               padding: const EdgeInsets.only(bottom: 24),
               child: Text(
@@ -489,7 +584,23 @@ class PostWidget extends StatelessWidget {
             ),
           ),
           GestureDetector(
-            onTap: () {},
+            onTap: () {
+              showDialog(
+                context: context,
+                barrierDismissible: false, // Bắt buộc user bấm OK
+                builder: (dialogContext) {
+                  return resultDialog(
+                    context: context,
+                    message: "Chức năng đang được phát triển",
+                    title: "Error",
+                    urlImage: AppImages.icWarning,
+                    isHideExit: true,
+                    onTap: () => context.pop(),
+                    isSuccess: false,
+                  );
+                },
+              );
+            },
             child: Padding(
               padding: const EdgeInsets.only(bottom: 24),
               child: Text(
@@ -499,7 +610,23 @@ class PostWidget extends StatelessWidget {
             ),
           ),
           GestureDetector(
-            onTap: () {},
+            onTap: () {
+              showDialog(
+                context: context,
+                barrierDismissible: false, // Bắt buộc user bấm OK
+                builder: (dialogContext) {
+                  return resultDialog(
+                    context: context,
+                    message: "Chức năng đang được phát triển",
+                    title: "Error",
+                    urlImage: AppImages.icWarning,
+                    isHideExit: true,
+                    onTap: () => context.pop(),
+                    isSuccess: false,
+                  );
+                },
+              );
+            },
             child: Padding(
               padding: const EdgeInsets.only(bottom: 24),
               child: Text(
@@ -509,7 +636,23 @@ class PostWidget extends StatelessWidget {
             ),
           ),
           GestureDetector(
-            onTap: () {},
+            onTap: () {
+              showDialog(
+                context: context,
+                barrierDismissible: false, // Bắt buộc user bấm OK
+                builder: (dialogContext) {
+                  return resultDialog(
+                    context: context,
+                    message: "Chức năng đang được phát triển",
+                    title: "Error",
+                    urlImage: AppImages.icWarning,
+                    isHideExit: true,
+                    onTap: () => context.pop(),
+                    isSuccess: false,
+                  );
+                },
+              );
+            },
             child: Padding(
               padding: const EdgeInsets.only(bottom: 24),
               child: Text(
@@ -519,7 +662,23 @@ class PostWidget extends StatelessWidget {
             ),
           ),
           GestureDetector(
-            onTap: () {},
+            onTap: () {
+              showDialog(
+                context: context,
+                barrierDismissible: false, // Bắt buộc user bấm OK
+                builder: (dialogContext) {
+                  return resultDialog(
+                    context: context,
+                    message: "Chức năng đang được phát triển",
+                    title: "Error",
+                    urlImage: AppImages.icWarning,
+                    isHideExit: true,
+                    onTap: () => context.pop(),
+                    isSuccess: false,
+                  );
+                },
+              );
+            },
             child: Padding(
               padding: const EdgeInsets.only(bottom: 24),
               child: Text(

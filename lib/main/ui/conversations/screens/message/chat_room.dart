@@ -190,7 +190,23 @@ class _ChatRoomState extends State<ChatRoom> {
       ),
       actions: [
         IconButton(
-          onPressed: () {},
+          onPressed: () {
+            showDialog(
+              context: context,
+              barrierDismissible: false, // Bắt buộc user bấm OK
+              builder: (dialogContext) {
+                return resultDialog(
+                  context: context,
+                  message: "Chức năng đang được phát triển",
+                  title: "Error",
+                  urlImage: AppImages.icWarning,
+                  isHideExit: true,
+                  onTap: () => context.pop(),
+                  isSuccess: false,
+                );
+              },
+            );
+          },
           icon: SvgPicture.asset(AppImages.icSearch),
         ),
         const SizedBox(width: 8),
@@ -327,19 +343,38 @@ class _ChatRoomState extends State<ChatRoom> {
           items
               .map(
                 (e) => Expanded(
-                  child: Column(
-                    children: [
-                      SvgPicture.asset(e['icon']!, width: 32, height: 32),
-                      const SizedBox(height: 8),
-                      SizedBox(
-                        width: 68,
-                        child: Text(
-                          e['text']!,
-                          style: AppStyles.bodyRegular,
-                          textAlign: TextAlign.center,
+                  child: InkWell(
+                    onTap: () {
+                      showDialog(
+                        context: context,
+                        barrierDismissible: false, // Bắt buộc user bấm OK
+                        builder: (dialogContext) {
+                          return resultDialog(
+                            context: context,
+                            message: "Chức năng đang được phát triển",
+                            title: "Error",
+                            urlImage: AppImages.icWarning,
+                            isHideExit: true,
+                            onTap: () => context.pop(),
+                            isSuccess: false,
+                          );
+                        },
+                      );
+                    },
+                    child: Column(
+                      children: [
+                        SvgPicture.asset(e['icon']!, width: 32, height: 32),
+                        const SizedBox(height: 8),
+                        SizedBox(
+                          width: 68,
+                          child: Text(
+                            e['text']!,
+                            style: AppStyles.bodyRegular,
+                            textAlign: TextAlign.center,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               )
@@ -585,7 +620,23 @@ class _ChatRoomState extends State<ChatRoom> {
         );
       },
       leadingIcon: IconButton.filledTonal(
-        onPressed: () {},
+        onPressed: () {
+          showDialog(
+            context: context,
+            barrierDismissible: false, // Bắt buộc user bấm OK
+            builder: (dialogContext) {
+              return resultDialog(
+                context: context,
+                message: "Chức năng đang được phát triển",
+                title: "Error",
+                urlImage: AppImages.icWarning,
+                isHideExit: true,
+                onTap: () => context.pop(),
+                isSuccess: false,
+              );
+            },
+          );
+        },
         icon: SvgPicture.asset(AppImages.icCameraDark, color: AppColors.white),
         style: IconButton.styleFrom(
           backgroundColor: AppColors.blue60.withOpacity(0.6),
@@ -600,7 +651,23 @@ class _ChatRoomState extends State<ChatRoom> {
         ),
       ),
       onPressPrefixIcon: IconButton.filledTonal(
-        onPressed: () {},
+        onPressed: () {
+          showDialog(
+            context: context,
+            barrierDismissible: false, // Bắt buộc user bấm OK
+            builder: (dialogContext) {
+              return resultDialog(
+                context: context,
+                message: "Chức năng đang được phát triển",
+                title: "Error",
+                urlImage: AppImages.icWarning,
+                isHideExit: true,
+                onTap: () => context.pop(),
+                isSuccess: false,
+              );
+            },
+          );
+        },
         icon: SvgPicture.asset(AppImages.icSearch, color: AppColors.black),
         style: IconButton.styleFrom(
           backgroundColor: AppColors.white.withOpacity(0.6),
@@ -684,7 +751,23 @@ class _ChatRoomState extends State<ChatRoom> {
             ),
             const SizedBox(width: 12),
             GestureDetector(
-              onTap: () {},
+              onTap: () {
+                showDialog(
+                  context: context,
+                  barrierDismissible: false, // Bắt buộc user bấm OK
+                  builder: (dialogContext) {
+                    return resultDialog(
+                      context: context,
+                      message: "Chức năng đang được phát triển",
+                      title: "Error",
+                      urlImage: AppImages.icWarning,
+                      isHideExit: true,
+                      onTap: () => context.pop(),
+                      isSuccess: false,
+                    );
+                  },
+                );
+              },
               child: SvgPicture.asset(
                 AppImages.icStickers,
                 width: 24,
