@@ -152,47 +152,6 @@ class ShareBottomSheet extends StatelessWidget {
                   const Divider(color: Colors.grey, thickness: 0.2),
                   const SizedBox(height: 10),
                   _buildShareTextField(),
-                  // 4. Hàng nút chức năng bên dưới (Action Row)
-                  //   SingleChildScrollView(
-                  //     scrollDirection: Axis.horizontal,
-                  //     padding: const EdgeInsets.symmetric(horizontal: 16),
-                  //     child: Row(
-                  //       crossAxisAlignment: CrossAxisAlignment.start,
-                  //       children: [
-                  //         _buildActionButton(
-                  //           icon: Icons.add_circle_outline,
-                  //           label: "Thêm vào\ntin",
-                  //           color: Colors.grey[800]!,
-                  //         ),
-                  //         const SizedBox(width: 20),
-                  //         _buildActionButton(
-                  //           icon: Icons.chat_bubble,
-                  //           label: "WhatsApp",
-                  //           color: const Color(0xFF25D366),
-                  //           iconColor: Colors.white,
-                  //         ),
-                  //         const SizedBox(width: 20),
-                  //         _buildActionButton(
-                  //           icon: Icons.timelapse,
-                  //           label: "Trạng thái\nWhatsApp",
-                  //           color: const Color(0xFF25D366),
-                  //           iconColor: Colors.white,
-                  //         ),
-                  //         const SizedBox(width: 20),
-                  //         _buildActionButton(
-                  //           icon: Icons.share_outlined,
-                  //           label: "Chia sẻ",
-                  //           color: Colors.grey[800]!,
-                  //         ),
-                  //         const SizedBox(width: 20),
-                  //         _buildActionButton(
-                  //           icon: Icons.link,
-                  //           label: "Sao chép\nliên kết",
-                  //           color: Colors.grey[800]!,
-                  //         ),
-                  //       ],
-                  //     ),
-                  //   ),
                 ],
               ),
             );
@@ -246,7 +205,6 @@ class ShareBottomSheet extends StatelessWidget {
     });
   }
 
-  // Widget con: Hiển thị từng người dùng
   Widget _buildUserItem(
     Conversation conversation,
     UserModel user,
@@ -333,35 +291,6 @@ class ShareBottomSheet extends StatelessWidget {
     );
   }
 
-  // Widget con: Nút chức năng tròn bên dưới
-  Widget _buildActionButton({
-    required IconData icon,
-    required String label,
-    required Color color,
-    Color iconColor = Colors.white,
-  }) {
-    return Column(
-      children: [
-        Container(
-          width: 55,
-          height: 55,
-          decoration: BoxDecoration(
-            color: color,
-            shape: BoxShape.circle,
-            border: Border.all(color: Colors.grey.withOpacity(0.2)),
-          ),
-          child: Icon(icon, color: iconColor, size: 28),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          label,
-          textAlign: TextAlign.center,
-          style: const TextStyle(color: Colors.white, fontSize: 11),
-        ),
-      ],
-    );
-  }
-
   Widget _buildShareTextField() {
     return BlocBuilder<ConversationsBloc, ConversationsState>(
       builder: (context, state) {
@@ -394,7 +323,10 @@ class ShareBottomSheet extends StatelessWidget {
                     SendMessage(
                       state.selectedConversationId!,
                       _shareController.text,
-                      mediaItem.map((e) => e.mediaUrl!).toList(),
+                      mediaItem.map((e) {
+                        print('MediaItem - Gửi media URL: ${e.mediaUrl!}');
+                        return e.mediaUrl!;
+                      }).toList(),
                     ),
                   );
                 }

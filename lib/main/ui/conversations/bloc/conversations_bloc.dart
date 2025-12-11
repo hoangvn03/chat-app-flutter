@@ -92,7 +92,7 @@ class ConversationsBloc extends Bloc<ConversationsEvent, ConversationsState> {
       };
 
       final res = await ApiUtil.post(url: url, data: params);
-
+      print("MediaItem - Gửi URL Event:${event.paths[0]}");
       if (res.statusCode == 201) {
         final data = MessageEntity.fromJson(res.body['data']['message']);
         add(ShareMediaFile(event.paths, data.messageId));
@@ -131,7 +131,7 @@ class ConversationsBloc extends Bloc<ConversationsEvent, ConversationsState> {
     List<File> files = await urlListToFileList(event.paths);
     final url = '${ApiEndPoints.SENDFILE}/${event.messageId}';
     final res = await ApiUtil.postFiles(url: url, files: files);
-
+    print("File upload response status: ${files[0].path}");
     if (res.statusCode == 201) {
       final data =
           (res.body['data'] as List)

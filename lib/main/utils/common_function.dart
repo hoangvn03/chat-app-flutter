@@ -115,26 +115,29 @@ Future<List<File>> uint8ListListToFileList(
 
   return files;
 }
-Future<File> urlToFile(String imageUrl) async {
-  // Tải dữ liệu từ URL
-  final response = await http.get(Uri.parse(imageUrl));
+
+Future<File> urlToFile(String mediaUrl) async {
+  final response = await http.get(Uri.parse(mediaUrl));
 
   if (response.statusCode != 200) {
-    throw Exception("Không tải được ảnh từ URL");
+    throw Exception("Không tải được media từ URL");
   }
 
-  // Lấy thư mục tạm
   final tempDir = await getTemporaryDirectory();
-  final filePath = '${tempDir.path}/${DateTime.now().millisecondsSinceEpoch}.png';
 
-  // Tạo file
+  // Lấy extension từ URL
+  final uri = Uri.parse(mediaUrl);
+  final extension = uri.path.split('.').last; // png, jpg, mp4, mov...
+
+  final filePath =
+      '${tempDir.path}/${DateTime.now().millisecondsSinceEpoch}.$extension';
+
   final file = File(filePath);
-
-  // Ghi bytes vào file
   await file.writeAsBytes(response.bodyBytes);
 
   return file;
 }
+
 String formatDuration(int milliseconds) {
   final seconds = (milliseconds / 1000).truncate();
   final minutes = (seconds ~/ 60).toString().padLeft(2, '0');
