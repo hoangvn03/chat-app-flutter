@@ -207,6 +207,101 @@ class ApiUtil {
     }
   }
 
+  static Future<dynamic> putV2(
+    String url, {
+    Map<String, dynamic>? data,
+    List<File>? files,
+    bool isFormData = false,
+  }) async {
+    try {
+      final token = await AppStorage.getToken();
+
+      if (!isFormData) {
+        // Gửi JSON
+        debugPrint("======== PUT JSON REQUEST ========");
+        debugPrint("URL: $url");
+        debugPrint(
+          "Headers: ${{"Authorization": "Bearer $token", "Content-Type": "application/json"}}",
+        );
+        debugPrint("Body: ${jsonEncode(data)}");
+        debugPrint("================================");
+
+        final response = await http.put(
+          Uri.parse(url),
+          headers: {
+            "Authorization": "Bearer $token",
+            "Content-Type": "application/json",
+          },
+          body: jsonEncode(data ?? {}),
+        );
+
+        debugPrint(
+          '📥 RESPONSE JSON: ${response.statusCode} | ${response.body}',
+        );
+        return _handleResponse(response);
+      } else {
+        // Gửi FormData
+        debugPrint("======== PUT FORM-DATA REQUEST ========");
+        debugPrint("URL: $url");
+        debugPrint("Headers: ${{"Authorization": "Bearer $token"}}");
+        debugPrint("Fields: $data");
+        debugPrint("Files: ${files?.map((f) => f.path).toList()}");
+        debugPrint("======================================");
+
+        final request = http.MultipartRequest("PUT", Uri.parse(url));
+        request.headers["Authorization"] = "Bearer $token";
+
+        // Thêm các field
+        data?.forEach((key, value) {
+          if (value is String) {
+            request.fields[key] = value;
+          } else {
+            request.fields[key] = value.toString();
+          }
+        });
+
+        // Thêm file (chỉ 1 file avatar)
+        if (files != null && files.isNotEmpty) {
+          final file = files[0]; // lấy file đầu tiên
+          final fileName = file.path.split('/').last;
+
+          // Xác định MIME type theo extension
+          final ext = fileName.split('.').last.toLowerCase();
+          String mimeType;
+          if (ext == 'jpg' || ext == 'jpeg') {
+            mimeType = 'image/jpeg';
+          } else if (ext == 'png') {
+            mimeType = 'image/png';
+          } else {
+            throw Exception('Only JPEG/PNG images allowed');
+          }
+
+          request.files.add(
+            await http.MultipartFile.fromPath(
+              'avatar', // key đúng backend
+              file.path,
+              filename: fileName,
+              contentType: MediaType(
+                mimeType.split('/')[0],
+                mimeType.split('/')[1],
+              ),
+            ),
+          );
+        }
+
+        final streamedResponse = await request.send();
+        final response = await http.Response.fromStream(streamedResponse);
+        debugPrint(
+          '📥 RESPONSE FORM-DATA: ${response.statusCode} | ${response.body}',
+        );
+        return _handleResponse(response);
+      }
+    } catch (e) {
+      debugPrint('❌ PUT error: $e');
+      rethrow;
+    }
+  }
+
   static Future<dynamic> delete(String url) async {
     try {
       final uri = Uri.parse(url);

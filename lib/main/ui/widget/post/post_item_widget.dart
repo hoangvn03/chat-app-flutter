@@ -44,10 +44,15 @@ class PostWidget extends StatelessWidget {
             commonTileItem(
               title: post.author!.username ?? 'Unknown',
               subtitle: formatDateTimeV2(post.updatedAt),
-              imageLeading: SvgPicture.network(
+              imageLeading: buildNetworkImage(
                 post.author!.avatar ??
                     'https://api.dicebear.com/7.x/avataaars/svg?seed=Alice',
+                32,
               ),
+              // SvgPicture.network(
+              //   post.author!.avatar ??
+              //       'https://api.dicebear.com/7.x/avataaars/svg?seed=Alice',
+              // ),
               titleWidget: GestureDetector(
                 onTap: () {
                   if (post.author?.id == userId) {

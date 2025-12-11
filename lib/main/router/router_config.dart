@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:chat_app/main.dart';
 import 'package:chat_app/main/main_page.dart';
 import 'package:chat_app/main/networks/model/converation.dart';
 import 'package:chat_app/main/networks/model/message.dart';
@@ -22,6 +23,8 @@ import 'package:chat_app/main/ui/home/widgets/upload_post_page.dart';
 import 'package:chat_app/main/ui/notification/notification_page.dart';
 import 'package:chat_app/main/ui/personal/personal_page.dart';
 import 'package:chat_app/main/ui/post/post_page.dart';
+import 'package:chat_app/main/ui/profile/bloc/profile_bloc.dart';
+import 'package:chat_app/main/ui/profile/widgets/choose_avatar_page.dart';
 import 'package:chat_app/main/ui/profile/widgets/edit_profile_page.dart';
 import 'package:chat_app/main/ui/profile/widgets/profile_list_user.dart';
 import 'package:chat_app/main/ui/profile/profile_page.dart';
@@ -30,6 +33,7 @@ import 'package:chat_app/main/ui/reels/widgets/camera/camera_page.dart';
 import 'package:chat_app/main/ui/reels/widgets/create_storys/create_reels_page.dart';
 import 'package:chat_app/main/ui/reels/widgets/create_storys/widgets/edit_element_media.dart';
 import 'package:chat_app/main/ui/reels/story/list_story/list_reels_page.dart';
+import 'package:chat_app/main/ui/reels/widgets/media_picked/bloc/media_picked_bloc.dart';
 import 'package:chat_app/main/ui/reels/widgets/media_picked/media_picked_page.dart';
 import 'package:chat_app/main/ui/reels/reels_page.dart';
 import 'package:chat_app/main/ui/search/search_page.dart';
@@ -62,6 +66,7 @@ class AppGoRouter {
   static final GoRouter _goRouter = GoRouter(
     initialLocation: AppPath.loginPage,
     navigatorKey: _rootNavigatorKey,
+    refreshListenable: refreshNotifier, // ⚡ đây là key
     debugLogDiagnostics: true,
     redirect: (context, state) async {
       final isLoggedIn = await AppStorage.getIsLogin();
@@ -142,7 +147,9 @@ class AppGoRouter {
             ],
             pageBuilder: (context, state) {
               final data = state.extra as List;
-              return slidePage(ChatRoom(conversation: data[0], userContact: data[1],));
+              return slidePage(
+                ChatRoom(conversation: data[0], userContact: data[1]),
+              );
             },
           ),
         ],
@@ -236,6 +243,26 @@ class AppGoRouter {
           return MediaPickedPage();
         },
       ),
+      GoRoute(
+        name: PathName.chooseAvatarPage,
+        path: AppPath.chooseAvatarPage,
+        builder: (context, state) {
+          final data = state.extra as Map?;
+
+          final mediaBloc = data?["mediaBloc"] as MediaPickedBloc?;
+          final profileBloc = data?["profileBloc"] as ProfileBloc?;
+          final user = data?["user"] as UserModel?;
+
+          return MultiBlocProvider(
+            providers: [
+              if (mediaBloc != null) BlocProvider.value(value: mediaBloc),
+              if (profileBloc != null) BlocProvider.value(value: profileBloc),
+            ],
+            child: ChooseAvatarPage(user: user),
+          );
+        },
+      ),
+
       GoRoute(
         name: PathName.cameraPage,
         path: AppPath.cameraPage,

@@ -239,8 +239,8 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
       var url = ApiEndPoints.PROFILE1;
       final params = {
         "username": event.user.username,
-        "email": event.user.email,
-        "avatar_url": event.user.avatar,
+        "email": event.user.email ?? 'test@gmail.com',
+        "avatar_url": event.avatar == null ? event.user.avatar : null,
         "status": event.user.status,
         "full_name": event.user.fullname,
         "gender": event.user.gender,
@@ -248,7 +248,19 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
         "bio": event.user.bio,
       };
       print(params);
-      ApiResponse res = await ApiUtil.put(url, params);
+      var res;
+      if (event.avatar != null) {
+        res =
+            await ApiUtil.putV2(
+                  url,
+                  data: params,
+                  files: [event.avatar!],
+                  isFormData: true,
+                )
+                as ApiResponse;
+      } else {
+        res = await ApiUtil.put(url, params) as ApiResponse;
+      }
       if (res.statusCode == 200) {
         final user = UserModel.fromJson(res.body['data']);
         await AppStorage.clearUser();

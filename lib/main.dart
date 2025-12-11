@@ -11,7 +11,7 @@ import 'main/router/router_config.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 late List<CameraDescription> cameras;
-
+final ValueNotifier<bool> refreshNotifier = ValueNotifier(false);
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   cameras = await availableCameras();

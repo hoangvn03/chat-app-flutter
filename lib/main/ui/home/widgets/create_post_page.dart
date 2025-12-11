@@ -95,9 +95,10 @@ class _CreatePostPageState extends State<CreatePostPage> {
                             return GestureDetector(
                               onTap: () async {
                                 if (state is MediaPickedSuccess) {
-                                  final listFile = await convertAssetEntitiesToFiles(
-                                    state.selectedAsset!,
-                                  );
+                                  final listFile =
+                                      await convertAssetEntitiesToFiles(
+                                        state.selectedAsset!,
+                                      );
                                   state.selectedAsset![0].type ==
                                           AssetType.video
                                       ? context.pushNamed(
@@ -137,7 +138,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
                     child: Container(
                       color: AppColors.black,
                       height: height * 0.5,
-                      child: MediaGridView(isHideListChooseMedia: true),
+                      child: MediaGridView(isHideListChooseMedia: false),
                     ),
                   ),
                   // MediaHeaderOption - có thể điều chỉnh vị trí

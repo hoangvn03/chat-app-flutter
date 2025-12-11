@@ -29,6 +29,7 @@ class AppPath {
   static const String editProfilePage = "/editProfilePage";
   static const String editVideoPage = "/editVideoPage";
   static const String uploadVideo= "/uploadVideo";
+  static const String chooseAvatarPage= "/chooseAvatarPage";
 
   ///context.gp(AppPath.homePage)
 }
@@ -64,6 +65,7 @@ class PathName {
   static const String editProfilePage = "editProfilePage";
   static const String editVideoPage = "editVideoPage";
   static const String uploadVideo = "uploadVideo";
+  static const String chooseAvatarPage = "chooseAvatarPage";
 
   ///context.goNamed(PathName.homePage)
 }

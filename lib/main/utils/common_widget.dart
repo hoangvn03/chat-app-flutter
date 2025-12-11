@@ -321,12 +321,7 @@ Widget userNote({String? img, String? note, String? subTitle}) {
                 img != null
                     ? Container(
                       color: AppColors.gray20,
-                      child: SvgPicture.network(
-                        img,
-                        width: 68,
-                        height: 68,
-                        fit: BoxFit.cover,
-                      ),
+                      child: buildNetworkImage(img, 68),
                     )
                     : Image.asset(
                       img ?? AppImages.imgAvatarDefault,
@@ -580,12 +575,13 @@ Widget groupUserAvatar({
               border: Border.all(color: Colors.white, width: 1.5),
             ),
             child: ClipOval(
-              child: SvgPicture.network(
-                images[index],
-                fit: BoxFit.cover,
-                width: avatarSize,
-                height: avatarSize,
-              ),
+              child: buildNetworkImage(images[index], avatarSize),
+              // SvgPicture.network(
+              //   images[index],
+              //   fit: BoxFit.cover,
+              //   width: avatarSize,
+              //   height: avatarSize,
+              // ),
             ),
           ),
         );
@@ -895,4 +891,32 @@ Widget resultDialog({
       ],
     ),
   );
+}
+
+Widget buildNetworkImage(String img, double size) {
+  final uri = Uri.parse(img);
+  final path = uri.path; // /7.x/avataaars/svg
+  final ext = path.split('/').last.toLowerCase(); // "svg"
+  if (ext == 'svg') {
+    return SvgPicture.network(
+      img,
+      width: size,
+      height: size,
+      fit: BoxFit.cover,
+      placeholderBuilder:
+          (context) =>
+              Container(width: size, height: size, color: Colors.grey[200]),
+    );
+  } else {
+    return CachedNetworkImage(
+      imageUrl: img,
+      width: size,
+      height: size,
+      fit: BoxFit.cover,
+      placeholder:
+          (context, url) =>
+              Container(width: size, height: size, color: Colors.grey[200]),
+      errorWidget: (context, url, error) => const Icon(Icons.error),
+    );
+  }
 }

@@ -267,16 +267,24 @@ class _HomePageState extends State<HomePage> {
                               ),
                               child: Center(
                                 child: ClipOval(
-                                  child: SvgPicture.network(
+                                  child: buildNetworkImage(
                                     state is HomeSuccess &&
                                             state.user != null &&
                                             state.user!.avatar != null
                                         ? state.user!.avatar!
                                         : 'https://api.dicebear.com/7.x/avataaars/svg?seed=Alice',
-                                    width: 72,
-                                    height: 72,
-                                    fit: BoxFit.cover,
+                                    72,
                                   ),
+                                  // SvgPicture.network(
+                                  //   state is HomeSuccess &&
+                                  //           state.user != null &&
+                                  //           state.user!.avatar != null
+                                  //       ? state.user!.avatar!
+                                  //       : 'https://api.dicebear.com/7.x/avataaars/svg?seed=Alice',
+                                  //   width: 72,
+                                  //   height: 72,
+                                  //   fit: BoxFit.cover,
+                                  // ),
                                 ),
                               ),
                             ),

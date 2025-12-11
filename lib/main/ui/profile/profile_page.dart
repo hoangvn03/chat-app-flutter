@@ -646,18 +646,24 @@ class _ProfilePageState extends State<ProfilePage>
                   borderRadius: BorderRadius.circular(100),
                   child:
                       (user.avatar != null)
-                          ? SvgPicture.network(
+                          ? buildNetworkImage(
                             (isCurrientUser)
                                 ? widget.user!.avatar!
                                 : user!.avatar!,
-                            fit: BoxFit.cover,
-                            placeholderBuilder:
-                                (context) => Center(
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                  ),
-                                ),
+                            86,
                           )
+                          // SvgPicture.network(
+                          //   (isCurrientUser)
+                          //       ? widget.user!.avatar!
+                          //       : user!.avatar!,
+                          //   fit: BoxFit.cover,
+                          //   placeholderBuilder:
+                          //       (context) => Center(
+                          //         child: CircularProgressIndicator(
+                          //           strokeWidth: 2,
+                          //         ),
+                          //       ),
+                          // )
                           : Image.asset(
                             AppImages.imgAvatarDefault,
                             fit: BoxFit.cover,
@@ -1081,7 +1087,7 @@ class _ProfilePageState extends State<ProfilePage>
                     ),
                     onTap: () {
                       if (state is ProfileSuccess) {
-                        context.pushNamed(
+                        context.goNamed(
                           PathName.editProfilePage,
                           extra: state.user,
                         );
@@ -1569,4 +1575,3 @@ class SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
     return false;
   }
 }
-

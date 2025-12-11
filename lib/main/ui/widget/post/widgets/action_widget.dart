@@ -130,16 +130,22 @@ class _CommentWidgetState extends State<CommentWidget> {
               child: Row(
                 children: [
                   ClipOval(
-                    child: SvgPicture.network(
-                      'https://api.dicebear.com/7.x/avataaars/svg?seed=Alice',
-                      width: 42,
-                      height: 42,
-                      fit: BoxFit.cover,
-                      placeholderBuilder:
-                          (context) => const Center(
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          ),
+                    child: buildNetworkImage(
+                      widget.postModel.author?.avatar ??
+                          'https://api.dicebear.com/7.x/avataaars/svg?seed=Alice',
+                      42,
                     ),
+
+                    // child: SvgPicture.network(
+                    //   'https://api.dicebear.com/7.x/avataaars/svg?seed=Alice',
+                    //   width: 42,
+                    //   height: 42,
+                    //   fit: BoxFit.cover,
+                    //   placeholderBuilder:
+                    //       (context) => const Center(
+                    //         child: CircularProgressIndicator(strokeWidth: 2),
+                    //       ),
+                    // ),
                   ),
                   const SizedBox(width: 12),
 
@@ -234,16 +240,21 @@ class _CommentWidgetState extends State<CommentWidget> {
             children: [
               // Avatar
               ClipOval(
-                child: SvgPicture.network(
-                  item.commenter?.avatar ?? '',
-                  width: 42,
-                  height: 42,
-                  fit: BoxFit.cover,
-                  placeholderBuilder:
-                      (context) => const Center(
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      ),
+                child: buildNetworkImage(
+                  item.commenter?.avatar ??
+                      'https://api.dicebear.com/7.x/avataaars/svg?seed=Alice',
+                  42,
                 ),
+                // child: SvgPicture.network(
+                //   item.commenter?.avatar ?? '',
+                //   width: 42,
+                //   height: 42,
+                //   fit: BoxFit.cover,
+                //   placeholderBuilder:
+                //       (context) => const Center(
+                //         child: CircularProgressIndicator(strokeWidth: 2),
+                //       ),
+                // ),
               ),
               const SizedBox(width: 8),
 

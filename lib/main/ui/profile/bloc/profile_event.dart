@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:chat_app/main/networks/model/user.dart';
 import 'package:flutter/material.dart';
 
@@ -18,7 +20,8 @@ class ClearStrogeUser extends ProfileEvent {
 }
 class EditProfile extends ProfileEvent {
   final UserModel user;
-  EditProfile(this.user);
+  final File? avatar;
+  EditProfile({required this.user, this.avatar});
 }
 
 class UpdateUser extends ProfileEvent {

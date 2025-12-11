@@ -87,6 +87,32 @@ class UserModel {
       'gender': gender, // ⭐ Gửi gender lên API
     };
   }
+
+  UserModel copyWith({
+    int? id,
+    String? username,
+    String? fullname,
+    bool? isPrivate,
+    String? bio,
+    String? email,
+    String? avatar,
+    String? status,
+    String? createdAt,
+    String? gender,
+  }) {
+    return UserModel(
+      id: id ?? this.id,
+      username: username ?? this.username,
+      fullname: fullname ?? this.fullname,
+      isPrivate: isPrivate ?? this.isPrivate,
+      bio: bio ?? this.bio,
+      email: email ?? this.email,
+      avatar: avatar ?? this.avatar,
+      status: status ?? this.status,
+      createdAt: createdAt ?? this.createdAt,
+      gender: gender ?? this.gender,
+    );
+  }
 }
 
 class UserContact {
