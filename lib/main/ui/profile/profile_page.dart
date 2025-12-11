@@ -328,6 +328,7 @@ class _ProfilePageState extends State<ProfilePage>
                             state.stats,
                             isCurrientUser,
                             state.conversationId,
+                            state.numFollowing,
                             state.posts?.length ?? 0,
                             state.hasFollow,
                           ),
@@ -626,10 +627,11 @@ class _ProfilePageState extends State<ProfilePage>
     Stats? stats,
     bool isCurrientUser,
     int? converationId,
+    int? numFollowing,
     int numPost,
     bool hasFollow,
   ) {
-    print('object: $hasFollow');
+    print('Follow - numFollowing: $numFollowing');
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -696,7 +698,7 @@ class _ProfilePageState extends State<ProfilePage>
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                '${stats != null ? stats.followers : 0}',
+                                '${numFollowing ?? (stats != null ? stats.followers : 0)}',
                                 style: AppStyles.title3Bold,
                               ),
                               Text(
@@ -1567,3 +1569,4 @@ class SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
     return false;
   }
 }
+

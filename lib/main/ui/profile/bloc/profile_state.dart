@@ -1,3 +1,4 @@
+import 'package:chat_app/main/networks/model/contact_user.dart';
 import 'package:chat_app/main/networks/model/converation.dart';
 import 'package:chat_app/main/networks/model/post.dart';
 import 'package:chat_app/main/networks/model/profile_model.dart';
@@ -13,10 +14,12 @@ class ProfileSuccess extends ProfileState {
   final List<PostChild>? posts;
   final List<UserModel>? suggestUsers;
   final List<UserModel>? usersContatct;
-  final List<UserModel>? userFollowing;
+  final List<UserModel>? friendContact;
+  final List<ContactUser>? userFollowing;
   final int? conversationId;
   final Conversation? conversation;
   final bool hasFollow;
+  final int? numFollowing;
 
   ProfileSuccess({
     required this.user,
@@ -25,9 +28,11 @@ class ProfileSuccess extends ProfileState {
     this.posts,
     this.suggestUsers,
     this.userFollowing,
+    this.friendContact,
     this.usersContatct,
     this.conversationId,
     this.conversation,
+    this.numFollowing,
     this.hasFollow = false
   });
 
@@ -37,10 +42,12 @@ class ProfileSuccess extends ProfileState {
     List<ReelModel>? reels,
     List<PostChild>? posts,
     List<UserModel>? suggestUsers,
+    List<UserModel>? friendContact,
     List<UserModel>? usersContatct,
-    List<UserModel>? userFollowing,
+    List<ContactUser>? userFollowing,
     int? conversationId,
     Conversation? conversation,
+    int? numFollowing,
     bool? hasFollow
   }) {
     return ProfileSuccess(
@@ -50,9 +57,11 @@ class ProfileSuccess extends ProfileState {
       posts: posts ?? this.posts,
       suggestUsers: suggestUsers ?? this.suggestUsers,
       usersContatct: usersContatct ?? this.usersContatct,
+      friendContact: friendContact ?? this.friendContact,
       userFollowing: userFollowing ?? this.userFollowing,
       conversationId: conversationId ?? this.conversationId,
       conversation: conversation ?? this.conversation,
+      numFollowing: numFollowing ?? this.numFollowing,
       hasFollow: hasFollow ?? this.hasFollow,
     );
   }

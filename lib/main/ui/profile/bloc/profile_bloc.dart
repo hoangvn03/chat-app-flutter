@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:chat_app/main/networks/api_end_point.dart';
+import 'package:chat_app/main/networks/model/contact_user.dart';
 import 'package:chat_app/main/networks/model/converation.dart';
 import 'package:chat_app/main/networks/model/post.dart';
 import 'package:chat_app/main/networks/model/profile_model.dart';
@@ -91,7 +92,11 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
       final url = '${ApiEndPoints.PROFILE}/contacts/${event.id}';
       ApiResponse res = await ApiUtil.delete(url);
       if (res.statusCode == 200) {
-        emit(currentState.copyWith(hasFollow: false));
+        final numFollowing = res.body['follower_count'];
+        print('NumFollowing: $numFollowing');
+        emit(
+          currentState.copyWith(hasFollow: false, numFollowing: numFollowing),
+        );
       } else {
         emit(currentState.copyWith(hasFollow: true));
       }
@@ -99,7 +104,11 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
       final url = '${ApiEndPoints.PROFILE}/contacts/${event.id}';
       ApiResponse res = await ApiUtil.post(url: url);
       if (res.statusCode == 201) {
-        emit(currentState.copyWith(hasFollow: true));
+        final numFollowing = res.body['follower_count'];
+        print('NumFollowing: $numFollowing');
+        emit(
+          currentState.copyWith(hasFollow: true, numFollowing: numFollowing),
+        );
       } else {
         emit(currentState.copyWith(hasFollow: false));
       }
@@ -114,10 +123,8 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
       var url = '${ApiEndPoints.USERS}/${event.id}';
       ApiResponse res = await ApiUtil.get(url);
       if (res.statusCode == 200) {
-        final user = UserModel.fromJson(res.body['data']['user']);
-        final converationId = res.body['data']['conversation_id'];
-        final isFollowing = res.body['data']['is_following'];
-        var url1 = '${ApiEndPoints.LOADPOST}/user/${user.id}';
+        final profileResponse = ProfileResponse.fromJson(res.body);
+        var url1 = '${ApiEndPoints.LOADPOST}/user/${profileResponse.user.id}';
         var params = {'page': '1', 'limit': '24'};
         ApiResponse res1 = await ApiUtil.get(url1, params: params);
 
@@ -128,16 +135,17 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
                   .toList();
           emit(
             ProfileSuccess(
-              user: user,
-              conversationId: converationId,
+              user: profileResponse.user,
+              conversationId: profileResponse.conversationId,
               posts: posts,
-              hasFollow: isFollowing,
+              stats: profileResponse.stats,
+              hasFollow: profileResponse.isFollowing,
             ),
           );
         }
       }
     } catch (e) {
-      emit(ProfileFailure());
+      emit(ProfileFailure(erroMessage: e.toString()));
     }
     return;
   }
@@ -185,16 +193,25 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     Emitter<ProfileState> emit,
   ) async {
     try {
-      var following, suggestUsers;
-      var url = '${ApiEndPoints.USERS}/friends';
+      var following, suggestUsers, friendContact;
+      var url = '${ApiEndPoints.USERS}/followers';
       var params = {'page': '1', 'limit': '20'};
       ApiResponse res = await ApiUtil.get(url, params: params);
-      var url1 = '${ApiEndPoints.USERS}/followers';
+      var url1 = '${ApiEndPoints.USERS}/me/contacts';
       var params1 = {'page': '1', 'limit': '20'};
-      ApiResponse res2 = await ApiUtil.get(url1, params: params1);
+      ApiResponse res1 = await ApiUtil.get(url1, params: params1);
+      var url2 = '${ApiEndPoints.USERS}/friends';
+      var params2 = {'page': '1', 'limit': '20'};
+      ApiResponse res2 = await ApiUtil.get(url2, params: params2);
       if (res2.statusCode == 200) {
+        friendContact =
+            (res2.body as List).map((e) => UserModel.fromJson(e)).toList();
+      }
+      if (res1.statusCode == 200) {
         following =
-            (res.body as List).map((e) => UserModel.fromJson(e)).toList();
+            (res1.body['data'] as List)
+                .map((e) => ContactUser.fromJson(e))
+                .toList();
       }
       if (res.statusCode == 200) {
         suggestUsers =
@@ -204,11 +221,12 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
         ProfileSuccess(
           usersContatct: suggestUsers,
           userFollowing: following,
+          friendContact: friendContact,
           user: event.user,
         ),
       );
     } catch (e) {
-      emit(ProfileFailure());
+      emit(ProfileFailure(erroMessage: e.toString()));
     }
     return;
   }

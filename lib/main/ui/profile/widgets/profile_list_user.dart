@@ -36,7 +36,7 @@ class _ProfileListFollowerPageState extends State<ProfileListFollowerPage>
   void initState() {
     super.initState();
     _tabController = TabController(
-      length: 3,
+      length: 4,
       vsync: this,
       initialIndex: widget.index, // <<< SET INDEX BAN ĐẦU
     );
@@ -91,6 +91,10 @@ class _ProfileListFollowerPageState extends State<ProfileListFollowerPage>
                         text:
                             'Đang theo dõi ${state is ProfileSuccess && state.userFollowing != null ? '(${state.userFollowing!.length})' : ''}',
                       ),
+                      Tab(
+                        text:
+                            'Bạn bè ${state is ProfileSuccess && state.friendContact != null ? '(${state.friendContact!.length})' : ''}',
+                      ),
                       Tab(text: 'Dành cho bạn'),
                     ],
                   ),
@@ -143,20 +147,15 @@ class _ProfileListFollowerPageState extends State<ProfileListFollowerPage>
 
                         state is ProfileSuccess && state.userFollowing != null
                             ? ListView.builder(
-                              itemCount:
-                                  state.userFollowing!.length +
-                                  2, // +2: 1 cho SizedBox, 1 cho AccountSuggestWidget
+                              itemCount: state.userFollowing!.length + 2,
                               itemBuilder: (context, index) {
                                 if (index < state.userFollowing!.length) {
-                                  // render từng follower item
                                   final user = state.userFollowing![index];
-                                  return _buildFollowerItem(user);
+                                  return _buildFollowerItem(user.friend!);
                                 } else if (index ==
                                     state.userFollowing!.length) {
-                                  // SizedBox giữa
                                   return const SizedBox(height: 10);
                                 } else {
-                                  // AccountSuggestWidget ở cuối
                                   return AccountSuggestWidget(
                                     isHorirontal: false,
                                   );
@@ -164,6 +163,26 @@ class _ProfileListFollowerPageState extends State<ProfileListFollowerPage>
                               },
                             )
                             : Center(child: CircularProgressIndicator()),
+
+                        state is ProfileSuccess && state.friendContact != null
+                            ? ListView.builder(
+                              itemCount: state.friendContact!.length + 2,
+                              itemBuilder: (context, index) {
+                                if (index < state.friendContact!.length) {
+                                  final user = state.friendContact![index];
+                                  return _buildFollowerItem(user);
+                                } else if (index ==
+                                    state.friendContact!.length) {
+                                  return const SizedBox(height: 10);
+                                } else {
+                                  return AccountSuggestWidget(
+                                    isHorirontal: false,
+                                  );
+                                }
+                              },
+                            )
+                            : Center(child: CircularProgressIndicator()),
+
                         state is ProfileSuccess && state.suggestUsers != null
                             ? ListView.builder(
                               itemCount:

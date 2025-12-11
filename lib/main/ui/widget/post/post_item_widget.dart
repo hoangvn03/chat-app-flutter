@@ -27,8 +27,9 @@ import 'package:go_router/go_router.dart';
 
 // ignore: must_be_immutable
 class PostWidget extends StatelessWidget {
-  PostWidget({super.key, required this.post});
+  PostWidget({super.key, required this.post, required this.userId});
   PostModel post;
+  int userId;
   final TextEditingController _commetController = TextEditingController();
   @override
   Widget build(BuildContext context) {
@@ -49,7 +50,11 @@ class PostWidget extends StatelessWidget {
               ),
               titleWidget: GestureDetector(
                 onTap: () {
-                  context.pushNamed(PathName.profilePage, extra: post.author);
+                  if (post.author?.id == userId) {
+                    context.pushNamed(PathName.personalPage);
+                  } else {
+                    context.pushNamed(PathName.profilePage, extra: post.author);
+                  }
                 },
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -242,7 +247,7 @@ class PostWidget extends StatelessWidget {
                       ),
                     ),
                     builder: (context) {
-                      return ShareBottomSheet(mediaItem: post.media ?? [],);
+                      return ShareBottomSheet(mediaItem: post.media ?? []);
                     },
                   );
                 },

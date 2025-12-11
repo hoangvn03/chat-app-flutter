@@ -110,44 +110,49 @@ class _EditProfilePageState extends State<EditProfilePage> {
             child: Column(
               children: [
                 // Ảnh đại diện
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(40),
-                      child: Container(
-                        width: 80,
-                        height: 80,
-                        color: AppColors.gray20, // nền xám
-                        child: SvgPicture.network(
-                          widget.user.avatar ??
-                              'https://www.svgrepo.com/show/170523/user-profile.svg',
+                InkWell(
+                  onTap: () {
+                    showAvatarBottomSheet(context);
+                  },
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(40),
+                        child: Container(
                           width: 80,
                           height: 80,
-                          fit: BoxFit.cover,
-                          placeholderBuilder:
-                              (context) => const Center(
-                                child: Icon(
-                                  Icons.person_outline,
-                                  size: 40,
-                                  color: AppColors.gray30,
+                          color: AppColors.gray20, // nền xám
+                          child: SvgPicture.network(
+                            widget.user.avatar ??
+                                'https://www.svgrepo.com/show/170523/user-profile.svg',
+                            width: 80,
+                            height: 80,
+                            fit: BoxFit.cover,
+                            placeholderBuilder:
+                                (context) => const Center(
+                                  child: Icon(
+                                    Icons.person_outline,
+                                    size: 40,
+                                    color: AppColors.gray30,
+                                  ),
                                 ),
-                              ),
+                          ),
                         ),
                       ),
-                    ),
 
-                    const SizedBox(width: 16),
-                    const CircleAvatar(
-                      radius: 40,
-                      backgroundColor: Color(0xFFEFEFEF),
-                      child: Icon(
-                        Icons.person_outline,
-                        size: 40,
-                        color: Colors.grey,
+                      const SizedBox(width: 16),
+                      const CircleAvatar(
+                        radius: 40,
+                        backgroundColor: Color(0xFFEFEFEF),
+                        child: Icon(
+                          Icons.person_outline,
+                          size: 40,
+                          color: Colors.grey,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
                 const SizedBox(height: 12),
                 GestureDetector(
@@ -252,6 +257,101 @@ class _EditProfilePageState extends State<EditProfilePage> {
           DropdownMenuItem(value: "Khác", child: Text("Khác")),
         ],
         onChanged: (val) => setState(() => gender = val!),
+      ),
+    );
+  }
+
+  void showAvatarBottomSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[400],
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              Row(
+                children: const [
+                  CircleAvatar(
+                    radius: 22,
+                    backgroundImage: AssetImage('assets/avatar.jpg'),
+                  ),
+                  SizedBox(width: 12),
+                  Text(
+                    "Ảnh đại diện của bạn",
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 24),
+
+              _item(Icons.photo, "Chọn từ thư viện", onTap: () {
+                
+              }),
+              _item(Icons.facebook, "Nhập từ Facebook", onTap: () {}),
+              _item(Icons.camera_alt, "Chụp ảnh", onTap: () {}),
+
+              const SizedBox(height: 4),
+
+              _item(Icons.delete, "Xóa", color: Colors.red, onTap: () {}),
+
+              const SizedBox(height: 16),
+
+              const Text(
+                "Ảnh đại diện cùng avatar của bạn hiển thị với mọi người ở trên và ngoài Instagram.",
+                style: TextStyle(fontSize: 13, color: Colors.grey),
+              ),
+              const SizedBox(height: 6),
+              const Text(
+                "Tìm hiểu thêm",
+                style: TextStyle(fontSize: 13, color: Colors.blue),
+              ),
+              const SizedBox(height: 10),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _item(
+    IconData icon,
+    String text, {
+    Color? color,
+    VoidCallback? onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        child: Row(
+          children: [
+            Icon(icon, size: 22, color: color ?? Colors.black),
+            const SizedBox(width: 12),
+            Text(
+              text,
+              style: TextStyle(fontSize: 16, color: color ?? Colors.black),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -348,7 +348,7 @@ class _HomePageState extends State<HomePage> {
 
         // Nếu đang loading, các index thực tế bắt đầu từ 1
         final postIndex = state.isLoading ? index - 1 : index;
-        return PostWidget(post: posts[postIndex]);
+        return PostWidget(post: posts[postIndex], userId: state.user!.id);
       },
     );
   }

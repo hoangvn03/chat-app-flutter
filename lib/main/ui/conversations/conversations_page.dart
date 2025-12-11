@@ -234,6 +234,10 @@ class _ChatPageState extends State<ChatPage> {
       final firstPart = conversation.lastMessage!.content.split("|")[0].trim();
       if (firstPart.isNotEmpty) {
         contentMedia = firstPart;
+      } else {
+        final secondPart =
+            conversation.lastMessage!.content.split("|")[1].trim();
+        contentMedia = secondPart;
       }
     }
 
