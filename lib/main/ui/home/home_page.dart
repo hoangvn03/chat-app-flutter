@@ -34,11 +34,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider<HomeBloc>(
-          create:
-              (_) =>
-                  HomeBloc()..add(LoadRequest()),
-        ),
+        BlocProvider<HomeBloc>(create: (_) => HomeBloc()..add(LoadRequest())),
       ],
       child: BlocListener<HomeBloc, HomeState>(
         listener: (context, state) {

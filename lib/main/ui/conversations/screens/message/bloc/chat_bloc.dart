@@ -61,6 +61,8 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   ) async {
     try {
       await socketService.initSocket();
+      socketService.connect();
+
       final url =
           '${ApiEndPoints.GETMESSAGE}/${event.conversation.conversationId}';
       final res = await ApiUtil.get(url);

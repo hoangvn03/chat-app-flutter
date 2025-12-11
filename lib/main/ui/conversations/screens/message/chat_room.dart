@@ -501,7 +501,7 @@ class _ChatRoomState extends State<ChatRoom> {
                       AppColors.purple80,
                       AppColors.purple60,
                     ]
-                    : [AppColors.gray30, AppColors.gray40],
+                    : [AppColors.gray30, AppColors.gray30],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),

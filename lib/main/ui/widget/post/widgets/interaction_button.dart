@@ -21,7 +21,7 @@ Widget interactionButton({
   TextStyle? textStyle,
   InteractionType? type,
   bool hasFollow = false,
-  dynamic data
+  dynamic data,
 }) {
   return BlocProvider(
     create: (_) => InteractionCubit(),
@@ -43,8 +43,7 @@ Widget interactionButton({
                   colorBorder: colorBorder,
                   text: 'Đang theo dõi',
                   onTap: () {
-                    cubit.toggleFollow1(data 
-                    as int);
+                    cubit.toggleFollow1(data as int);
                   },
                   radius: 6,
                 )

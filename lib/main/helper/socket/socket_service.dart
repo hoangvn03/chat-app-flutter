@@ -15,30 +15,30 @@ class SocketService {
 
   bool get isConnected => _socket.connected;
 
-  Future<void> initSocket() async {
+Future<void> initSocket() async {
     final token = await AppStorage.getToken();
     print('Socket Token: $token');
 
-    // 1. Tạo options map bằng Builder
-    Map<String, dynamic> options =
-        IO.OptionBuilder()
-            .setTransports(['websocket'])
-            .disableAutoConnect()
-            .setExtraHeaders({"Authorization": "Bearer $token"})
-            .setAuth({'token': token})
-            .build();
-
-    // 2. Thêm thủ công tùy chọn forceNew vào Map
-    options['forceNew'] = true;
-
-    // 3. Truyền options đã sửa vào IO.io
+    Map<String, dynamic> options = IO.OptionBuilder()
+        .setTransports(['websocket'])
+        .disableAutoConnect()
+        .setExtraHeaders({"Authorization": "Bearer $token"})
+        .setAuth({'token': token})
+        .build();
+    options['forceNew'] = true; 
+    _socket = IO.io(
+      ApiEndPoints.DOMAIN,
+      options,
+    );
     _socket = IO.io(ApiEndPoints.DOMAIN, options);
-
-    _socket!.connect();
-  }
+}
 
   IO.Socket get socket => _socket;
-
+  void connect() {
+    if (!_socket.connected) {
+      _socket.connect();
+    }
+  }
   /// Gửi tin nhắn
   void sendMessage(dynamic params) {
     if (!isConnected) {
@@ -115,7 +115,7 @@ class SocketService {
   /// Ngắt kết nối
   void disconnect() {
     _socket.disconnect();
-    _socket.emit('disconnect');
+    _socket.emit('disconnect',);
 
     // _connectionController.add(false);
     log('🔌 Socket disconnected manually');

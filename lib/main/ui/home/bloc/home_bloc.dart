@@ -23,25 +23,16 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     on<CreatePost>(_createPost);
     on<AddNewPost>(_addPost);
   }
-  UserModel user = UserModel(id: 999);
   final List<PostModel> _posts = [];
   Future<void> _loadRequest(LoadRequest event, Emitter<HomeState> emit) async {
     try {
       emit(HomeLoading());
-      await socketService.initSocket();
       var url = ApiEndPoints.LOADPOST;
       final param = {'page': '1', 'limit': '10'};
-      socketService.updateUserStatus(StatusUser.online.name);
-      socketService.socket.on('unread_notifications_count', (data) {
-        print("Noti Gui :$data['count]");
-        final num = data['count'] as int;
-        add(GetNotificationCount(num));
-      });
-      socketService.socket.on('status_updated', (data) {
-        add(UpdateStatusUsers(isInit: false, status: data['status']));
-      });
+      int num = 0;
       final user = await AppStorage.getUser();
       ApiResponse res = await ApiUtil.get(url, params: param);
+
       if (res.statusCode == 200) {
         final test =
             (res.body['data']['posts'] as List)
@@ -49,8 +40,18 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
                 .toList();
         _posts.addAll(test);
       }
-
-      emit(HomeSuccess(reels: [], posts: _posts, user: user));
+      await socketService.initSocket();
+      socketService.socket.on('unread_notifications_count', (data) {
+        print("Noti Gui :${data['count']}");
+        num = data['count'] as int;
+        add(GetNotificationCount(num));
+      });
+      socketService.socket.on('status_updated', (data) {
+        add(UpdateStatusUsers(isInit: false, status: data['status']));
+      });
+      socketService.connect();
+      socketService.updateUserStatus(StatusUser.online.name);
+      emit(HomeSuccess(reels: [], posts: _posts, user: user, numNoti: num));
     } catch (e) {
       emit(HomeFailure(errorMessage: e.toString()));
     }

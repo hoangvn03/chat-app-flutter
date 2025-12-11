@@ -858,7 +858,7 @@ Widget resultDialog({
               ),
               const SizedBox(height: 16),
               const DottedLine(
-                dashColor: Color(0xFFE3EAF2),
+                dashColor: AppColors.gray40,
                 dashGapLength: 3,
                 dashLength: 4,
               ),
